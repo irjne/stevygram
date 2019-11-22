@@ -38,56 +38,33 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var util_1 = require("util");
 var fs = require("fs");
-/*const readFile = promisify(fs.readFile);
-async function promisedReadFile () {
-    try {
-      const file = await readFile('info.json', 'utf-8');
-      return file;
-    }
-    catch (err) {
-       console.error(err);
-       return;
-    }
-}
-
-const writeFile = promisify(fs.writeFile);
-async function promisedWriteFile() {
-    try {
-        const file = await writeFile('info.json', 'utf-8');
-    }
-    catch (err) {
-        console.log(err);
-    }
-}
-
-let users: Array<User> = [];
-promisedReadFile().then(item => {
-    users = JSON.parse(item ? item : "[]") as Array<User>;
-});*/
+/*export interface User {
+    nickname: string,
+    name: string,
+    surname: string,
+    phone: string
+}*/
 exports.addUser = function (nickname, name, surname, phone) {
     var obj = {
         users: Array()
     };
     (function () { return __awaiter(void 0, void 0, void 0, function () {
-        var readFile, info, json, writeFile, file, err_1;
+        var readFile, users, json, writeFile, file, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 3, , 4]);
-                    console.log("hello");
                     readFile = util_1.promisify(fs.readFile);
-                    return [4 /*yield*/, readFile('info.json', 'utf-8')];
+                    return [4 /*yield*/, readFile('users.json', 'utf-8')];
                 case 1:
-                    info = _a.sent();
-                    obj = JSON.parse(info);
+                    users = _a.sent();
+                    obj = JSON.parse(users);
                     obj.users.push({ nickname: nickname, name: name, surname: surname, phone: phone });
                     json = JSON.stringify(obj);
                     writeFile = util_1.promisify(fs.writeFile);
-                    return [4 /*yield*/, writeFile('info.json', json, 'utf-8')];
+                    return [4 /*yield*/, writeFile('users.json', json, 'utf-8')];
                 case 2:
                     file = _a.sent();
-                    console.log(obj, json);
-                    console.log("goobye");
                     return [3 /*break*/, 4];
                 case 3:
                     err_1 = _a.sent();
@@ -98,4 +75,40 @@ exports.addUser = function (nickname, name, surname, phone) {
         });
     }); })();
 };
+exports.addChat = function (name, description) { };
+exports.getAllChats = function () { };
+exports.getAllUsers = function () { };
+exports.getUsersByChatId = function (id) {
+    var obj = {
+        users: Array()
+    };
+    (function () { return __awaiter(void 0, void 0, void 0, function () {
+        var readFile, users, err_2;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    readFile = util_1.promisify(fs.readFile);
+                    return [4 /*yield*/, readFile('chats.json', 'utf-8')];
+                case 1:
+                    users = _a.sent();
+                    obj = JSON.parse(users);
+                    console.log(obj.users);
+                    return [3 /*break*/, 3];
+                case 2:
+                    err_2 = _a.sent();
+                    console.error(err_2);
+                    return [3 /*break*/, 3];
+                case 3: return [2 /*return*/];
+            }
+        });
+    }); })();
+};
+exports.getInfoByChatId = function (id) { };
+exports.getMessagesByChatId = function (id) { };
+exports.changeInfoByChatId = function (id, name, description) { };
+exports.changeUserByPhone = function (nickname, name, surname, phone) { };
+exports.removeChatById = function (id) { };
+exports.removeUserByPhone = function (phone) { };
 exports.addUser("MainframeTv", "Gabriele", "Connelli", "+393482523775");
+//getUsersByChatId(2);

@@ -1,5 +1,6 @@
 import express from 'express';
-//TODO riga dove importare index.ts e tutte le classe con il require
+import * as stevygram from '../index';
+
 const router = express.Router();
 
 //Cluster: /chats
@@ -7,25 +8,25 @@ const router = express.Router();
 //GET
 //- url: /, stampa tutte le chat
 router.get('/', (req, res) => {
-    res.json(stevyGram.getAllChats());
+    res.json(stevygram.getAllChats());
 }) 
 
 //- url: /:id/users, stampa tutti gli utenti di una chat;
 router.get('/:id/users', (req, res) => {
     let id = req.params.id;
-    res.json(stevyGram.getUsersByChatId(id));
+    res.json(stevygram.getUsersByChatId(id));
 }) 
 
 //- url: /:id, stampa tutti i dati di una chat;
 router.get('/:id', (req, res) => {
     let id = req.params.id;
-    res.json(stevyGram.getAllInfoByChatId(id));
+    res.json(stevygram.getAllInfoByChatId(id));
 })
 
 // - url: /:id/messages, stampa tutti i messaggi di una chat:
 router.get('/:id/messages', (req, res) => {
     let id = req.params.id;
-    res.json(stevyGram.getAllMessagesByChatId(id));
+    res.json(stevygram.getAllMessagesByChatId(id));
 })
 
 //filter: ?word="pippo", stampa tutti i messaggi contenenti la parola; filter: ?user="id", 
@@ -39,7 +40,7 @@ router.put('/:id', (req, res) => {
     let id = req.params.id;
     let description = req.body.description;
     let name = req.body.name;
-    res.json(stevyGram.changeInfoByChatId(id, name, description));
+    res.json(stevygram.changeInfoByChatId(id, name, description));
 }) 
 
 //POST
@@ -51,19 +52,17 @@ router.post('/', (req, res) => {
     let users=[];
     users = usersTemp.split(usersTemp, ", ");
     for(let i = 0; i < users.length; i++){
-        
+        //codice mancante
     }
-    
 
-
-    res.json(stevyGram.addNewChat(name, description,  //manca il parametro users));
+    res.json(stevygram.addChat(name, description,  //manca il parametro users));
 }) 
 
 //DELETE
 //- url: /:id, cancella la chat avendo l'id.
 router.delete('/:id', (req, res) => {
     let id = req.params.id;
-    res.json(stevyGram.removeChatById(id)); 
+    res.json(stevygram.removeChatById(id)); 
 })
 
 

@@ -1,5 +1,5 @@
 //import { expect } from 'chai';
-import 'mocha';
+/*import 'mocha';
 const assert = require('assert');
 
 describe('#addMessage', () => {
@@ -24,4 +24,4 @@ describe('#addMessage', () => {
         assert.notInclude(users, sender);
         assert.equal(addMessage(message), 0);
     });
-});
+});*/

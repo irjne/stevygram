@@ -1,6 +1,5 @@
 import express from 'express';
-//TODO riga dove importare index.ts e tutte le classe con il require
-
+import * as stevygram from '../index';
 
 const router = express.Router();
 
@@ -8,7 +7,7 @@ const router = express.Router();
 //GET - url: /, stampa tutti gli utenti.
 
 router.get('/', (req, res) => {
-    res.json(stevyGram.getAllUsers());
+    res.json(stevygram.getAllUsers());
 }) 
 
 //PUT
@@ -17,8 +16,8 @@ router.put('/:phone', (req, res) => {
     let phone = req.params.phone;
     let name = req.body.name;
     let surname = req.body.surname;
-    let nickName = req.body.nickName;
-    res.json(stevyGram.changeUserByPhone(phone, name, surname, nickName));
+    let nickname = req.body.nickname;
+    res.json(stevygram.changeUserByPhone(nickname, name, surname, phone));
 }) 
 
 //POST 
@@ -26,16 +25,16 @@ router.put('/:phone', (req, res) => {
 router.post('/', (req, res) => {
     let name = req.body.name;
     let surname = req.body.surname;
-    let nickName = req.body.nickName;
+    let nickname = req.body.nickname;
     let phone = req.body.phone;
-    res.json(stevyGram.addNewUser(phone, name, surname, nickName));
+    res.json(stevygram.addUser(nickname, name, surname, phone));
 }) 
 
 //DELETE 
 //- url: /:id, cancella l'utente avendo l'id.
 router.delete(':phone', (req, res) => {
     let phone = req.params.phone;
-    res.json(stevyGram.removeUserByPhone(phone));
+    res.json(stevygram.removeUserByPhone(phone));
 
 })
 

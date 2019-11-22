@@ -34,26 +34,28 @@ export const addChat = (name: string, description: string) => {}
 
 export const getAllChats = () => {}
 export const getAllUsers = () => {}
-export const getUsersByChatId = (id: number): any => {
+export const getUsersByChatId = (id: number): string[] | any => {
     let obj = {
-        users: Array<any>()
+        chats: Array<any>()
     };
 
     (async () => {
         try {
             const readFile = promisify(fs.readFile);
-            const users = await readFile('chats.json', 'utf-8');
-            obj = JSON.parse(users);
+            const chats = await readFile('chats.json', 'utf-8');
+            obj = JSON.parse(chats);
             
-            console.log(obj.users);
+            return obj.chats[id].users;
         }
         catch (err) {
-            console.error(err);
+            return err; 
         }
     })();
 }
 
-export const getInfoByChatId = (id: number) => {}
+export const getInfoByChatId = (id: number) => {
+    //return [obj.chats[id].name, obj.chats[id].description];
+}
 export const getMessagesByChatId = (id: number) => {}
 
 export const changeInfoByChatId = (id: number, name: string, description: string) => {}
@@ -62,4 +64,4 @@ export const changeUserByPhone = (nickname: string, name: string, surname: strin
 export const removeChatById = (id: number) => {}
 export const removeUserByPhone = (phone: string) => {}
 
-//getUsersByChatId(2);
+getUsersByChatId(2);

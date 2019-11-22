@@ -80,10 +80,10 @@ exports.getAllChats = function () { };
 exports.getAllUsers = function () { };
 exports.getUsersByChatId = function (id) {
     var obj = {
-        users: Array()
+        chats: Array()
     };
     (function () { return __awaiter(void 0, void 0, void 0, function () {
-        var readFile, users, err_2;
+        var readFile, chats, err_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -91,9 +91,9 @@ exports.getUsersByChatId = function (id) {
                     readFile = util_1.promisify(fs.readFile);
                     return [4 /*yield*/, readFile('chats.json', 'utf-8')];
                 case 1:
-                    users = _a.sent();
-                    obj = JSON.parse(users);
-                    console.log(obj.users);
+                    chats = _a.sent();
+                    obj = JSON.parse(chats);
+                    console.log(obj.chats[id].users);
                     return [3 /*break*/, 3];
                 case 2:
                     err_2 = _a.sent();
@@ -110,5 +110,4 @@ exports.changeInfoByChatId = function (id, name, description) { };
 exports.changeUserByPhone = function (nickname, name, surname, phone) { };
 exports.removeChatById = function (id) { };
 exports.removeUserByPhone = function (phone) { };
-exports.addUser("MainframeTv", "Gabriele", "Connelli", "+393482523775");
-//getUsersByChatId(2);
+exports.getUsersByChatId(2);

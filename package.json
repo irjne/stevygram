@@ -5,15 +5,16 @@
   "main": "dist/index.js",
   "types": "dist",
   "scripts": {
-    "start": "npm run build; node dist/index.js",
+    "start": "npm run build; node dist/app.js",
     "build": "tsc -p .",
     "dev": "nodemon src/index.ts",
     "test": "npm run build; mocha -r ts-node/register src/test/test.ts"
   },
-  "author": "Gilletti, Giangravè, Laganà, Landolfo, Guglielmino",
+  "author": "Daria Gilletti, Giusy Giangravè, Dario Laganà, Claudio Landolfo",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "promisify-node": "^0.5.0"
   },
   "devDependencies": {
     "@types/chai": "^4.2.5",

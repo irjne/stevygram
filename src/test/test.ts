@@ -1,27 +1,24 @@
 //import { expect } from 'chai';
-/*import 'mocha';
+import 'mocha';
+import * as methods from '../index'; 
 const assert = require('assert');
 
-describe('#addMessage', () => {
-    let users = [new User("MainframeTv", "Gabriele", "Connelli", "3456789678"), new User("tano.carfi", "Gaetano", "Carfì", "3456789789")]
-    
-    it('should return 1 if it can be add a new message', () => {
-        let sender = new User("MainframeTv", "Gabriele", "Connelli", "3456789678");
-        let message = new Message(sender, "Ciao, come stai?");
+describe('#addUser', () => {
+    it('should return a string if the chat has been added', () => {
+        let result = methods.addUser("MainframeTv", "Gabriele", "Connelli", "+393482523775");
+        assert.isString(result);
+        assert.include(result, 'MainframeTv');
+    })
 
-        assert.isBoolean(addMessage(message));
-        assert.include(users, sender);
-        assert.equals(addMessage(message), 1);
-    });
+    /*it('should return an error if the chat hasn\'t been added', () => {
+        assert.isNotString(methods.addUser("MainframeTv", "Gabriele", "Connelli", "+393482523775"));
+        assert.notInclude(methods.addUser("MainframeTv", "Gabriele", "Connelli", "+393482523775"), 'MainframeTv');
+    })*/
+});
 
-    it('should return 0 if the sender doesn\'t exists', () => {
-        let sender = new User("irjne", "Daria", "Gilletti", "3456789456");
-        let message = new Message(sender, "Ciao, come stai?");
-        let isAnUser = false; 
-
-        //verifica che il sender sia un utente
-        assert.isBoolean(addMessage(message));
-        assert.notInclude(users, sender);
-        assert.equal(addMessage(message), 0);
-    });
-});*/
+describe('#getUsersByChatId', () => {
+    it('should return an array if the chat exists', () => {
+        let result = methods.getUsersByChatId(2);
+        assert.isArray(result);
+    })
+});

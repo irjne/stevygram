@@ -9,7 +9,7 @@ import { userInfo } from 'os';
     phone: string
 }*/
 
-export const addUser = (nickname: string, name: string, surname: string, phone: string): any  => {
+export const addUser = (nickname: string, name: string, surname: string, phone: string): string | any  => {
     let obj = {
         users: Array<any>()
     };
@@ -23,14 +23,17 @@ export const addUser = (nickname: string, name: string, surname: string, phone: 
             let json = JSON.stringify(obj);
             const writeFile = promisify(fs.writeFile);
             const file = await writeFile('users.json', json, 'utf-8');
+
+            return `User ${nickname} added successfully.`;
         }
         catch (err) {
             console.error(err);
+            return err;
         }
     })();
 }
 
-export const addChat = (name: string, description: string) => {}
+export const addChat = (name: string, description: string, users: string[]) => {}
 
 export const getAllChats = () => {}
 export const getAllUsers = () => {}
@@ -63,5 +66,3 @@ export const changeUserByPhone = (nickname: string, name: string, surname: strin
 
 export const removeChatById = (id: number) => {}
 export const removeUserByPhone = (phone: string) => {}
-
-getUsersByChatId(2);

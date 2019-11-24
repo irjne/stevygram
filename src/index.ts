@@ -46,35 +46,39 @@ export const addChat = (name: string, description: string, users: string[]): str
     })();
 }
 
-export const getAllChats = (): string | any => {
+export const getAllChats = () => {
     let obj = {
         chats: Array<any>()
     };
+
     (async() => {
-        const readFile = promisify(fs.readFile);
-        const chats = await readFile('chats.json', 'utf-8');
-        obj = JSON.parse(chats);
-        let array= [];
-        for (let i=0; i< chats.length; i++) {
-           // ? array.push(chats[chats[i]]);
+            try {
+                const readFile = promisify(fs.readFile);
+                const chats = await readFile('chats.json', 'utf-8');
+                obj = JSON.parse(chats);
+                return obj.chats;
+            }
+        catch (err) {
+        return err; 
         }
-         // ? return array;
     })
 }
 
-export const getAllUsers = (): string | any => {
+export const getAllUsers = () => {
     let obj = {
         users: Array<any>()
     };
+
     (async() => {
-        const readFile = promisify(fs.readFile);
-        const users = await readFile('users.json', 'utf-8');
-        obj = JSON.parse(users);
-        let array= [];
-        for (let i=0; i<users.length; i++) {
-            // ? array.push(users[users[i]]);
-        }
-         // ? return array;
+            try {
+                const readFile = promisify(fs.readFile);
+                const users = await readFile('users.json', 'utf-8');
+                obj = JSON.parse(users);
+                return obj.users;
+            }
+        catch (err) {
+        return err; 
+        }    
     })
 }
 
@@ -194,7 +198,7 @@ export const changeUserByPhone = (phone: string, nickname?: string, name?: strin
     })();
 }
 
-export const removeChatById = (id: number): string | any => {
+export const removeChatById = (id: number) => {
     let obj = {
         chats: Array<any>()
     };
@@ -205,9 +209,9 @@ export const removeChatById = (id: number): string | any => {
             const chats = await readFile('chats.json', 'utf-8');
             obj = JSON.parse(chats);
             for (let i=0; i<chats.length; i++) {
-               // if (id == chats[]) {
-               //     obj.chats[id].delete();//??
-               // }
+                if (id == obj.chats[i].id) {
+                    delete(obj.chats[i]);
+                }
             }
             let json = JSON.stringify(obj);
             const writeFile = promisify(fs.writeFile);
@@ -219,7 +223,7 @@ export const removeChatById = (id: number): string | any => {
     })();
 }
 
-export const removeUserByPhone = (phone: string): string | any => {
+export const removeUserByPhone = (phone: string) => {
     let obj = {
         users: Array<any>()
     };
@@ -229,9 +233,10 @@ export const removeUserByPhone = (phone: string): string | any => {
             const readFile = promisify(fs.readFile);
             const users = await readFile('users.json', 'utf-8');
             obj = JSON.parse(users);
-            for (let i=0; i<users.length; i++){
-                if (phone == phone[i]) {
-                    obj.users[i].delete();//??
+
+            for (let i = 0; i < users.length; i++){
+                if (phone == obj.users[i].phone) {
+                    delete(obj.users[i]);
                 }
             }
             let json = JSON.stringify(obj);

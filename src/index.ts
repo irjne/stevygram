@@ -25,7 +25,7 @@ export const addUser = (nickname: string, name: string, surname: string, phone: 
     })();
 }
 
-export const addChat = (name: string, description: string, users: string[]): string | any => {
+export const addChat = (name: string, description: string, users: string[]): object | any => {
     let obj = {
         chats: Array<any>()
     };
@@ -61,10 +61,10 @@ export const getAllChats = () => {
         catch (err) {
         return err; 
         }
-    })
+    })();
 }
 
-export const getAllUsers = () => {
+export const getAllUsers = (): object | any => {
     let obj = {
         users: Array<any>()
     };
@@ -79,10 +79,10 @@ export const getAllUsers = () => {
         catch (err) {
         return err; 
         }    
-    })
+    })();
 }
 
-export const getUsersByChatId = (id: number): string | any => {
+export const getUsersByChatId = (id: number): object | any => {
     let obj = {
         chats: Array<any>()
     };
@@ -92,7 +92,6 @@ export const getUsersByChatId = (id: number): string | any => {
             const readFile = promisify(fs.readFile);
             const chats = await readFile('chats.json', 'utf-8');
             obj = JSON.parse(chats);
-            
             return obj.chats[id].users;
         }
         catch (err) {
@@ -101,16 +100,16 @@ export const getUsersByChatId = (id: number): string | any => {
     })();
 }
 
-export const getInfoByChatId = (id: number): string[] | any => {
+export const getInfoByChatId = (id: number): object[] | any => {
     let obj = {
         chats: Array<any>()
     };
     (async() => {
         try {
-        const readFile = promisify(fs.readFile);
-        const chats = await readFile('chats.json', 'utf-8');
-        obj = JSON.parse(chats);
-        return [obj.chats[id].name, obj.chats[id].description];
+            const readFile = promisify(fs.readFile);
+            const chats = await readFile('chats.json', 'utf-8');
+            obj = JSON.parse(chats);
+            return [obj.chats[id].name, obj.chats[id].description];
         }
         catch(err) {
             return err;
@@ -118,7 +117,7 @@ export const getInfoByChatId = (id: number): string[] | any => {
     })();
 }
 
-export const getMessagesByChatId = (id: number) => {
+export const getMessagesByChatId = (id: number): object | any => {
     let obj = {
         chats: Array<any>()
     };
@@ -128,7 +127,7 @@ export const getMessagesByChatId = (id: number) => {
             const readFile = promisify(fs.readFile);
             const chats = await readFile('chats.json', 'utf-8');
             obj = JSON.parse(chats);
-            
+            console.log(obj.chats[id].messages);
             return obj.chats[id].messages; 
         }
         catch(err) {
@@ -214,7 +213,7 @@ export const removeChatById = (id: number) => {
             const file = await writeFile('chats.json', json, 'utf-8');
         }
         catch (err) {
-            console.log(err);
+            return err; 
         }
     })();
 }
@@ -240,7 +239,7 @@ export const removeUserByPhone = (phone: string) => {
             const file = await writeFile('users.json', json, 'utf-8');
         }
         catch (err) {
-            console.error(err);
+            return err;
         }
     })();
 }

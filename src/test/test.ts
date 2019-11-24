@@ -1,7 +1,20 @@
 //import { expect } from 'chai';
 import 'mocha';
 import * as methods from '../index'; 
+const request = require('supertest');
+const app = require('../app');
 const assert = require('assert');
+
+/*describe("GET /chats/:id/users", () => {
+    it("should return 200 if the db is accessible", () => {
+        request(app)
+        .get('/chats/1/users')
+        .end((err: any, res: any) => {
+            if (err) return err;
+            return res; 
+        });
+    });
+  });*/
 
 describe('#addUser', () => {
     let result = methods.addUser("MainframeTv", "Gabriele", "Connelli", "+393482523775");

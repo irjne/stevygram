@@ -1,0 +1,12 @@
+export declare const addUser: (nickname: string, name: string, surname: string, phone: string) => any;
+export declare const addChat: (name: string, description: string, users: string[]) => any;
+export declare const getAllChats: () => void;
+export declare const getAllUsers: () => void;
+export declare const getUsersByChatId: (id: number) => any;
+export declare const getInfoByChatId: (id: number) => any;
+export declare const getMessagesByChatId: (id: number) => void;
+export declare const changeInfoByChatId: (id: number, name?: string | undefined, description?: string | undefined) => any;
+export declare const changeUserByPhone: (phone: string, nickname?: string | undefined, name?: string | undefined, surname?: string | undefined) => any;
+export declare const removeChatById: (id: number) => void;
+export declare const removeUserByPhone: (phone: string) => void;
+//# sourceMappingURL=index.d.ts.map

@@ -1,13 +1,5 @@
 import { promisify } from 'util';
 import * as fs from 'fs';
-import { userInfo } from 'os';
-
-/*export interface User {
-    nickname: string, 
-    name: string,
-    surname: string,
-    phone: string
-}*/
 
 export const addUser = (nickname: string, name: string, surname: string, phone: string): string | any  => {
     let obj = {
@@ -33,7 +25,7 @@ export const addUser = (nickname: string, name: string, surname: string, phone: 
     })();
 }
 
-export const addChat = (name: string, description: string, users: string[]) => {
+export const addChat = (name: string, description: string, users: string[]): string | any => {
     let obj = {
         chats: Array<any>()
     };
@@ -46,14 +38,15 @@ export const addChat = (name: string, description: string, users: string[]) => {
             let json = JSON.stringify(obj);
             const writeFile = promisify(fs.writeFile);
             const file = await writeFile('chats.json', json, 'utf-8');
+            return `Chat ${name} added successfully.`;
         }
         catch (err) {
-            console.log(err);
+            return err;
         }
     })();
 }
 
-export const getAllChats = () => {
+export const getAllChats = (): string | any => {
     let obj = {
         chats: Array<any>()
     };
@@ -68,7 +61,8 @@ export const getAllChats = () => {
          // ? return array;
     })
 }
-export const getAllUsers = () => {
+
+export const getAllUsers = (): string | any => {
     let obj = {
         users: Array<any>()
     };
@@ -83,7 +77,8 @@ export const getAllUsers = () => {
          // ? return array;
     })
 }
-export const getUsersByChatId = (id: number): string[] | any => {
+
+export const getUsersByChatId = (id: number): string | any => {
     let obj = {
         chats: Array<any>()
     };
@@ -102,51 +97,108 @@ export const getUsersByChatId = (id: number): string[] | any => {
     })();
 }
 
-export const getInfoByChatId = (id: number) => {
+export const getInfoByChatId = (id: number): string[] | any => {
     let obj = {
-                chats: Array<any>()
-            };
-            (async() => {
-                try {
-            const readFile = promisify(fs.readFile);
-            const chats = await readFile('chats.json', 'utf-8');
-            obj = JSON.parse(chats);
-            return [obj.chats[id].name, obj.chats[id].description];
-        }
-                catch(err) {
-                    return err;
-                }
-            })();
-}
-export const getMessagesByChatId = (id: number) => {
-    let obj = {
-        chats: Array<any>()
-};
-(async() => {
-    try {
+        chats: Array<any>()
+    };
+    (async() => {
+        try {
         const readFile = promisify(fs.readFile);
         const chats = await readFile('chats.json', 'utf-8');
         obj = JSON.parse(chats);
-        let array= [];
-        for (let i=0; i<chats[id].length; i++) {
-            //for (let j=0; j<chats[id]) { per entrare nell'array dei messaggi
-        // array.push(...);} 
+        return [obj.chats[id].name, obj.chats[id].description];
         }
-        return //array;
-    }
-    catch(err) {
-        return err;
-    }
-})();
+        catch(err) {
+            return err;
+        }
+    })();
 }
 
-export const changeInfoByChatId = (id: number, name: string, description: string) => {}
-export const changeUserByPhone = (nickname: string, name: string, surname: string, phone: string) => {}
-
-export const removeChatById = (id: number) => {
+export const getMessagesByChatId = (id: number): string | any => {
     let obj = {
         chats: Array<any>()
     };
+
+    (async() => {
+        try {
+            const readFile = promisify(fs.readFile);
+            const chats = await readFile('chats.json', 'utf-8');
+            obj = JSON.parse(chats);
+            let array= [];
+            for (let i=0; i<chats[id].length; i++) {
+                //for (let j=0; j<chats[id]) { per entrare nell'array dei messaggi
+            // array.push(...);} 
+            }
+            return //array;
+        }
+        catch(err) {
+            return err;
+        }
+    })();
+}
+
+export const changeInfoByChatId = (id: number, name?: string, description?: string): string | any => {
+    let obj = {
+        chats: Array<any>()
+    };
+
+    (async () => {
+        try {
+            const readFile = promisify(fs.readFile);
+            const chats = await readFile('chats.json', 'utf-8');
+            obj = JSON.parse(chats);
+            for (let i = 0; i < chats.length; i++) {
+                if (id == obj.chats[i].id) {
+                    if (name) obj.chats[i].name = name; 
+                    if (description) obj.chats[i].description = description;
+                }
+            }
+            let json = JSON.stringify(obj);
+            const writeFile = promisify(fs.writeFile);
+            const file = await writeFile('chats.json', json, 'utf-8');
+
+            return `Chat ${name} changed successfully.`;
+        }
+        catch (err) {
+            return err;
+        }
+    })();
+}
+
+export const changeUserByPhone = (phone: string, nickname?: string, name?: string, surname?: string): string | any => {
+    let obj = {
+        users: Array<any>()
+    };
+
+    (async () => {
+        try {
+            const readFile = promisify(fs.readFile);
+            const chats = await readFile('users.json', 'utf-8');
+            obj = JSON.parse(chats);
+            for (let i = 0; i < chats.length; i++) {
+                if (phone == obj.users[i].phone) {
+                    if (nickname) obj.users[i].nickname = nickname;
+                    if (name) obj.users[i].name = name; 
+                    if (surname) obj.users[i].surname = surname;
+                }
+            }
+            let json = JSON.stringify(obj);
+            const writeFile = promisify(fs.writeFile);
+            const file = await writeFile('users.json', json, 'utf-8');
+
+            return `User ${nickname} (${phone}) changed successfully.`;
+        }
+        catch (err) {
+            return err; 
+        }
+    })();
+}
+
+export const removeChatById = (id: number): string | any => {
+    let obj = {
+        chats: Array<any>()
+    };
+
     (async () => {
         try {
             const readFile = promisify(fs.readFile);
@@ -166,7 +218,8 @@ export const removeChatById = (id: number) => {
         }
     })();
 }
-export const removeUserByPhone = (phone: string) => {
+
+export const removeUserByPhone = (phone: string): string | any => {
     let obj = {
         users: Array<any>()
     };

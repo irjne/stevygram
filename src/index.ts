@@ -129,7 +129,7 @@ export const getMessagesByChatId = (id: number): string | any => {
                 //for (let j=0; j<chats[id]) { per entrare nell'array dei messaggi
             // array.push(...);} 
             }
-            return //array;
+            return //array
         }
         catch(err) {
             return err;

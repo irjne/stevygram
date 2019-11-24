@@ -118,7 +118,7 @@ export const getInfoByChatId = (id: number): string[] | any => {
     })();
 }
 
-export const getMessagesByChatId = (id: number): string | any => {
+export const getMessagesByChatId = (id: number) => {
     let obj = {
         chats: Array<any>()
     };
@@ -128,12 +128,8 @@ export const getMessagesByChatId = (id: number): string | any => {
             const readFile = promisify(fs.readFile);
             const chats = await readFile('chats.json', 'utf-8');
             obj = JSON.parse(chats);
-            let array= [];
-            for (let i=0; i<chats[id].length; i++) {
-                //for (let j=0; j<chats[id]) { per entrare nell'array dei messaggi
-            // array.push(...);} 
-            }
-            return //array
+            
+            return obj.chats[id].messages; 
         }
         catch(err) {
             return err;

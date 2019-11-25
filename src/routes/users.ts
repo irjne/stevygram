@@ -17,7 +17,10 @@ router.put('/:phone', (req, res) => {
     let name = req.body.name;
     let surname = req.body.surname;
     let nickname = req.body.nickname;
-    res.json(stevygram.changeUserByPhone(nickname, name, surname, phone));
+    let result = stevygram.changeUserByPhone(nickname, name, surname, phone);
+
+    if (typeof(result) == "object") return res.json(result);
+    return res.status(404).send("Unexpected error.");
 }) 
 
 //POST 
@@ -27,7 +30,10 @@ router.post('/', (req, res) => {
     let surname = req.body.surname;
     let nickname = req.body.nickname;
     let phone = req.body.phone;
-    res.json(stevygram.addUser(nickname, name, surname, phone));
+    let result = stevygram.addUser(nickname, name, surname, phone);
+
+    if (typeof(result) == "object") return res.json(result);
+    return res.status(404).send("Unexpected error.");
 }) 
 
 //DELETE 

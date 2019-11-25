@@ -39,7 +39,7 @@ exports.__esModule = true;
 var util_1 = require("util");
 var fs = require("fs");
 exports.addUser = function (nickname, name, surname, phone) { return __awaiter(void 0, void 0, void 0, function () {
-    var obj, readFile, users, json, writeFile, file, err_1;
+    var obj, readFile, users, exists, i, json, writeFile, file, err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -50,14 +50,20 @@ exports.addUser = function (nickname, name, surname, phone) { return __awaiter(v
             case 1:
                 _a.trys.push([1, 4, , 5]);
                 readFile = util_1.promisify(fs.readFile);
-                return [4 /*yield*/, readFile('users.json', 'utf-8')];
+                return [4 /*yield*/, readFile('./users.json', 'utf-8')];
             case 2:
                 users = _a.sent();
                 obj = JSON.parse(users);
+                exists = false;
+                for (i = 0; i < obj.users.length; i++) {
+                    if (phone == obj.users[i].phone) {
+                        return [2 /*return*/, "User " + phone + " already exists."];
+                    }
+                }
                 obj.users.push({ nickname: nickname, name: name, surname: surname, phone: phone });
                 json = JSON.stringify(obj);
                 writeFile = util_1.promisify(fs.writeFile);
-                return [4 /*yield*/, writeFile('users.json', json, 'utf-8')];
+                return [4 /*yield*/, writeFile('./users.json', json, 'utf-8')];
             case 3:
                 file = _a.sent();
                 return [2 /*return*/, "User " + nickname + " added successfully."];
@@ -69,7 +75,7 @@ exports.addUser = function (nickname, name, surname, phone) { return __awaiter(v
         }
     });
 }); };
-exports.addChat = function (name, description, users) { return __awaiter(void 0, void 0, void 0, function () {
+exports.addChat = function (id, name, description, users) { return __awaiter(void 0, void 0, void 0, function () {
     var obj, readFile, chats, json, writeFile, file, err_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -85,13 +91,13 @@ exports.addChat = function (name, description, users) { return __awaiter(void 0,
             case 2:
                 chats = _a.sent();
                 obj = JSON.parse(chats);
-                obj.chats.push({ name: name, description: description });
+                obj.chats.push({ id: id, name: name, description: description, users: users });
                 json = JSON.stringify(obj);
                 writeFile = util_1.promisify(fs.writeFile);
                 return [4 /*yield*/, writeFile('chats.json', json, 'utf-8')];
             case 3:
                 file = _a.sent();
-                return [2 /*return*/, "Chat " + name + " added successfully."];
+                return [2 /*return*/, "Chat \"" + name + "\" added successfully."];
             case 4:
                 err_2 = _a.sent();
                 return [2 /*return*/, err_2];
@@ -221,59 +227,66 @@ exports.getMessagesByChatId = function (id) { return __awaiter(void 0, void 0, v
     });
 }); };
 exports.changeInfoByChatId = function (id, name, description) { return __awaiter(void 0, void 0, void 0, function () {
-    var obj, readFile, chats, i, json, writeFile, file, err_8;
+    var obj, isFounded, readFile, chats, i, json, writeFile, file, err_8;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 obj = {
                     chats: Array()
                 };
+                isFounded = false;
                 _a.label = 1;
             case 1:
-                _a.trys.push([1, 4, , 5]);
+                _a.trys.push([1, 6, , 7]);
                 readFile = util_1.promisify(fs.readFile);
                 return [4 /*yield*/, readFile('chats.json', 'utf-8')];
             case 2:
                 chats = _a.sent();
                 obj = JSON.parse(chats);
-                for (i = 0; i < chats.length; i++) {
+                for (i = 0; i < obj.chats.length; i++) {
                     if (id == obj.chats[i].id) {
                         if (name)
                             obj.chats[i].name = name;
                         if (description)
                             obj.chats[i].description = description;
+                        isFounded = true;
+                        break;
                     }
                 }
+                if (!isFounded) return [3 /*break*/, 4];
                 json = JSON.stringify(obj);
                 writeFile = util_1.promisify(fs.writeFile);
                 return [4 /*yield*/, writeFile('chats.json', json, 'utf-8')];
             case 3:
                 file = _a.sent();
                 return [2 /*return*/, "Chat " + name + " changed successfully."];
-            case 4:
+            case 4: return [2 /*return*/, "Chat " + name + " not found."];
+            case 5: return [3 /*break*/, 7];
+            case 6:
                 err_8 = _a.sent();
                 return [2 /*return*/, err_8];
-            case 5: return [2 /*return*/];
+            case 7: return [2 /*return*/];
         }
     });
 }); };
 exports.changeUserByPhone = function (phone, nickname, name, surname) { return __awaiter(void 0, void 0, void 0, function () {
-    var obj, readFile, chats, i, json, writeFile, file, err_9;
+    var obj, isFounded, readFile, users, i, json, writeFile, file, err_9;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 obj = {
                     users: Array()
                 };
+                isFounded = false;
                 _a.label = 1;
             case 1:
-                _a.trys.push([1, 4, , 5]);
+                _a.trys.push([1, 6, , 7]);
                 readFile = util_1.promisify(fs.readFile);
                 return [4 /*yield*/, readFile('users.json', 'utf-8')];
             case 2:
-                chats = _a.sent();
-                obj = JSON.parse(chats);
-                for (i = 0; i < chats.length; i++) {
+                users = _a.sent();
+                obj = JSON.parse(users);
+                for (i = 0; i < obj.users.length; i++) {
                     if (phone == obj.users[i].phone) {
                         if (nickname)
                             obj.users[i].nickname = nickname;
@@ -281,18 +294,22 @@ exports.changeUserByPhone = function (phone, nickname, name, surname) { return _
                             obj.users[i].name = name;
                         if (surname)
                             obj.users[i].surname = surname;
+                        isFounded = true;
                     }
                 }
+                if (!isFounded) return [3 /*break*/, 4];
                 json = JSON.stringify(obj);
                 writeFile = util_1.promisify(fs.writeFile);
                 return [4 /*yield*/, writeFile('users.json', json, 'utf-8')];
             case 3:
                 file = _a.sent();
                 return [2 /*return*/, "User " + nickname + " (" + phone + ") changed successfully."];
-            case 4:
+            case 4: return [2 /*return*/, "User \"" + phone + "\" not found."];
+            case 5: return [3 /*break*/, 7];
+            case 6:
                 err_9 = _a.sent();
                 return [2 /*return*/, err_9];
-            case 5: return [2 /*return*/];
+            case 7: return [2 /*return*/];
         }
     });
 }); };
@@ -312,9 +329,10 @@ exports.removeChatById = function (id) { return __awaiter(void 0, void 0, void 0
             case 2:
                 chats = _a.sent();
                 obj = JSON.parse(chats);
-                for (i = 0; i < chats.length; i++) {
+                for (i = 0; i < obj.chats.length; i++) {
                     if (id == obj.chats[i].id) {
-                        delete (obj.chats[i]);
+                        obj.chats.splice(i, 1);
+                        break;
                     }
                 }
                 json = JSON.stringify(obj);
@@ -322,7 +340,7 @@ exports.removeChatById = function (id) { return __awaiter(void 0, void 0, void 0
                 return [4 /*yield*/, writeFile('chats.json', json, 'utf-8')];
             case 3:
                 file = _a.sent();
-                return [2 /*return*/, "Chat " + id + " removed successfully."];
+                return [2 /*return*/, "Chat \"" + id + "\" removed successfully."];
             case 4:
                 err_10 = _a.sent();
                 return [2 /*return*/, err_10];
@@ -346,9 +364,10 @@ exports.removeUserByPhone = function (phone) { return __awaiter(void 0, void 0, 
             case 2:
                 users = _a.sent();
                 obj = JSON.parse(users);
-                for (i = 0; i < users.length; i++) {
+                for (i = 0; i < obj.users.length; i++) {
                     if (phone == obj.users[i].phone) {
-                        delete (obj.users[i]);
+                        obj.users.splice(i, 1);
+                        break;
                     }
                 }
                 json = JSON.stringify(obj);
@@ -364,8 +383,8 @@ exports.removeUserByPhone = function (phone) { return __awaiter(void 0, void 0, 
         }
     });
 }); };
-exports.getAllChats().then(function (res) {
-    console.log(res);
+exports.changeUserByPhone("+666").then(function (result) {
+    console.log(result);
 })["catch"](function (err) {
     console.log(err);
 });

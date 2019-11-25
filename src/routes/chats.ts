@@ -13,7 +13,6 @@ const router = express.Router();
 
 //GET - url: /, stampa tutte le chat
 router.get('/', async (req, res) => {
-
     getAllChats().then(res => {
         return res.json(res);
     }).catch(err => {

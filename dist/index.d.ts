@@ -1,0 +1,12 @@
+export declare const addUser: (nickname: string, name: string, surname: string, phone: string) => Promise<any>;
+export declare const addChat: (name: string, description: string, users: string[]) => Promise<any>;
+export declare const getAllChats: () => Promise<any>;
+export declare const getAllUsers: () => Promise<any>;
+export declare const getUsersByChatId: (id: number) => Promise<any>;
+export declare const getInfoByChatId: (id: number) => Promise<any>;
+export declare const getMessagesByChatId: (id: number) => Promise<any>;
+export declare const changeInfoByChatId: (id: number, name?: string | undefined, description?: string | undefined) => Promise<any>;
+export declare const changeUserByPhone: (phone: string, nickname?: string | undefined, name?: string | undefined, surname?: string | undefined) => Promise<any>;
+export declare const removeChatById: (id: number) => Promise<any>;
+export declare const removeUserByPhone: (phone: string) => Promise<any>;
+//# sourceMappingURL=index.d.ts.map

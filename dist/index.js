@@ -26,6 +26,12 @@ exports.addUser = (nickname, name, surname, phone) => __awaiter(void 0, void 0, 
         const readFile = util_1.promisify(fs.readFile);
         const users = yield readFile('./users.json', 'utf-8');
         obj = JSON.parse(users);
+        let exists = false;
+        for (let i = 0; i < obj.users.length; i++) {
+            if (phone == obj.users[i].phone) {
+                return `User ${phone} already exists.`;
+            }
+        }
         obj.users.push({ nickname, name, surname, phone });
         let json = JSON.stringify(obj);
         const writeFile = util_1.promisify(fs.writeFile);
@@ -37,7 +43,7 @@ exports.addUser = (nickname, name, surname, phone) => __awaiter(void 0, void 0, 
         return err;
     }
 });
-exports.addChat = (name, description, users) => __awaiter(void 0, void 0, void 0, function* () {
+exports.addChat = (id, name, description, users) => __awaiter(void 0, void 0, void 0, function* () {
     let obj = {
         chats: Array()
     };
@@ -45,11 +51,11 @@ exports.addChat = (name, description, users) => __awaiter(void 0, void 0, void 0
         const readFile = util_1.promisify(fs.readFile);
         const chats = yield readFile('chats.json', 'utf-8');
         obj = JSON.parse(chats);
-        obj.chats.push({ name, description });
+        obj.chats.push({ id, name, description, users });
         let json = JSON.stringify(obj);
         const writeFile = util_1.promisify(fs.writeFile);
         const file = yield writeFile('chats.json', json, 'utf-8');
-        return `Chat ${name} added successfully.`;
+        return `Chat \"${name}\" added successfully.`;
     }
     catch (err) {
         return err;
@@ -130,22 +136,30 @@ exports.changeInfoByChatId = (id, name, description) => __awaiter(void 0, void 0
     let obj = {
         chats: Array()
     };
+    let isFounded = false;
     try {
         const readFile = util_1.promisify(fs.readFile);
         const chats = yield readFile('chats.json', 'utf-8');
         obj = JSON.parse(chats);
-        for (let i = 0; i < chats.length; i++) {
+        for (let i = 0; i < obj.chats.length; i++) {
             if (id == obj.chats[i].id) {
                 if (name)
                     obj.chats[i].name = name;
                 if (description)
                     obj.chats[i].description = description;
+                isFounded = true;
+                break;
             }
         }
-        let json = JSON.stringify(obj);
-        const writeFile = util_1.promisify(fs.writeFile);
-        const file = yield writeFile('chats.json', json, 'utf-8');
-        return `Chat ${name} changed successfully.`;
+        if (isFounded) {
+            let json = JSON.stringify(obj);
+            const writeFile = util_1.promisify(fs.writeFile);
+            const file = yield writeFile('chats.json', json, 'utf-8');
+            return `Chat ${name} changed successfully.`;
+        }
+        else {
+            return `Chat ${name} not found.`;
+        }
     }
     catch (err) {
         return err;
@@ -155,11 +169,12 @@ exports.changeUserByPhone = (phone, nickname, name, surname) => __awaiter(void 0
     let obj = {
         users: Array()
     };
+    let isFounded = false;
     try {
         const readFile = util_1.promisify(fs.readFile);
-        const chats = yield readFile('users.json', 'utf-8');
-        obj = JSON.parse(chats);
-        for (let i = 0; i < chats.length; i++) {
+        const users = yield readFile('users.json', 'utf-8');
+        obj = JSON.parse(users);
+        for (let i = 0; i < obj.users.length; i++) {
             if (phone == obj.users[i].phone) {
                 if (nickname)
                     obj.users[i].nickname = nickname;
@@ -167,12 +182,18 @@ exports.changeUserByPhone = (phone, nickname, name, surname) => __awaiter(void 0
                     obj.users[i].name = name;
                 if (surname)
                     obj.users[i].surname = surname;
+                isFounded = true;
             }
         }
-        let json = JSON.stringify(obj);
-        const writeFile = util_1.promisify(fs.writeFile);
-        const file = yield writeFile('users.json', json, 'utf-8');
-        return `User ${nickname} (${phone}) changed successfully.`;
+        if (isFounded) {
+            let json = JSON.stringify(obj);
+            const writeFile = util_1.promisify(fs.writeFile);
+            const file = yield writeFile('users.json', json, 'utf-8');
+            return `User ${nickname} (${phone}) changed successfully.`;
+        }
+        else {
+            return `User \"${phone}\" not found.`;
+        }
     }
     catch (err) {
         return err;
@@ -186,15 +207,16 @@ exports.removeChatById = (id) => __awaiter(void 0, void 0, void 0, function* () 
         const readFile = util_1.promisify(fs.readFile);
         const chats = yield readFile('chats.json', 'utf-8');
         obj = JSON.parse(chats);
-        for (let i = 0; i < chats.length; i++) {
+        for (let i = 0; i < obj.chats.length; i++) {
             if (id == obj.chats[i].id) {
-                delete (obj.chats[i]);
+                obj.chats.splice(i, 1);
+                break;
             }
         }
         let json = JSON.stringify(obj);
         const writeFile = util_1.promisify(fs.writeFile);
         const file = yield writeFile('chats.json', json, 'utf-8');
-        return `Chat ${id} removed successfully.`;
+        return `Chat \"${id}\" removed successfully.`;
     }
     catch (err) {
         return err;
@@ -208,9 +230,10 @@ exports.removeUserByPhone = (phone) => __awaiter(void 0, void 0, void 0, functio
         const readFile = util_1.promisify(fs.readFile);
         const users = yield readFile('users.json', 'utf-8');
         obj = JSON.parse(users);
-        for (let i = 0; i < users.length; i++) {
+        for (let i = 0; i < obj.users.length; i++) {
             if (phone == obj.users[i].phone) {
-                delete (obj.users[i]);
+                obj.users.splice(i, 1);
+                break;
             }
         }
         let json = JSON.stringify(obj);

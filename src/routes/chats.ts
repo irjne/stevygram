@@ -23,22 +23,31 @@ router.get('/', async (req, res) => {
 //- url: /:id/users, stampa tutti gli utenti di una chat;
 router.get('/:id/users', (req, res) => {
     let id = Number(req.params.id);
-    let result = getUsersByChatId(id);
-
-    if (typeof (result) == "object") return res.json(result);
-    return res.status(404).send("Unexpected error.");
+    getUsersByChatId(id).then(result => {
+        return res.json(result);
+    }).catch(err => {
+        return res.status(404).send(`Unexpected error: ${err}`);
+    });
 })
 
 //- url: /:id, stampa tutti i dati di una chat;
 router.get('/:id', (req, res) => {
     let id = Number(req.params.id);
-    res.json(getInfoByChatId(id));
+    getInfoByChatId(id).then(result => {
+        return res.json(result);
+    }).catch(err => {
+        return res.status(404).send(`Unexpected error: ${err}`);
+    });
 })
 
 // - url: /:id/messages, stampa tutti i messaggi di una chat:
 router.get('/:id/messages', (req, res) => {
     let id = Number(req.params.id);
-    res.json(getMessagesByChatId(id));
+    getMessagesByChatId(id).then(result => {
+        return res.json(result);
+    }).catch(err => {
+        return res.status(404).send(`Unexpected error: ${err}`);
+    });
 
     //TODO: filter: ?word="pippo", stampa tutti i messaggi contenenti la parola; 
     //TODO: filter: ?user="id", stampa tutti i messaggi di un determinato utente.
@@ -49,23 +58,38 @@ router.put('/:id', (req, res) => {
     let id = Number(req.params.id);
     let description = req.body.description;
     let name = req.body.name;
-    res.json(changeInfoByChatId(id, name, description));
+
+    changeInfoByChatId(id, name, description).then(result => {
+        return res.json(result);
+    }).catch(err => {
+        return res.status(404).send(`Unexpected error: ${err}`);
+    });
 })
 
 //POST - url: / + BODY, aggiunge una chat.
 router.post('/', (req, res) => {
-    let name = req.body.name;
-    let description = req.body.description;
+    let id = Number(req.body.id);
+    let name = String(req.body.name);
+    let description = String(req.body.description);
     let users = req.body.users;
     users = users.split(users, ", ");
 
-    res.json(addChat(name, description, users));
+    addChat(id, name, description, users).then(result => {
+        return res.json(result);
+    }).catch(err => {
+        return res.status(404).send(`Unexpected error: ${err}`);
+    });
 })
 
 //DELETE - url: /:id, cancella la chat avendo l'id.
 router.delete('/:id', (req, res) => {
     let id = Number(req.params.id);
-    res.json(removeChatById(id));
+
+    removeChatById(id).then(result => {
+        return res.json(result);
+    }).catch(err => {
+        return res.status(404).send(`Unexpected error: ${err}`);
+    });
 })
 
 export default router; 

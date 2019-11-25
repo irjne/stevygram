@@ -1,5 +1,5 @@
 export declare const addUser: (nickname: string, name: string, surname: string, phone: string) => Promise<any>;
-export declare const addChat: (name: string, description: string, users: string[]) => Promise<any>;
+export declare const addChat: (id: number, name: string, description: string, users: string[]) => Promise<any>;
 export declare const getAllChats: () => Promise<any>;
 export declare const getAllUsers: () => Promise<any>;
 export declare const getUsersByChatId: (id: number) => Promise<any>;

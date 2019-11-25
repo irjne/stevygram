@@ -7,4 +7,4 @@ const app = express();
 app.use('/users', users);
 app.use('/chats', chats);
 
-app.listen(3001, () => console.log('Server running!'));
+app.listen(3001, () => console.log('🙌 Server is running!'));

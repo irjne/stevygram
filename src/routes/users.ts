@@ -18,7 +18,6 @@ router.put('/:phone', async (req, res) => {
     let name = req.body.name;
     let surname = req.body.surname;
     let nickname = req.body.nickname;
-    //let result = changeUserByPhone(nickname, name, surname, phone);
 
     changeUserByPhone(nickname, name, surname, phone).then(result => {
         return res.json(result);
@@ -28,12 +27,11 @@ router.put('/:phone', async (req, res) => {
 })
 
 //POST - url: /, aggiunge un utente nell'app + BODY.
-router.post('/', (req, res) => {
-    let name = req.body.name;
-    let surname = req.body.surname;
-    let nickname = req.body.nickname;
-    let phone = req.body.phone;
-    let result = addUser(nickname, name, surname, phone);
+router.post('/', async (req, res) => {
+    let name = String(req.body.name);
+    let surname = String(req.body.surname);
+    let nickname = String(req.body.nickname);
+    let phone = String(req.body.phone);
 
     addUser(nickname, name, surname, phone).then(result => {
         return res.json(result);
@@ -43,8 +41,9 @@ router.post('/', (req, res) => {
 })
 
 //DELETE - url: /:id, cancella l'utente avendo l'id.
-router.delete(':phone', (req, res) => {
-    let phone = req.params.phone;
+router.delete(':phone', async (req, res) => {
+    let phone = String(req.params.phone);
+    console.log(phone);
 
     removeUserByPhone(phone).then(result => {
         return res.json(result);

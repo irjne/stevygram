@@ -36,7 +36,7 @@ describe('#addUser', () => {
 });
 describe('#addChat', () => {
     it('should return a string if the chat has been added', () => {
-        let result = methods.addChat("Quelli che... si disperano", "Help us, pls", ["+393466457463", "+393286239190", "+393451691678"]);
+        let result = methods.addChat(5, "Quelli che... si disperano", "Help us, pls", ["+393466457463", "+393286239190", "+393451691678"]);
         assert.isString(result);
         assert.include(result, 'Quelli che... si disperano');
     });

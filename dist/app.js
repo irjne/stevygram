@@ -9,5 +9,5 @@ const chats_1 = __importDefault(require("./routes/chats"));
 const app = express_1.default();
 app.use('/users', users_1.default);
 app.use('/chats', chats_1.default);
-app.listen(3001, () => console.log('Server running!'));
+app.listen(3001, () => console.log('🙌 Server is running!'));
 //# sourceMappingURL=app.js.map

@@ -29,7 +29,6 @@ router.put('/:phone', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     let name = req.body.name;
     let surname = req.body.surname;
     let nickname = req.body.nickname;
-    //let result = changeUserByPhone(nickname, name, surname, phone);
     index_1.changeUserByPhone(nickname, name, surname, phone).then(result => {
         return res.json(result);
     }).catch(err => {
@@ -37,26 +36,27 @@ router.put('/:phone', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     });
 }));
 //POST - url: /, aggiunge un utente nell'app + BODY.
-router.post('/', (req, res) => {
-    let name = req.body.name;
-    let surname = req.body.surname;
-    let nickname = req.body.nickname;
-    let phone = req.body.phone;
-    let result = index_1.addUser(nickname, name, surname, phone);
-    index_1.addUser(nickname, name, surname, phone).then(result => {
+router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let name = String(req.body.name);
+    let surname = String(req.body.surname);
+    let nickname = String(req.body.nickname);
+    let phone = String(req.body.phone);
+    //addUser(nickname, name, surname, phone).then(result => {
+    index_1.addUser("nickname", "name", "surname", "phone").then(result => {
         return res.json(result);
     }).catch(err => {
         return res.status(404).send(`Unexpected error: ${err}`);
     });
-});
+}));
 //DELETE - url: /:id, cancella l'utente avendo l'id.
-router.delete(':phone', (req, res) => {
-    let phone = req.params.phone;
+router.delete(':phone', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let phone = String(req.params.phone);
+    console.log(phone);
     index_1.removeUserByPhone(phone).then(result => {
         return res.json(result);
     }).catch(err => {
         return res.status(404).send(`Unexpected error: ${err}`);
     });
-});
+}));
 exports.default = router;
 //# sourceMappingURL=users.js.map

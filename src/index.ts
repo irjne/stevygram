@@ -25,7 +25,7 @@ export const addUser = (nickname: string, name: string, surname: string, phone: 
     })();
 }
 
-export const addChat = (name: string, description: string, users: string[]): object | any => {
+export const addChat = (name: string, description: string, users: string[]): string | any => {
     let obj = {
         chats: Array<any>()
     };
@@ -46,20 +46,20 @@ export const addChat = (name: string, description: string, users: string[]): obj
     })();
 }
 
-export const getAllChats = () => {
+export const getAllChats = (): object | any  => {
     let obj = {
         chats: Array<any>()
     };
 
     (async() => {
-            try {
-                const readFile = promisify(fs.readFile);
-                const chats = await readFile('chats.json', 'utf-8');
-                obj = JSON.parse(chats);
-                return obj.chats;
-            }
+        try {
+            const readFile = promisify(fs.readFile);
+            const chats = await readFile('chats.json', 'utf-8');
+            obj = JSON.parse(chats);
+            return obj.chats;
+        }
         catch (err) {
-        return err; 
+            return err; 
         }
     })();
 }
@@ -193,7 +193,7 @@ export const changeUserByPhone = (phone: string, nickname?: string, name?: strin
     })();
 }
 
-export const removeChatById = (id: number) => {
+export const removeChatById = (id: number): string | any => {
     let obj = {
         chats: Array<any>()
     };
@@ -211,6 +211,7 @@ export const removeChatById = (id: number) => {
             let json = JSON.stringify(obj);
             const writeFile = promisify(fs.writeFile);
             const file = await writeFile('chats.json', json, 'utf-8');
+            return `Chat ${id} removed successfully.`;
         }
         catch (err) {
             return err; 
@@ -218,7 +219,7 @@ export const removeChatById = (id: number) => {
     })();
 }
 
-export const removeUserByPhone = (phone: string) => {
+export const removeUserByPhone = (phone: string): string | any => {
     let obj = {
         users: Array<any>()
     };
@@ -237,6 +238,7 @@ export const removeUserByPhone = (phone: string) => {
             let json = JSON.stringify(obj);
             const writeFile = promisify(fs.writeFile);
             const file = await writeFile('users.json', json, 'utf-8');
+            return `User ${phone} removed successfully.`;
         }
         catch (err) {
             return err;

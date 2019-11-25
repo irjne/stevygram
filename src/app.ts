@@ -1,6 +1,6 @@
 import express from 'express';
-const users = require('./routes/users');
-const chats = require('./routes/chats');
+import users from "./routes/users";
+import chats from './routes/chats';
 
 const app = express();
 

@@ -4,8 +4,8 @@ import { body, param, validationResult } from 'express-validator';
 const router = express.Router();
 
 //GET - url: /, stampa tutti gli utenti.
-router.get('/', async (req, res) => {
-    try{
+router.get('/', async (req: any, res: any) => {
+    try {
         const result = await getAllUsers();
         res.json(result);
     } catch (err) {
@@ -27,7 +27,7 @@ router.put('/:phone', [
         .isString()
         .not().isEmpty()
         .trim()
-], async (req, res) => {
+], async (req: any, res: any) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -35,7 +35,7 @@ router.put('/:phone', [
 
     const { name, phone, surname, nickname } = req.body;
     try {
-        const result = await changeUserByPhone(nickname, name, surname, phone); 
+        const result = await changeUserByPhone(nickname, name, surname, phone);
         res.json(result);
     } catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);
@@ -43,7 +43,7 @@ router.put('/:phone', [
 })
 
 //POST - url: /, aggiunge un utente nell'app + BODY.
-router.post('/',[
+router.post('/', [
     body('nickname')
         .isString()
         .not().isEmpty()
@@ -60,19 +60,19 @@ router.post('/',[
         .isString()
         .not().isEmpty()
         .trim()
-], async (req, res) => {
+], async (req: any, res: any) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() });
+        return res.status(422).json({ errors: errors.array() });
     }
 
     const { name, phone, surname, nickname } = req.body;
-    try{
+    try {
         const result = await addUser(nickname, name, surname, phone);
         res.json(result);
     } catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);
-    }     
+    }
 })
 
 //DELETE - url: /:id, cancella l'utente avendo l'id.
@@ -81,12 +81,11 @@ router.delete('/:phone', [
         .isString()
         .not().isEmpty()
         .trim()
-], async (req, res) => {
-    {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-          return res.status(422).json({ errors: errors.array() });
-        }
+], async (req: any, res: any) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
 
     let phone = String(req.params.phone);
     try {
@@ -94,7 +93,7 @@ router.delete('/:phone', [
         res.json(result);
     } catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);
-    }  
+    }
 })
 
 export default router; 

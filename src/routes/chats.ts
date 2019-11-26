@@ -13,8 +13,8 @@ import {
 const router = express.Router();
 
 //GET - url: /, stampa tutte le chat
-router.get('/', async (req, res) => {
-    try{
+router.get('/', async (req: any, res: any) => {
+    try {
         const result = await getAllChats();
         res.json(result);
     } catch (err) {
@@ -24,16 +24,15 @@ router.get('/', async (req, res) => {
 
 //- url: /:id/users, stampa tutti gli utenti di una chat;
 router.get('/:id/users', [
-    param ('id')
+    param('id')
         .isNumeric()
         .not().isEmpty(),
     sanitizeParam('id').toInt()
-
-], async(req, res) => {
+], async (req: any, res: any) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() });
+        return res.status(422).json({ errors: errors.array() });
     }
 
     const id = req.params.id;
@@ -47,15 +46,15 @@ router.get('/:id/users', [
 
 //- url: /:id, stampa tutti i dati di una chat;
 router.get('/:id', [
-    param ('id')
+    param('id')
         .isNumeric()
         .not().isEmpty(),
-        sanitizeParam('id').toInt()
-], async(req, res) => {
+    sanitizeParam('id').toInt()
+], async (req: any, res: any) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() });
+        return res.status(422).json({ errors: errors.array() });
     }
 
     const id = req.params.id;
@@ -69,21 +68,21 @@ router.get('/:id', [
 
 // - url: /:id/messages, stampa tutti i messaggi di una chat:
 router.get('/:id/messages', [
-    param ('id')
+    param('id')
         .isNumeric()
         .not().isEmpty(),
-        sanitizeParam('id').toInt()
-], async(req, res) => {
+    sanitizeParam('id').toInt()
+], async (req: any, res: any) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() });
+        return res.status(422).json({ errors: errors.array() });
     }
 
     const id = req.params.id;
     try {
-         const result = await getMessagesByChatId(id);
-         res.json(result); 
+        const result = await getMessagesByChatId(id);
+        res.json(result);
     } catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);
     }
@@ -93,27 +92,27 @@ router.get('/:id/messages', [
 })
 
 //PUT - url: /:id + BODY, modifica una chat dando un id.
-router.put('/:id',[
-    param ('id')
+router.put('/:id', [
+    param('id')
         .isNumeric()
         .not().isEmpty(),
-    body ('description')
+    body('description')
         .trim()
         .isString(),
-    body ('name')
+    body('name')
         .trim()
         .isString()
         .not().isEmpty(),
     sanitizeParam('id').toInt()
-], async(req, res) => {
+], async (req: any, res: any) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() });
+        return res.status(422).json({ errors: errors.array() });
     }
-    
+
     const id = req.params.id;
-    const {description, name} = req.body;
+    const { description, name } = req.body;
     try {
         const result = await changeInfoByChatId(id, name, description);
         res.json(result);
@@ -123,34 +122,34 @@ router.put('/:id',[
 })
 
 //POST - url: / + BODY, aggiunge una chat.
-router.post('/',  [
-    param ('id')
+router.post('/', [
+    param('id')
         .isNumeric()
         .not().isEmpty(),
-    body ('description')
+    body('description')
         .trim()
         .isString(),
-    body ('name')
+    body('name')
         .trim()
         .isString()
         .not().isEmpty(),
-    body ('users')
+    body('users')
         .isString()
         .trim(),
     sanitizeParam('id').toInt()
-], async(req, res) => {
+], async (req: any, res: any) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() });
+        return res.status(422).json({ errors: errors.array() });
     }
 
-    const {id, name, description, users} = req.body;
+    const { id, name, description, users } = req.body;
     const usersArray = users.split(users, ", ");
-    
+
     try {
         const result = await addChat(id, name, description, usersArray);
-        res.json (result);
+        res.json(result);
     } catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);
     }
@@ -158,18 +157,18 @@ router.post('/',  [
 
 //DELETE - url: /:id, cancella la chat avendo l'id.
 router.delete('/:id', [
-    param ('id')
+    param('id')
         .isNumeric()
         .not().isEmpty(),
     sanitizeParam('id').toInt()
-], async(req, res) => {
+], async (req: any, res: any) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() });
+        return res.status(422).json({ errors: errors.array() });
     }
     const id = req.params.id;
-    
+
     try {
         const result = await removeChatById(id);
         res.json(result);

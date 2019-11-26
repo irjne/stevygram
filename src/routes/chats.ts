@@ -9,7 +9,6 @@ import {
     addChat,
     removeChatById
 } from '../index';
-import { resolveSoa } from 'dns';
 
 const router = express.Router();
 
@@ -25,9 +24,11 @@ router.get('/', async (req, res) => {
 
 //- url: /:id/users, stampa tutti gli utenti di una chat;
 router.get('/:id/users', [
-    check ('id')
+    param ('id')
         .isNumber()
-        .not().isEmpty()
+        .not().isEmpty(),
+    sanitizeParam('id').toNumber()
+
 ], async(req, res) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
@@ -35,7 +36,7 @@ router.get('/:id/users', [
       return res.status(422).json({ errors: errors.array() });
     }
 
-    let id = Number(req.params.id);
+    const id = req.params.id;
     try {
         const result = await getUsersByChatId(id);
         res.json(result);
@@ -46,9 +47,10 @@ router.get('/:id/users', [
 
 //- url: /:id, stampa tutti i dati di una chat;
 router.get('/:id', [
-    check ('id')
+    param ('id')
         .isNumber()
-        .not().isEmpty()
+        .not().isEmpty(),
+        sanitizeParam('id').toNumber()
 ], async(req, res) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
@@ -56,7 +58,7 @@ router.get('/:id', [
       return res.status(422).json({ errors: errors.array() });
     }
 
-    let id = Number(req.params.id);
+    const id = req.params.id;
     try {
         const result = await getInfoByChatId(id);
         res.json(result);
@@ -67,9 +69,10 @@ router.get('/:id', [
 
 // - url: /:id/messages, stampa tutti i messaggi di una chat:
 router.get('/:id/messages', [
-    check ('id')
+    param ('id')
         .isNumber()
-        .not().isEmpty()
+        .not().isEmpty(),
+        sanitizeParam('id').toNumber()
 ], async(req, res) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
@@ -77,7 +80,7 @@ router.get('/:id/messages', [
       return res.status(422).json({ errors: errors.array() });
     }
 
-    let id = Number(req.params.id);
+    const id = req.params.id;
     try {
          const result = await getMessagesByChatId(id);
          res.json(result); 
@@ -91,24 +94,26 @@ router.get('/:id/messages', [
 
 //PUT - url: /:id + BODY, modifica una chat dando un id.
 router.put('/:id',[
-    check ('id')
+    param ('id')
         .isNumber()
         .not().isEmpty(),
-    check ('description')
+    body ('description')
         .trim()
         .isString(),
-    check ('name')
+    body ('name')
         .trim()
         .isString()
         .not().isEmpty(),
+    sanitizeParam('id').toNumber()
 ], async(req, res) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
- 
-    const {id, description, name} = req.body;
+    
+    const id = req.params.id;
+    const {description, name} = req.body;
     try {
         const result = await changeInfoByChatId(id, name, description);
         res.json(result);
@@ -118,7 +123,28 @@ router.put('/:id',[
 })
 
 //POST - url: / + BODY, aggiunge una chat.
-router.post('/', async(req, res) => {
+router.post('/',  [
+    param ('id')
+        .isNumber()
+        .not().isEmpty(),
+    body ('description')
+        .trim()
+        .isString(),
+    body ('name')
+        .trim()
+        .isString()
+        .not().isEmpty(),
+    body ('users')
+        .isString()
+        .trim(),
+    sanitizeParam('id').toNumber()
+], async(req, res) => {
+    // Finds the validation errors in this request and wraps them in an object with handy functions
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+
     const {id, name, description, users} = req.body;
     const usersArray = users.split(users, ", ");
     
@@ -131,8 +157,18 @@ router.post('/', async(req, res) => {
 })
 
 //DELETE - url: /:id, cancella la chat avendo l'id.
-router.delete('/:id', async(req, res) => {
-    let id = Number(req.params.id);
+router.delete('/:id', [
+    param ('id')
+        .isNumber()
+        .not().isEmpty()
+    sanitizeParam('id').toNumber()
+], async(req, res) => {
+    // Finds the validation errors in this request and wraps them in an object with handy functions
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+    const id = req.params.id;
     
     try {
         const result = await removeChatById(id);

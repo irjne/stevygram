@@ -39,6 +39,7 @@ router.get('/:id/users', [
     const id = req.params.id;
     try {
         const result = await getUsersByChatId(id);
+        if (result == false) return res.status(404).send(`Chat not found.`);
         res.json(result);
     } catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);
@@ -61,6 +62,7 @@ router.get('/:id', [
     const id = req.params.id;
     try {
         const result = await getInfoByChatId(id);
+        if (result == false) return res.status(404).send(`Chat not found.`);
         res.json(result);
     } catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);
@@ -72,10 +74,6 @@ router.get('/:id/messages', [
     param('id')
         .isNumeric()
         .not().isEmpty(),
-    query('word')
-        .isString(),
-    query('sender')
-        .isString(),
     sanitizeParam('id').toInt()
 ], async (req: any, res: any) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions
@@ -90,7 +88,8 @@ router.get('/:id/messages', [
     //filter: ?word="pippo", stampa tutti i messaggi contenenti la parola; 
     if (req.query.word) {
         try {
-            const result = await searchByChatId(id, word);
+            const result = await searchByChatId(id, undefined, word);
+            if (result == false) return res.status(404).send(`Chat not found.`);
             res.json(result);
         } catch (err) {
             return res.status(400).send(`Unexpected error: ${err}`);
@@ -101,6 +100,7 @@ router.get('/:id/messages', [
     else if (req.query.sender) {
         try {
             const result = await searchByChatId(id, sender);
+            if (result == false) return res.status(404).send(`Chat not found.`);
             res.json(result);
         } catch (err) {
             return res.status(400).send(`Unexpected error: ${err}`);
@@ -109,6 +109,7 @@ router.get('/:id/messages', [
     else {
         try {
             const result = await getMessagesByChatId(id);
+            if (result == false) return res.status(404).send(`Chat not found.`);
             res.json(result);
         } catch (err) {
             return res.status(400).send(`Unexpected error: ${err}`);
@@ -140,6 +141,7 @@ router.put('/:id', [
     const { description, name } = req.body;
     try {
         const result = await changeInfoByChatId(id, name, description);
+        if (result == false) return res.status(404).send(`Chat not found.`);
         res.json(result);
     } catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);
@@ -174,6 +176,7 @@ router.post('/', [
 
     try {
         const result = await addChat(id, name, description, usersArray);
+        if (result == false) return res.status(404).send(`Chat not found.`);
         res.json(result);
     } catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);
@@ -196,6 +199,7 @@ router.delete('/:id', [
 
     try {
         const result = await removeChatById(id);
+        if (result == false) return res.status(404).send(`Chat not found.`);
         res.json(result);
     } catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);

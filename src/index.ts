@@ -21,7 +21,7 @@ export const addUser = async (nickname: string, name: string, surname: string, p
         obj.users.push({ nickname, name, surname, phone });
         let json = JSON.stringify(obj);
         const writeFile = promisify(fs.writeFile);
-        const file = await writeFile(__dirname + '/users.json', json, 'utf-8');
+        await writeFile(__dirname + '/users.json', json, 'utf-8');
 
         return `User ${nickname} added successfully.`;
     }
@@ -38,13 +38,13 @@ export const addChat = async (id: number, name: string, description: string, use
 
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(__dirname + 'chats.json', 'utf-8');
+        const chats = await readFile(__dirname + '/chats.json', 'utf-8');
         obj = JSON.parse(chats);
 
         obj.chats.push({ id, name, description, users });
         let json = JSON.stringify(obj);
         const writeFile = promisify(fs.writeFile);
-        const file = await writeFile(__dirname + 'chats.json', json, 'utf-8');
+        await writeFile(__dirname + '/chats.json', json, 'utf-8');
         return `Chat \"${name}\" added successfully.`;
 
     }
@@ -60,7 +60,7 @@ export const getAllChats = async (): Promise<object | any> => {
 
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(__dirname + 'chats.json', 'utf-8');
+        const chats = await readFile(__dirname + '/chats.json', 'utf-8');
         obj = JSON.parse(chats);
         return obj;
     }
@@ -77,7 +77,7 @@ export const getAllUsers = async (): Promise<object | any> => {
 
     try {
         const readFile = promisify(fs.readFile);
-        const users = await readFile(__dirname + 'users.json', 'utf-8');
+        const users = await readFile(__dirname + '/users.json', 'utf-8');
         obj = JSON.parse(users);
         return obj.users;
     }
@@ -93,8 +93,10 @@ export const getUsersByChatId = async (id: number): Promise<object | any> => {
 
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(__dirname + 'chats.json', 'utf-8');
+        const chats = await readFile(__dirname + '/chats.json', 'utf-8');
         obj = JSON.parse(chats);
+
+        if (id > obj.chats.length - 1) return false;
         return obj.chats[id].users;
     }
     catch (err) {
@@ -109,8 +111,10 @@ export const getInfoByChatId = async (id: number): Promise<object[] | any> => {
 
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(__dirname + 'chats.json', 'utf-8');
+        const chats = await readFile(__dirname + '/chats.json', 'utf-8');
         obj = JSON.parse(chats);
+
+        if (id > obj.chats.length - 1) return false;
         return [obj.chats[id].name, obj.chats[id].description];
     }
     catch (err) {
@@ -125,9 +129,11 @@ export const getMessagesByChatId = async (id: number): Promise<object | any> => 
 
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(__dirname + 'chats.json', 'utf-8');
+        const chats = await readFile(__dirname + '/chats.json', 'utf-8');
         obj = JSON.parse(chats);
         console.log(obj.chats[id].messages);
+
+        if (id > obj.chats.length - 1) return false;
         return obj.chats[id].messages;
     }
     catch (err) {
@@ -144,8 +150,10 @@ export const changeInfoByChatId = async (id: number, name?: string, description?
 
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(__dirname + 'chats.json', 'utf-8');
+        const chats = await readFile(__dirname + '/chats.json', 'utf-8');
         obj = JSON.parse(chats);
+
+        if (id > obj.chats.length - 1) return false;
         for (let i = 0; i < obj.chats.length; i++) {
             if (id == obj.chats[i].id) {
                 if (name) obj.chats[i].name = name;
@@ -158,7 +166,7 @@ export const changeInfoByChatId = async (id: number, name?: string, description?
         if (isFounded) {
             let json = JSON.stringify(obj);
             const writeFile = promisify(fs.writeFile);
-            const file = await writeFile(__dirname + 'chats.json', json, 'utf-8');
+            await writeFile(__dirname + '/chats.json', json, 'utf-8');
 
             return `Chat ${name} changed successfully.`;
         }
@@ -192,7 +200,7 @@ export const changeUserByPhone = async (phone: string, nickname?: string, name?:
         if (isFounded) {
             let json = JSON.stringify(obj);
             const writeFile = promisify(fs.writeFile);
-            const file = await writeFile(__dirname + '/users.json', json, 'utf-8');
+            await writeFile(__dirname + '/users.json', json, 'utf-8');
 
             return `User ${nickname} (${phone}) changed successfully.`;
         }
@@ -212,53 +220,63 @@ export const searchByChatId = async (id: number, sender?: string, word?: string)
 
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(__dirname + 'chats.json', 'utf-8');
+        const chats = await readFile(__dirname + '/chats.json', 'utf-8');
         obj = JSON.parse(chats);
+        if (id > obj.chats.length - 1) return false;
 
         if (sender) choice = 0;
         else if (word) choice = 1;
 
         let isFounded = false;
         let result = {
-            chats: Array<any>()
+            messages: Array<any>()
         };
 
         switch (choice) {
-            case 0: { // search by user
+            case 0:
+                // search by sender
                 for (let i = 0; i < obj.chats.length; i++) {
                     if (id == obj.chats[i].id) {
                         for (let j = 0; j < obj.chats[i].messages.length; j++) {
                             if (sender == obj.chats[i].messages[j].sender) {
-                                result.chats[result.chats.length].bodyMessage = obj.chats[i].bodyMessage;
-                                result.chats[result.chats.length].date = obj.chats[i].date;
+                                result.messages[result.messages.length] = {
+                                    "body": obj.chats[i].messages[j].body,
+                                    "date": obj.chats[i].messages[j].date
+                                }
+
                                 isFounded = true;
                             }
                         }
                     }
                 }
-            }
-            case 1: { // search by word
+                break;
+
+            case 1:
+                // search by word
                 for (let i = 0; i < obj.chats.length; i++) {
                     if (id == obj.chats[i].id) {
                         for (let j = 0; j < obj.chats[i].messages.length; j++) {
-                            if (obj.chats[i].messages.body.includes(word)) {
-                                result.chats[result.chats.length].sender = obj.chats[i].sender;
-                                result.chats[result.chats.length].bodyMessage = obj.chats[i].bodyMessage;
-                                result.chats[result.chats.length].date = obj.chats[i].date;
+                            if (obj.chats[i].messages[j].body.includes(word)) {
+                                result.messages[result.messages.length] = {
+                                    "sender": obj.chats[i].messages[j].sender,
+                                    "body": obj.chats[i].messages[j].body,
+                                    "date": obj.chats[i].messages[j].date
+                                }
+
                                 isFounded = true;
                             }
                         }
                     }
                 }
-            }
+                break;
         }
 
         if (isFounded) {
             return result;
         }
         else {
-            if (choice == 0) return `The research by user \"${sender}\" reported 0 results.`;
-            else return `The research by word \"${word}\" reported 0 results.`;
+            if (choice == 0) return `The research by user (${sender}) reported 0 results.`;
+            else return `The research by word (${word}) reported 0 results.`;
         }
     }
     catch (err) {
@@ -273,8 +291,10 @@ export const removeChatById = async (id: number): Promise<string | any> => {
 
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(__dirname + 'chats.json', 'utf-8');
+        const chats = await readFile(__dirname + '/chats.json', 'utf-8');
         obj = JSON.parse(chats);
+        if (id > obj.chats.length - 1) return false;
+
         for (let i = 0; i < obj.chats.length; i++) {
             if (id == obj.chats[i].id) {
                 obj.chats.splice(i, 1);
@@ -283,7 +303,7 @@ export const removeChatById = async (id: number): Promise<string | any> => {
         }
         let json = JSON.stringify(obj);
         const writeFile = promisify(fs.writeFile);
-        const file = await writeFile(__dirname + 'chats.json', json, 'utf-8');
+        await writeFile(__dirname + '/chats.json', json, 'utf-8');
         return `Chat \"${id}\" removed successfully.`;
     }
     catch (err) {
@@ -298,7 +318,7 @@ export const removeUserByPhone = async (phone: string): Promise<string | any> =>
 
     try {
         const readFile = promisify(fs.readFile);
-        const users = await readFile(__dirname + 'users.json', 'utf-8');
+        const users = await readFile(__dirname + '/users.json', 'utf-8');
         obj = JSON.parse(users);
 
         for (let i = 0; i < obj.users.length; i++) {
@@ -309,7 +329,7 @@ export const removeUserByPhone = async (phone: string): Promise<string | any> =>
         }
         let json = JSON.stringify(obj);
         const writeFile = promisify(fs.writeFile);
-        const file = await writeFile(__dirname + 'users.json', json, 'utf-8');
+        await writeFile(__dirname + '/users.json', json, 'utf-8');
         return `User ${phone} removed successfully.`;
     }
     catch (err) {

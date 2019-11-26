@@ -13,77 +13,202 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const express_validator_1 = require("express-validator");
 const index_1 = require("../index");
 const router = express_1.default.Router();
 //GET - url: /, stampa tutte le chat
 router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    index_1.getAllChats().then(res => {
-        return res.json(res);
-    }).catch(err => {
-        return res.status(404).send(`Unexpected error: ${err}`);
-    });
+    try {
+        const result = yield index_1.getAllChats();
+        res.json(result);
+    }
+    catch (err) {
+        return res.status(400).send(`Unexpected error: ${err}`);
+    }
 }));
 //- url: /:id/users, stampa tutti gli utenti di una chat;
-router.get('/:id/users', (req, res) => {
-    let id = Number(req.params.id);
-    index_1.getUsersByChatId(id).then(result => {
-        return res.json(result);
-    }).catch(err => {
-        return res.status(404).send(`Unexpected error: ${err}`);
-    });
-});
+router.get('/:id/users', [
+    express_validator_1.param('id')
+        .isNumeric()
+        .not().isEmpty(),
+    express_validator_1.sanitizeParam('id').toInt()
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // Finds the validation errors in this request and wraps them in an object with handy functions
+    const errors = express_validator_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    const id = req.params.id;
+    try {
+        const result = yield index_1.getUsersByChatId(id);
+        if (result == false)
+            return res.status(404).send(`Chat not found.`);
+        res.json(result);
+    }
+    catch (err) {
+        return res.status(400).send(`Unexpected error: ${err}`);
+    }
+}));
 //- url: /:id, stampa tutti i dati di una chat;
-router.get('/:id', (req, res) => {
-    let id = Number(req.params.id);
-    index_1.getInfoByChatId(id).then(result => {
-        return res.json(result);
-    }).catch(err => {
-        return res.status(404).send(`Unexpected error: ${err}`);
-    });
-});
+router.get('/:id', [
+    express_validator_1.param('id')
+        .isNumeric()
+        .not().isEmpty(),
+    express_validator_1.sanitizeParam('id').toInt()
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // Finds the validation errors in this request and wraps them in an object with handy functions
+    const errors = express_validator_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    const id = req.params.id;
+    try {
+        const result = yield index_1.getInfoByChatId(id);
+        if (result == false)
+            return res.status(404).send(`Chat not found.`);
+        res.json(result);
+    }
+    catch (err) {
+        return res.status(400).send(`Unexpected error: ${err}`);
+    }
+}));
 // - url: /:id/messages, stampa tutti i messaggi di una chat:
-router.get('/:id/messages', (req, res) => {
-    let id = Number(req.params.id);
-    index_1.getMessagesByChatId(id).then(result => {
-        return res.json(result);
-    }).catch(err => {
-        return res.status(404).send(`Unexpected error: ${err}`);
-    });
-    //TODO: filter: ?word="pippo", stampa tutti i messaggi contenenti la parola; 
-    //TODO: filter: ?user="id", stampa tutti i messaggi di un determinato utente.
-});
+router.get('/:id/messages', [
+    express_validator_1.param('id')
+        .isNumeric()
+        .not().isEmpty(),
+    express_validator_1.sanitizeParam('id').toInt()
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // Finds the validation errors in this request and wraps them in an object with handy functions
+    const errors = express_validator_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    const id = req.params.id;
+    const { sender, word } = req.query;
+    //filter: ?word="pippo", stampa tutti i messaggi contenenti la parola; 
+    if (req.query.word) {
+        try {
+            const result = yield index_1.searchByChatId(id, undefined, word);
+            if (result == false)
+                return res.status(404).send(`Chat not found.`);
+            res.json(result);
+        }
+        catch (err) {
+            return res.status(400).send(`Unexpected error: ${err}`);
+        }
+    }
+    //filter: ?sender="id", stampa tutti i messaggi di un determinato utente.
+    else if (req.query.sender) {
+        try {
+            const result = yield index_1.searchByChatId(id, sender);
+            if (result == false)
+                return res.status(404).send(`Chat not found.`);
+            res.json(result);
+        }
+        catch (err) {
+            return res.status(400).send(`Unexpected error: ${err}`);
+        }
+    }
+    else {
+        try {
+            const result = yield index_1.getMessagesByChatId(id);
+            if (result == false)
+                return res.status(404).send(`Chat not found.`);
+            res.json(result);
+        }
+        catch (err) {
+            return res.status(400).send(`Unexpected error: ${err}`);
+        }
+    }
+}));
 //PUT - url: /:id + BODY, modifica una chat dando un id.
-router.put('/:id', (req, res) => {
-    let id = Number(req.params.id);
-    let description = req.body.description;
-    let name = req.body.name;
-    index_1.changeInfoByChatId(id, name, description).then(result => {
-        return res.json(result);
-    }).catch(err => {
-        return res.status(404).send(`Unexpected error: ${err}`);
-    });
-});
+router.put('/:id', [
+    express_validator_1.param('id')
+        .isNumeric()
+        .not().isEmpty(),
+    express_validator_1.body('description')
+        .trim()
+        .isString(),
+    express_validator_1.body('name')
+        .trim()
+        .isString()
+        .not().isEmpty(),
+    express_validator_1.sanitizeParam('id').toInt()
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // Finds the validation errors in this request and wraps them in an object with handy functions
+    const errors = express_validator_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    const id = req.params.id;
+    const { description, name } = req.body;
+    try {
+        const result = yield index_1.changeInfoByChatId(id, name, description);
+        if (result == false)
+            return res.status(404).send(`Chat not found.`);
+        res.json(result);
+    }
+    catch (err) {
+        return res.status(400).send(`Unexpected error: ${err}`);
+    }
+}));
 //POST - url: / + BODY, aggiunge una chat.
-router.post('/', (req, res) => {
-    let id = Number(req.body.id);
-    let name = String(req.body.name);
-    let description = String(req.body.description);
-    let users = req.body.users;
-    users = users.split(users, ", ");
-    index_1.addChat(id, name, description, users).then(result => {
-        return res.json(result);
-    }).catch(err => {
-        return res.status(404).send(`Unexpected error: ${err}`);
-    });
-});
+router.post('/', [
+    express_validator_1.param('id')
+        .isNumeric()
+        .not().isEmpty(),
+    express_validator_1.body('description')
+        .trim()
+        .isString(),
+    express_validator_1.body('name')
+        .trim()
+        .isString()
+        .not().isEmpty(),
+    express_validator_1.body('users')
+        .isString()
+        .trim(),
+    express_validator_1.sanitizeParam('id').toInt()
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // Finds the validation errors in this request and wraps them in an object with handy functions
+    const errors = express_validator_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    const { id, name, description, users } = req.body;
+    const usersArray = users.split(users, ", ");
+    try {
+        const result = yield index_1.addChat(id, name, description, usersArray);
+        if (result == false)
+            return res.status(404).send(`Chat not found.`);
+        res.json(result);
+    }
+    catch (err) {
+        return res.status(400).send(`Unexpected error: ${err}`);
+    }
+}));
 //DELETE - url: /:id, cancella la chat avendo l'id.
-router.delete('/:id', (req, res) => {
-    let id = Number(req.params.id);
-    index_1.removeChatById(id).then(result => {
-        return res.json(result);
-    }).catch(err => {
-        return res.status(404).send(`Unexpected error: ${err}`);
-    });
-});
+router.delete('/:id', [
+    express_validator_1.param('id')
+        .isNumeric()
+        .not().isEmpty(),
+    express_validator_1.sanitizeParam('id').toInt()
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // Finds the validation errors in this request and wraps them in an object with handy functions
+    const errors = express_validator_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    const id = req.params.id;
+    try {
+        const result = yield index_1.removeChatById(id);
+        if (result == false)
+            return res.status(404).send(`Chat not found.`);
+        res.json(result);
+    }
+    catch (err) {
+        return res.status(400).send(`Unexpected error: ${err}`);
+    }
+}));
 exports.default = router;
 //# sourceMappingURL=chats.js.map

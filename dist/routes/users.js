@@ -14,49 +14,97 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const index_1 = require("../index");
+const express_validator_1 = require("express-validator");
 const router = express_1.default.Router();
 //GET - url: /, stampa tutti gli utenti.
 router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    index_1.getAllUsers().then(result => {
-        return res.json(result);
-    }).catch(err => {
-        return res.status(404).send(`Unexpected error: ${err}`);
-    });
+    try {
+        const result = yield index_1.getAllUsers();
+        res.json(result);
+    }
+    catch (err) {
+        return res.status(400).send(`Unexpected error: ${err}`);
+    }
 }));
 //PUT - url: /:id, modifica un user dando un id + BODY.
-router.put('/:phone', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let phone = req.params.phone;
-    let name = req.body.name;
-    let surname = req.body.surname;
-    let nickname = req.body.nickname;
-    index_1.changeUserByPhone(nickname, name, surname, phone).then(result => {
-        return res.json(result);
-    }).catch(err => {
-        return res.status(404).send(`Unexpected error: ${err}`);
-    });
+router.put('/:phone', [
+    express_validator_1.body('nickname')
+        .isString()
+        .trim(),
+    express_validator_1.body('name')
+        .isString()
+        .trim(),
+    express_validator_1.body('surname').isString()
+        .trim(),
+    express_validator_1.param('phone')
+        .isString()
+        .not().isEmpty()
+        .trim()
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const errors = express_validator_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    const { name, phone, surname, nickname } = req.body;
+    try {
+        const result = yield index_1.changeUserByPhone(nickname, name, surname, phone);
+        res.json(result);
+    }
+    catch (err) {
+        return res.status(400).send(`Unexpected error: ${err}`);
+    }
 }));
 //POST - url: /, aggiunge un utente nell'app + BODY.
-router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(req.body);
-    let name = String(req.body.name);
-    let surname = String(req.body.surname);
-    let nickname = String(req.body.nickname);
-    let phone = String(req.body.phone);
-    index_1.addUser(nickname, name, surname, phone).then(result => {
-        return res.json(result);
-    }).catch(err => {
-        return res.status(404).send(`Unexpected error: ${err}`);
-    });
+router.post('/', [
+    express_validator_1.body('nickname')
+        .isString()
+        .not().isEmpty()
+        .trim(),
+    express_validator_1.body('name')
+        .isString()
+        .not().isEmpty()
+        .trim(),
+    express_validator_1.body('surname')
+        .isString()
+        .not().isEmpty()
+        .trim(),
+    express_validator_1.body('phone')
+        .isString()
+        .not().isEmpty()
+        .trim()
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const errors = express_validator_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    const { name, phone, surname, nickname } = req.body;
+    try {
+        const result = yield index_1.addUser(nickname, name, surname, phone);
+        res.json(result);
+    }
+    catch (err) {
+        return res.status(400).send(`Unexpected error: ${err}`);
+    }
 }));
 //DELETE - url: /:id, cancella l'utente avendo l'id.
-router.delete(':phone', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.delete('/:phone', [
+    express_validator_1.param('phone')
+        .isString()
+        .not().isEmpty()
+        .trim()
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const errors = express_validator_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
     let phone = String(req.params.phone);
-    console.log(phone);
-    index_1.removeUserByPhone(phone).then(result => {
-        return res.json(result);
-    }).catch(err => {
-        return res.status(404).send(`Unexpected error: ${err}`);
-    });
+    try {
+        const result = yield index_1.removeUserByPhone(phone);
+        res.json(result);
+    }
+    catch (err) {
+        return res.status(400).send(`Unexpected error: ${err}`);
+    }
 }));
 exports.default = router;
 //# sourceMappingURL=users.js.map

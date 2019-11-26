@@ -1,5 +1,5 @@
-import express, { RouterOptions } from 'express';
-import { check, validationResult } from 'express-validator';
+import express from 'express';
+import { body, param, validationResult, sanitizeParam } from 'express-validator';
 import {
     getAllChats,
     getInfoByChatId,
@@ -25,9 +25,9 @@ router.get('/', async (req, res) => {
 //- url: /:id/users, stampa tutti gli utenti di una chat;
 router.get('/:id/users', [
     param ('id')
-        .isNumber()
+        .isNumeric()
         .not().isEmpty(),
-    sanitizeParam('id').toNumber()
+    sanitizeParam('id').toInt()
 
 ], async(req, res) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions
@@ -48,9 +48,9 @@ router.get('/:id/users', [
 //- url: /:id, stampa tutti i dati di una chat;
 router.get('/:id', [
     param ('id')
-        .isNumber()
+        .isNumeric()
         .not().isEmpty(),
-        sanitizeParam('id').toNumber()
+        sanitizeParam('id').toInt()
 ], async(req, res) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
@@ -70,9 +70,9 @@ router.get('/:id', [
 // - url: /:id/messages, stampa tutti i messaggi di una chat:
 router.get('/:id/messages', [
     param ('id')
-        .isNumber()
+        .isNumeric()
         .not().isEmpty(),
-        sanitizeParam('id').toNumber()
+        sanitizeParam('id').toInt()
 ], async(req, res) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
@@ -95,7 +95,7 @@ router.get('/:id/messages', [
 //PUT - url: /:id + BODY, modifica una chat dando un id.
 router.put('/:id',[
     param ('id')
-        .isNumber()
+        .isNumeric()
         .not().isEmpty(),
     body ('description')
         .trim()
@@ -104,7 +104,7 @@ router.put('/:id',[
         .trim()
         .isString()
         .not().isEmpty(),
-    sanitizeParam('id').toNumber()
+    sanitizeParam('id').toInt()
 ], async(req, res) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
@@ -125,7 +125,7 @@ router.put('/:id',[
 //POST - url: / + BODY, aggiunge una chat.
 router.post('/',  [
     param ('id')
-        .isNumber()
+        .isNumeric()
         .not().isEmpty(),
     body ('description')
         .trim()
@@ -137,7 +137,7 @@ router.post('/',  [
     body ('users')
         .isString()
         .trim(),
-    sanitizeParam('id').toNumber()
+    sanitizeParam('id').toInt()
 ], async(req, res) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
@@ -159,9 +159,9 @@ router.post('/',  [
 //DELETE - url: /:id, cancella la chat avendo l'id.
 router.delete('/:id', [
     param ('id')
-        .isNumber()
-        .not().isEmpty()
-    sanitizeParam('id').toNumber()
+        .isNumeric()
+        .not().isEmpty(),
+    sanitizeParam('id').toInt()
 ], async(req, res) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);

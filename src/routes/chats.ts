@@ -1,5 +1,5 @@
 import express from 'express';
-import { body, param, validationResult, sanitizeParam } from 'express-validator';
+import { body, param, validationResult, sanitizeParam, query } from 'express-validator';
 import {
     getAllChats,
     getInfoByChatId,
@@ -7,7 +7,8 @@ import {
     getUsersByChatId,
     changeInfoByChatId,
     addChat,
-    removeChatById
+    removeChatById,
+    searchByChatId
 } from '../index';
 
 const router = express.Router();
@@ -71,6 +72,10 @@ router.get('/:id/messages', [
     param('id')
         .isNumeric()
         .not().isEmpty(),
+    query('word')
+        .isString(),
+    query('sender')
+        .isString(),
     sanitizeParam('id').toInt()
 ], async (req: any, res: any) => {
     // Finds the validation errors in this request and wraps them in an object with handy functions
@@ -80,15 +85,35 @@ router.get('/:id/messages', [
     }
 
     const id = req.params.id;
-    try {
-        const result = await getMessagesByChatId(id);
-        res.json(result);
-    } catch (err) {
-        return res.status(400).send(`Unexpected error: ${err}`);
+    const { sender, word } = req.query;
+
+    //filter: ?word="pippo", stampa tutti i messaggi contenenti la parola; 
+    if (req.query.word) {
+        try {
+            const result = await searchByChatId(id, word);
+            res.json(result);
+        } catch (err) {
+            return res.status(400).send(`Unexpected error: ${err}`);
+        }
     }
 
-    //TODO: filter: ?word="pippo", stampa tutti i messaggi contenenti la parola; 
-    //TODO: filter: ?user="id", stampa tutti i messaggi di un determinato utente.
+    //filter: ?sender="id", stampa tutti i messaggi di un determinato utente.
+    else if (req.query.sender) {
+        try {
+            const result = await searchByChatId(id, sender);
+            res.json(result);
+        } catch (err) {
+            return res.status(400).send(`Unexpected error: ${err}`);
+        }
+    }
+    else {
+        try {
+            const result = await getMessagesByChatId(id);
+            res.json(result);
+        } catch (err) {
+            return res.status(400).send(`Unexpected error: ${err}`);
+        }
+    }
 })
 
 //PUT - url: /:id + BODY, modifica una chat dando un id.

@@ -14,20 +14,18 @@ router.get('/', async (req, res) => {
 
 //PUT - url: /:id, modifica un user dando un id + BODY.
 router.put('/:phone', async (req, res) => {
-    let phone = req.params.phone;
-    let name = req.body.name;
-    let surname = req.body.surname;
-    let nickname = req.body.nickname;
-
-    changeUserByPhone(nickname, name, surname, phone).then(result => {
-        return res.json(result);
-    }).catch(err => {
+    const { name, phone, surname, nickname } = req.body;
+    try {
+        const result = await changeUserByPhone(nickname, name, surname, phone);
+        res.json(result);
+    } catch (err) {
         return res.status(404).send(`Unexpected error: ${err}`);
-    });
+    }
 })
 
 //POST - url: /, aggiunge un utente nell'app + BODY.
 router.post('/', async (req, res) => {
+    console.log(req.body);
     let name = String(req.body.name);
     let surname = String(req.body.surname);
     let nickname = String(req.body.nickname);

@@ -8,7 +8,7 @@ export const addUser = async (nickname: string, name: string, surname: string, p
 
     try {
         const readFile = promisify(fs.readFile);
-        const users = await readFile('./users.json', 'utf-8');
+        const users = await readFile(__dirname + '/users.json', 'utf-8');
         obj = JSON.parse(users);
         let exists = false;
 
@@ -21,7 +21,7 @@ export const addUser = async (nickname: string, name: string, surname: string, p
         obj.users.push({ nickname, name, surname, phone });
         let json = JSON.stringify(obj);
         const writeFile = promisify(fs.writeFile);
-        const file = await writeFile('./users.json', json, 'utf-8');
+        const file = await writeFile(__dirname + '/users.json', json, 'utf-8');
 
         return `User ${nickname} added successfully.`;
     }
@@ -178,7 +178,7 @@ export const changeUserByPhone = async (phone: string, nickname?: string, name?:
 
     try {
         const readFile = promisify(fs.readFile);
-        const users = await readFile('users.json', 'utf-8');
+        const users = await readFile(__dirname + '/users.json', 'utf-8');
         obj = JSON.parse(users);
         for (let i = 0; i < obj.users.length; i++) {
             if (phone == obj.users[i].phone) {
@@ -192,13 +192,14 @@ export const changeUserByPhone = async (phone: string, nickname?: string, name?:
         if (isFounded) {
             let json = JSON.stringify(obj);
             const writeFile = promisify(fs.writeFile);
-            const file = await writeFile('users.json', json, 'utf-8');
+            const file = await writeFile(__dirname + '/users.json', json, 'utf-8');
 
             return `User ${nickname} (${phone}) changed successfully.`;
         }
         else { return `User \"${phone}\" not found.`; }
     }
     catch (err) {
+        console.error(err);
         return err;
     }
 }

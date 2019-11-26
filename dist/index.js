@@ -24,7 +24,7 @@ exports.addUser = (nickname, name, surname, phone) => __awaiter(void 0, void 0, 
     };
     try {
         const readFile = util_1.promisify(fs.readFile);
-        const users = yield readFile('./users.json', 'utf-8');
+        const users = yield readFile(__dirname + '/users.json', 'utf-8');
         obj = JSON.parse(users);
         let exists = false;
         for (let i = 0; i < obj.users.length; i++) {
@@ -35,7 +35,7 @@ exports.addUser = (nickname, name, surname, phone) => __awaiter(void 0, void 0, 
         obj.users.push({ nickname, name, surname, phone });
         let json = JSON.stringify(obj);
         const writeFile = util_1.promisify(fs.writeFile);
-        const file = yield writeFile('./users.json', json, 'utf-8');
+        const file = yield writeFile(__dirname + '/users.json', json, 'utf-8');
         return `User ${nickname} added successfully.`;
     }
     catch (err) {
@@ -172,7 +172,7 @@ exports.changeUserByPhone = (phone, nickname, name, surname) => __awaiter(void 0
     let isFounded = false;
     try {
         const readFile = util_1.promisify(fs.readFile);
-        const users = yield readFile('users.json', 'utf-8');
+        const users = yield readFile(__dirname + '/users.json', 'utf-8');
         obj = JSON.parse(users);
         for (let i = 0; i < obj.users.length; i++) {
             if (phone == obj.users[i].phone) {
@@ -188,7 +188,7 @@ exports.changeUserByPhone = (phone, nickname, name, surname) => __awaiter(void 0
         if (isFounded) {
             let json = JSON.stringify(obj);
             const writeFile = util_1.promisify(fs.writeFile);
-            const file = yield writeFile('users.json', json, 'utf-8');
+            const file = yield writeFile(__dirname + '/users.json', json, 'utf-8');
             return `User ${nickname} (${phone}) changed successfully.`;
         }
         else {
@@ -196,6 +196,7 @@ exports.changeUserByPhone = (phone, nickname, name, surname) => __awaiter(void 0
         }
     }
     catch (err) {
+        console.error(err);
         return err;
     }
 });

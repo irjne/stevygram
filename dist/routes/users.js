@@ -37,12 +37,12 @@ router.put('/:phone', (req, res) => __awaiter(void 0, void 0, void 0, function* 
 }));
 //POST - url: /, aggiunge un utente nell'app + BODY.
 router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(req.body);
     let name = String(req.body.name);
     let surname = String(req.body.surname);
     let nickname = String(req.body.nickname);
     let phone = String(req.body.phone);
-    //addUser(nickname, name, surname, phone).then(result => {
-    index_1.addUser("nickname", "name", "surname", "phone").then(result => {
+    index_1.addUser(nickname, name, surname, phone).then(result => {
         return res.json(result);
     }).catch(err => {
         return res.status(404).send(`Unexpected error: ${err}`);

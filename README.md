@@ -3,7 +3,7 @@
 Stevygram is a basilar version of Telegram: it manages information of users, chats and correlated messages. 
 It uses JSON files to store its data; its APIs are based on REST paradigm.  
 
-Created by **@irjne**, **@clacchisi**, **@GlitchXCIV**, **@DarioLag96**
+Created by [@irjne](https://github.com/irjne), [@clacchisi](https://github.com/clacchisi), [@GlitchXCIV](https://github.com/GlitchXCIV), [@DarioLag96](https://github.com/Dariolag96)
 
 
 ## 📕 STRUCTURE

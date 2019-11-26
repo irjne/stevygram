@@ -129,7 +129,6 @@ exports.getMessagesByChatId = (id) => __awaiter(void 0, void 0, void 0, function
         const readFile = util_1.promisify(fs.readFile);
         const chats = yield readFile(__dirname + '/chats.json', 'utf-8');
         obj = JSON.parse(chats);
-        console.log(obj.chats[id].messages);
         if (id > obj.chats.length - 1)
             return false;
         return obj.chats[id].messages;
@@ -191,6 +190,7 @@ exports.changeUserByPhone = (phone, nickname, name, surname) => __awaiter(void 0
                 if (surname)
                     obj.users[i].surname = surname;
                 isFounded = true;
+                break;
             }
         }
         if (isFounded) {

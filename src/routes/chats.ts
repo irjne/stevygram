@@ -30,7 +30,6 @@ router.get('/:id/users', [
         .not().isEmpty(),
     sanitizeParam('id').toInt()
 ], async (req: any, res: any) => {
-    // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -39,7 +38,7 @@ router.get('/:id/users', [
     const id = req.params.id;
     try {
         const result = await getUsersByChatId(id);
-        if (result == false) return res.status(404).send(`Chat not found.`);
+        if (result == false) return res.status(404).send("Chat not found.");
         res.json(result);
     } catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);
@@ -53,7 +52,6 @@ router.get('/:id', [
         .not().isEmpty(),
     sanitizeParam('id').toInt()
 ], async (req: any, res: any) => {
-    // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -76,7 +74,6 @@ router.get('/:id/messages', [
         .not().isEmpty(),
     sanitizeParam('id').toInt()
 ], async (req: any, res: any) => {
-    // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -131,7 +128,6 @@ router.put('/:id', [
         .not().isEmpty(),
     sanitizeParam('id').toInt()
 ], async (req: any, res: any) => {
-    // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -165,7 +161,6 @@ router.post('/', [
         .trim(),
     sanitizeParam('id').toInt()
 ], async (req: any, res: any) => {
-    // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -190,7 +185,6 @@ router.delete('/:id', [
         .not().isEmpty(),
     sanitizeParam('id').toInt()
 ], async (req: any, res: any) => {
-    // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });

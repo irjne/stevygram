@@ -131,7 +131,6 @@ export const getMessagesByChatId = async (id: number): Promise<object | any> => 
         const readFile = promisify(fs.readFile);
         const chats = await readFile(__dirname + '/chats.json', 'utf-8');
         obj = JSON.parse(chats);
-        console.log(obj.chats[id].messages);
 
         if (id > obj.chats.length - 1) return false;
         return obj.chats[id].messages;
@@ -194,6 +193,7 @@ export const changeUserByPhone = async (phone: string, nickname?: string, name?:
                 if (name) obj.users[i].name = name;
                 if (surname) obj.users[i].surname = surname;
                 isFounded = true;
+                break;
             }
         }
 

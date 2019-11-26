@@ -15,14 +15,6 @@ router.get('/', async (req: any, res: any) => {
 
 //PUT - url: /:id, modifica un user dando un id + BODY.
 router.put('/:phone', [
-    body('nickname')
-        .isString()
-        .trim(),
-    body('name')
-        .isString()
-        .trim(),
-    body('surname').isString()
-        .trim(),
     param('phone')
         .isString()
         .not().isEmpty()
@@ -33,9 +25,11 @@ router.put('/:phone', [
         return res.status(422).json({ errors: errors.array() });
     }
 
-    const { name, phone, surname, nickname } = req.body;
+    const phone = req.params.phone;
+    const { nickname, name, surname } = req.body;
+
     try {
-        const result = await changeUserByPhone(nickname, name, surname, phone);
+        const result = await changeUserByPhone(phone, nickname, name, surname);
         res.json(result);
     } catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);
@@ -87,7 +81,7 @@ router.delete('/:phone', [
         return res.status(422).json({ errors: errors.array() });
     }
 
-    let phone = String(req.params.phone);
+    let phone = req.params.phone;
     try {
         const result = await removeUserByPhone(phone);
         res.json(result);

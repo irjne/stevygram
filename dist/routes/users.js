@@ -28,14 +28,6 @@ router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 }));
 //PUT - url: /:id, modifica un user dando un id + BODY.
 router.put('/:phone', [
-    express_validator_1.body('nickname')
-        .isString()
-        .trim(),
-    express_validator_1.body('name')
-        .isString()
-        .trim(),
-    express_validator_1.body('surname').isString()
-        .trim(),
     express_validator_1.param('phone')
         .isString()
         .not().isEmpty()
@@ -45,9 +37,10 @@ router.put('/:phone', [
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-    const { name, phone, surname, nickname } = req.body;
+    const phone = req.params.phone;
+    const { nickname, name, surname } = req.body;
     try {
-        const result = yield index_1.changeUserByPhone(nickname, name, surname, phone);
+        const result = yield index_1.changeUserByPhone(phone, nickname, name, surname);
         res.json(result);
     }
     catch (err) {
@@ -97,7 +90,7 @@ router.delete('/:phone', [
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-    let phone = String(req.params.phone);
+    let phone = req.params.phone;
     try {
         const result = yield index_1.removeUserByPhone(phone);
         res.json(result);

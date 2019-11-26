@@ -1,50 +1,96 @@
-//import { expect } from 'chai';
 import 'mocha';
-import * as methods from '../index';
-const request = require('supertest');
+import { expect } from 'chai';
+import supertest from 'supertest';
 const app = require('../app');
-const assert = require('assert');
 
-/*describe("GET /chats/:id/users", () => {
-    it("should return 200 if the db is accessible", () => {
-        request(app)
-        .get('/chats/1/users')
-        .end((err: any, res: any) => {
-            if (err) return err;
-            return res; 
+describe("users.ts API", () => {
+    it("GET /users - should return all users", async () => {
+        const result = await supertest(app).get('/users');
+        expect(result.status).to.equal(200);
+        expect(result.body).to.be.a('array');
+    });
+
+    it("PUT /users/:phone - should return a message", async () => {
+        const phone = "3466457463";
+        const nickname = "irjne";
+        const result = await supertest(app).put('/users/' + phone)
+            .send({ "phone": phone, "nickname": nickname });
+        expect(result.status).to.equal(200);
+        expect(result.body).to.be.a('string');
+    });
+
+    it("POST /users - should return a message", async () => {
+        const phone = "3482523775";
+        const nickname = "MainframeTV";
+        const name = "Gabriele";
+        const surname = "Connelli";
+        const result = await supertest(app).post('/users/')
+            .send({ "nickname": nickname, "name": name, "surname": surname, "phone": phone });
+        expect(result.status).to.equal(200);
+        expect(result.body).to.be.a('string');
+    });
+
+    it("DELETE /users/:phone - should return a message", async () => {
+        const phone = "3482523775";
+        const result = await supertest(app).delete('/users/' + phone)
+            .send({ "phone": phone });
+        expect(result.status).to.equal(200);
+        expect(result.body).to.be.a('string');
+    });
+});
+
+describe("chats.ts API", () => {
+    describe("GET /chats", () => {
+        it("should return all chats", async () => {
+            const result = await supertest(app).get('/chats');
+            expect(result.status).to.equal(200);
+            expect(result.body).to.be.a('object');
         });
     });
-  });*/
 
-describe('#addUser', () => {
-    let result = methods.addUser("MainframeTv", "Gabriele", "Connelli", "+393482523775");
-    it('should return a string if the user has been added', () => {
-        assert.isString(result);
-        assert.include(result, 'MainframeTv');
-    })
+    describe("GET /chats/:id/users", () => {
+        it("should return all users of a specific chat if it exists", async () => {
+            const id = 2;
+            const result = await supertest(app).get('/chats/' + id + '/users');
+            expect(result.status).to.equal(200);
+            expect(result.body).to.be.a('array');
+        });
 
-    /*it('should return an error if the user hasn\'t been added', () => {
-        assert.isNotString(result);
-        assert.notInclude(result);
-    })*/
-});
+        it("should return a 404 status if the chat doesn't exist", async () => {
+            const id = 10000;
+            const result = await supertest(app).get('/chats/' + id + '/users');
+            expect(result.status).to.equal(404);
+        });
+    });
 
-describe('#addChat', () => {
-    it('should return a string if the chat has been added', () => {
-        let result = methods.addChat(5, "Quelli che... si disperano", "Help us, pls", ["+393466457463", "+393286239190", "+393451691678"])
-        assert.isString(result);
-        assert.include(result, 'Quelli che... si disperano');
-    })
+    describe("GET /chats/:id", () => {
+        it("should return all info of a specific chat if it exists", async () => {
+            const id = 2;
+            const result = await supertest(app).get('/chats/' + id);
+            expect(result.status).to.equal(200);
+            expect(result.body).to.be.a('array');
+            expect(result.body).to.have.lengthOf(2);
+        });
 
-    /*it('should return an error if the chat hasn\'t been added', () => {
-        assert.isNotString(result);
-        assert.notInclude(result);
-    })*/
-});
+        it("should return a 404 status if the chat doesn't exist", async () => {
+            const id = 10000;
+            const result = await supertest(app).get('/chats/' + id);
+            expect(result.status).to.equal(404);
+        });
+    });
 
-describe('#getUsersByChatId', () => {
-    it('should return an array if the chat exists', () => {
-        let result = methods.getUsersByChatId(2);
-        assert.isArray(result);
+    describe("GET /chats/:id/messages", () => {
+        it("should return all info of a specific chat if it exists", async () => {
+            const id = 2;
+            const result = await supertest(app).get('/chats/' + id + '/messages');
+            expect(result.status).to.equal(200);
+            expect(result.body).to.be.a('array');
+        });
+
+        it("should return a 404 status if the chat doesn't exist", async () => {
+            const id = 10000;
+            const result = await supertest(app).get('/chats/' + id + '/messages');
+            expect(result.status).to.equal(404);
+        });
     })
 });

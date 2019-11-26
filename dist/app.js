@@ -13,4 +13,5 @@ app.use(body_parser_1.default.json());
 app.use('/users', users_1.default);
 app.use('/chats', chats_1.default);
 app.listen(3001, () => console.log('🙌 Server is running!'));
+module.exports = app;
 //# sourceMappingURL=app.js.map

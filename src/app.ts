@@ -12,3 +12,4 @@ app.use('/users', users);
 app.use('/chats', chats);
 
 app.listen(3001, () => console.log('🙌 Server is running!'));
+module.exports = app;

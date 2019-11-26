@@ -33,7 +33,6 @@ router.get('/:id/users', [
         .not().isEmpty(),
     express_validator_1.sanitizeParam('id').toInt()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = express_validator_1.validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -42,7 +41,7 @@ router.get('/:id/users', [
     try {
         const result = yield index_1.getUsersByChatId(id);
         if (result == false)
-            return res.status(404).send(`Chat not found.`);
+            return res.status(404).send("Chat not found.");
         res.json(result);
     }
     catch (err) {
@@ -56,7 +55,6 @@ router.get('/:id', [
         .not().isEmpty(),
     express_validator_1.sanitizeParam('id').toInt()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = express_validator_1.validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -79,7 +77,6 @@ router.get('/:id/messages', [
         .not().isEmpty(),
     express_validator_1.sanitizeParam('id').toInt()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = express_validator_1.validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -136,7 +133,6 @@ router.put('/:id', [
         .not().isEmpty(),
     express_validator_1.sanitizeParam('id').toInt()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = express_validator_1.validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -170,7 +166,6 @@ router.post('/', [
         .trim(),
     express_validator_1.sanitizeParam('id').toInt()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = express_validator_1.validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -194,7 +189,6 @@ router.delete('/:id', [
         .not().isEmpty(),
     express_validator_1.sanitizeParam('id').toInt()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = express_validator_1.validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });

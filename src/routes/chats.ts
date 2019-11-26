@@ -1,4 +1,5 @@
 import express, { RouterOptions } from 'express';
+import { check, validationResult } from 'express-validator';
 import {
     getAllChats,
     getInfoByChatId,
@@ -23,9 +24,18 @@ router.get('/', async (req, res) => {
 })
 
 //- url: /:id/users, stampa tutti gli utenti di una chat;
-router.get('/:id/users', (req, res) => {
+router.get('/:id/users', [
+    check ('id')
+        .isNumber()
+        .not().isEmpty()
+], async(req, res) => {
+    // Finds the validation errors in this request and wraps them in an object with handy functions
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+
     let id = Number(req.params.id);
-    
     try {
         const result = await getUsersByChatId(id);
         res.json(result);
@@ -35,9 +45,18 @@ router.get('/:id/users', (req, res) => {
 })
 
 //- url: /:id, stampa tutti i dati di una chat;
-router.get('/:id', (req, res) => {
+router.get('/:id', [
+    check ('id')
+        .isNumber()
+        .not().isEmpty()
+], async(req, res) => {
+    // Finds the validation errors in this request and wraps them in an object with handy functions
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+
     let id = Number(req.params.id);
-    
     try {
         const result = await getInfoByChatId(id);
         res.json(result);
@@ -47,9 +66,18 @@ router.get('/:id', (req, res) => {
 })
 
 // - url: /:id/messages, stampa tutti i messaggi di una chat:
-router.get('/:id/messages', (req, res) => {
+router.get('/:id/messages', [
+    check ('id')
+        .isNumber()
+        .not().isEmpty()
+], async(req, res) => {
+    // Finds the validation errors in this request and wraps them in an object with handy functions
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+
     let id = Number(req.params.id);
-    
     try {
          const result = await getMessagesByChatId(id);
          res.json(result); 
@@ -62,9 +90,25 @@ router.get('/:id/messages', (req, res) => {
 })
 
 //PUT - url: /:id + BODY, modifica una chat dando un id.
-router.put('/:id', (req, res) => {
+router.put('/:id',[
+    check ('id')
+        .isNumber()
+        .not().isEmpty(),
+    check ('description')
+        .trim()
+        .isString(),
+    check ('name')
+        .trim()
+        .isString()
+        .not().isEmpty(),
+], async(req, res) => {
+    // Finds the validation errors in this request and wraps them in an object with handy functions
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+ 
     const {id, description, name} = req.body;
-    
     try {
         const result = await changeInfoByChatId(id, name, description);
         res.json(result);
@@ -74,7 +118,7 @@ router.put('/:id', (req, res) => {
 })
 
 //POST - url: / + BODY, aggiunge una chat.
-router.post('/', (req, res) => {
+router.post('/', async(req, res) => {
     const {id, name, description, users} = req.body;
     const usersArray = users.split(users, ", ");
     
@@ -87,7 +131,7 @@ router.post('/', (req, res) => {
 })
 
 //DELETE - url: /:id, cancella la chat avendo l'id.
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async(req, res) => {
     let id = Number(req.params.id);
     
     try {

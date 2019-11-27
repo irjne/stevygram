@@ -30,6 +30,12 @@ describe("users.ts API", () => {
         chai_1.expect(result.status).to.equal(200);
         chai_1.expect(result.body).to.be.a('string');
     }));
+    it.only("PUT /users/:phone - should return a message", () => __awaiter(void 0, void 0, void 0, function* () {
+        const phone = "3466457463";
+        const result = yield supertest_1.default(app).put(`/users/${phone}`)
+            .send({});
+        chai_1.expect(result.status).to.equal(400);
+    }));
     it("POST /users - should return a message", () => __awaiter(void 0, void 0, void 0, function* () {
         const phone = "3482523775";
         const nickname = "MainframeTV";
@@ -48,12 +54,13 @@ describe("users.ts API", () => {
         chai_1.expect(result.body).to.be.a('string');
     }));
 });
-describe("chats.ts API", () => {
+describe.only("chats.ts API", () => {
     describe("GET /chats", () => {
         it("should return all chats", () => __awaiter(void 0, void 0, void 0, function* () {
-            const result = yield supertest_1.default(app).get('/chats');
+            const result = yield supertest_1.default(app)
+                .get(`/chats?user=3466457463`);
             chai_1.expect(result.status).to.equal(200);
-            chai_1.expect(result.body).to.be.a('object');
+            chai_1.expect(result.body).to.be.a('array');
         }));
     });
     describe("GET /chats/:id/users", () => {

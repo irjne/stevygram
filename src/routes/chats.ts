@@ -8,15 +8,25 @@ import {
     changeInfoByChatId,
     addChat,
     removeChatById,
-    searchByChatId
+    searchByChatId,
+    findUserByPhone
 } from '../index';
+import { NextFunction } from 'express-serve-static-core';
 
 const router = express.Router();
 
+const middleware = async (req: any, res: any, next: NextFunction) => {
+    console.log('sto passando dal middleware');
+    if (req.query.user) {
+        res.locals.user = await findUserByPhone(req.query.user);
+    }
+    next();
+}
+
 //GET - url: /, stampa tutte le chat
-router.get('/', async (req: any, res: any) => {
+router.get('/', middleware, async (req: any, res: any) => {
     try {
-        const result = await getAllChats();
+        const result = await getAllChats(res.locals.user);
         res.json(result);
     } catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);

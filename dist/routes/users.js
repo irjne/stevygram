@@ -16,21 +16,24 @@ const express_1 = __importDefault(require("express"));
 const index_1 = require("../index");
 const express_validator_1 = require("express-validator");
 const router = express_1.default.Router();
-//GET - url: /, stampa tutti gli utenti.
-router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+//GET - url: /, ritorna tutti gli utenti.
+router.get('/', [
+    express_validator_1.query('name')
+        .isString()
+        .trim()
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const result = yield index_1.getAllUsers();
-        res.json(result);
+        const users = yield index_1.getAllUsers(req.query.name);
+        res.json(users);
     }
     catch (err) {
-        return res.status(400).send(`Unexpected error: ${err}`);
+        return res.status(500).send(`Unexpected error: ${err}`);
     }
 }));
 //PUT - url: /:id, modifica un user dando un id + BODY.
 router.put('/:phone', [
     express_validator_1.param('phone')
         .isString()
-        .not().isEmpty()
         .trim()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);
@@ -39,6 +42,9 @@ router.put('/:phone', [
     }
     const phone = req.params.phone;
     const { nickname, name, surname } = req.body;
+    if (!nickname && !name && !surname) {
+        return res.status(400).json({ errors: 'Missing params: ...' });
+    }
     try {
         const result = yield index_1.changeUserByPhone(phone, nickname, name, surname);
         res.json(result);
@@ -76,14 +82,13 @@ router.post('/', [
         res.json(result);
     }
     catch (err) {
-        return res.status(400).send(`Unexpected error: ${err}`);
+        return res.status(500).send(`Unexpected error: ${err}`);
     }
 }));
 //DELETE - url: /:id, cancella l'utente avendo l'id.
 router.delete('/:phone', [
     express_validator_1.param('phone')
         .isString()
-        .not().isEmpty()
         .trim()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);
@@ -96,7 +101,7 @@ router.delete('/:phone', [
         res.json(result);
     }
     catch (err) {
-        return res.status(400).send(`Unexpected error: ${err}`);
+        return res.status(500).send(`Unexpected error: ${err}`);
     }
 }));
 exports.default = router;

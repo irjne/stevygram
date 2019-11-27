@@ -19,6 +19,13 @@ describe("users.ts API", () => {
         expect(result.body).to.be.a('string');
     });
 
+    it.only("PUT /users/:phone - should return a message", async () => {
+        const phone = "3466457463";
+        const result = await supertest(app).put(`/users/${phone}`)
+            .send({});
+        expect(result.status).to.equal(400);
+    });
+
     it("POST /users - should return a message", async () => {
         const phone = "3482523775";
         const nickname = "MainframeTV";
@@ -39,12 +46,14 @@ describe("users.ts API", () => {
     });
 });
 
-describe("chats.ts API", () => {
+describe.only("chats.ts API", () => {
     describe("GET /chats", () => {
         it("should return all chats", async () => {
-            const result = await supertest(app).get('/chats');
+            const result = 
+            await supertest(app)
+                .get(`/chats?user=3466457463`);
             expect(result.status).to.equal(200);
-            expect(result.body).to.be.a('object');
+            expect(result.body).to.be.a('array');
         });
     });
 

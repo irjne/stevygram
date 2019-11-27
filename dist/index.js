@@ -61,29 +61,46 @@ exports.addChat = (id, name, description, users) => __awaiter(void 0, void 0, vo
         return err;
     }
 });
-exports.getAllChats = () => __awaiter(void 0, void 0, void 0, function* () {
-    let obj = {
-        chats: Array()
-    };
+exports.getAllChats = (user) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);
-        const chats = yield readFile(__dirname + '/chats.json', 'utf-8');
-        obj = JSON.parse(chats);
-        return obj;
+        let chats = JSON.parse(yield readFile(__dirname + '/chats.json', 'utf-8')).chats;
+        if (user) {
+            chats = chats.filter(chat => {
+                return chat.users.includes(user.phone);
+            });
+            chats = yield Promise.all(chats.map((chat) => __awaiter(void 0, void 0, void 0, function* () {
+                if (chat.users.length === 2) {
+                    const otherUserPhone = user.phone === chat.users[0] ? chat.users[1] : chat.users[0];
+                    const otherUser = yield exports.findUserByPhone(otherUserPhone);
+                    chat.name = `${otherUser.name} ${otherUser.surname}`;
+                }
+                return chat;
+            })));
+        }
+        return Promise.all(chats.map((chat) => __awaiter(void 0, void 0, void 0, function* () {
+            const lastMessage = chat.messages.pop();
+            delete chat.users;
+            delete chat.messages;
+            chat.lastMessage = lastMessage;
+            chat.lastMessage.sender = yield exports.findUserByPhone(chat.lastMessage.sender);
+            return chat;
+        })));
     }
     catch (err) {
         return err;
     }
 });
-exports.getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () {
-    let obj = {
-        users: Array()
-    };
+exports.getAllUsers = (findByName) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);
-        const users = yield readFile(__dirname + '/users.json', 'utf-8');
-        obj = JSON.parse(users);
-        return obj.users;
+        const usersByFile = yield readFile(__dirname + '/users.json', 'utf-8');
+        const users = JSON.parse(usersByFile).users;
+        if (!findByName)
+            return users;
+        return users.filter((user) => {
+            return user.name === findByName;
+        });
     }
     catch (err) {
         return err;
@@ -319,6 +336,16 @@ exports.removeUserByPhone = (phone) => __awaiter(void 0, void 0, void 0, functio
         const writeFile = util_1.promisify(fs.writeFile);
         yield writeFile(__dirname + '/users.json', json, 'utf-8');
         return `User ${phone} removed successfully.`;
+    }
+    catch (err) {
+        return err;
+    }
+});
+exports.findUserByPhone = (phone) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const readFile = util_1.promisify(fs.readFile);
+        const users = JSON.parse(yield readFile(__dirname + '/users.json', 'utf-8')).users;
+        return users.find((user) => user.phone === phone);
     }
     catch (err) {
         return err;

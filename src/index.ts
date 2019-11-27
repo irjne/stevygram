@@ -1,6 +1,31 @@
 import { promisify } from 'util';
 import * as fs from 'fs';
 
+
+export interface User {
+    name: string;
+    surname: string;
+    nickname: string;
+    phone: string;
+}
+
+
+export interface Message {
+    sender: string | User;
+    body: string;
+    date: Date;
+}
+
+export interface Chat {
+    id: number;
+    name: string;
+    description: string;
+    users: string[];
+    messages: Message[];
+    lastMessage: Message
+
+}
+
 export const addUser = async (nickname: string, name: string, surname: string, phone: string): Promise<string | any> => {
     let obj = {
         users: Array<any>()
@@ -53,33 +78,46 @@ export const addChat = async (id: number, name: string, description: string, use
     }
 }
 
-export const getAllChats = async (): Promise<object | any> => {
-    let obj = {
-        chats: Array<any>()
-    };
-
+export const getAllChats = async (user?: User): Promise<Chat[]> => {
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(__dirname + '/chats.json', 'utf-8');
-        obj = JSON.parse(chats);
-        return obj;
+        let chats: Chat[]= JSON.parse(await readFile(__dirname + '/chats.json', 'utf-8')).chats as Chat[];
+        if (user) {
+            chats = chats.filter(chat => {
+                return chat.users.includes(user.phone)
+            })
+            chats = await Promise.all(chats.map(async chat => {
+                if (chat.users.length === 2) {
+                    const otherUserPhone = user.phone === chat.users[0] ? chat.users[1] : chat.users[0];
+                    const otherUser = await findUserByPhone(otherUserPhone);
+                    chat.name = `${otherUser.name} ${otherUser.surname}`;
+                }
+                return chat;
+            }))
+        }
+        return Promise.all(chats.map(async chat => {
+            const lastMessage = chat.messages.pop() as Message;  
+            delete chat.users;
+            delete chat.messages; 
+            chat.lastMessage = lastMessage;
+            chat.lastMessage.sender = await findUserByPhone(chat.lastMessage.sender as string);
+            return chat; 
+        }));
     }
     catch (err) {
         return err;
     }
 }
 
-export const getAllUsers = async (): Promise<object | any> => {
-    let obj = {
-        users: Array<any>()
-    };
-
-
+export const getAllUsers = async (findByName? :string): Promise<object | any> => {
     try {
         const readFile = promisify(fs.readFile);
-        const users = await readFile(__dirname + '/users.json', 'utf-8');
-        obj = JSON.parse(users);
-        return obj.users;
+        const usersByFile = await readFile(__dirname + '/users.json', 'utf-8');
+        const users = JSON.parse(usersByFile).users;
+        if (!findByName) return users;
+        return users.filter((user: any) => {
+            return user.name === findByName;
+        })
     }
     catch (err) {
         return err;
@@ -331,6 +369,17 @@ export const removeUserByPhone = async (phone: string): Promise<string | any> =>
         const writeFile = promisify(fs.writeFile);
         await writeFile(__dirname + '/users.json', json, 'utf-8');
         return `User ${phone} removed successfully.`;
+    }
+    catch (err) {
+        return err;
+    }
+}
+
+export const findUserByPhone = async (phone: string): Promise<User> => {
+    try {
+        const readFile = promisify(fs.readFile);
+        const users = JSON.parse(await readFile(__dirname + '/users.json', 'utf-8')).users;
+        return users.find((user: any) => user.phone === phone);
     }
     catch (err) {
         return err;

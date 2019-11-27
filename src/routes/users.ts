@@ -1,15 +1,19 @@
 import express from 'express';
 import { getAllUsers, addUser, changeUserByPhone, removeUserByPhone } from '../index';
-import { body, param, validationResult } from 'express-validator';
+import { body, param, validationResult, query } from 'express-validator';
 const router = express.Router();
 
-//GET - url: /, stampa tutti gli utenti.
-router.get('/', async (req: any, res: any) => {
+//GET - url: /, ritorna tutti gli utenti.
+router.get('/',  [
+    query('name')
+        .isString()
+        .trim()
+], async (req: any, res: any) => {
     try {
-        const result = await getAllUsers();
-        res.json(result);
+        const users = await getAllUsers(req.query.name);
+        res.json(users);
     } catch (err) {
-        return res.status(400).send(`Unexpected error: ${err}`);
+        return res.status(500).send(`Unexpected error: ${err}`);
     }
 })
 
@@ -17,7 +21,6 @@ router.get('/', async (req: any, res: any) => {
 router.put('/:phone', [
     param('phone')
         .isString()
-        .not().isEmpty()
         .trim()
 ], async (req: any, res: any) => {
     const errors = validationResult(req);
@@ -27,6 +30,9 @@ router.put('/:phone', [
 
     const phone = req.params.phone;
     const { nickname, name, surname } = req.body;
+    if (!nickname && !name && !surname) {
+        return res.status(400).json({ errors: 'Missing params: ...' });
+    }
 
     try {
         const result = await changeUserByPhone(phone, nickname, name, surname);
@@ -65,7 +71,7 @@ router.post('/', [
         const result = await addUser(nickname, name, surname, phone);
         res.json(result);
     } catch (err) {
-        return res.status(400).send(`Unexpected error: ${err}`);
+        return res.status(500).send(`Unexpected error: ${err}`);
     }
 })
 
@@ -73,7 +79,6 @@ router.post('/', [
 router.delete('/:phone', [
     param('phone')
         .isString()
-        .not().isEmpty()
         .trim()
 ], async (req: any, res: any) => {
     const errors = validationResult(req);
@@ -86,7 +91,7 @@ router.delete('/:phone', [
         const result = await removeUserByPhone(phone);
         res.json(result);
     } catch (err) {
-        return res.status(400).send(`Unexpected error: ${err}`);
+        return res.status(500).send(`Unexpected error: ${err}`);
     }
 })
 

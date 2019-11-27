@@ -16,10 +16,17 @@ const express_1 = __importDefault(require("express"));
 const express_validator_1 = require("express-validator");
 const index_1 = require("../index");
 const router = express_1.default.Router();
+const middleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('sto passando dal middleware');
+    if (req.query.user) {
+        res.locals.user = yield index_1.findUserByPhone(req.query.user);
+    }
+    next();
+});
 //GET - url: /, stampa tutte le chat
-router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/', middleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const result = yield index_1.getAllChats();
+        const result = yield index_1.getAllChats(res.locals.user);
         res.json(result);
     }
     catch (err) {

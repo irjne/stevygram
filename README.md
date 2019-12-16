@@ -11,7 +11,6 @@ Created by [@irjne](https://github.com/irjne), [@clacchisi](https://github.com/c
 
 All methods belong to the *index.ts* library.
 In particular, they are:
-
  - `addUser  =  async (nickname:  string, name:  string, surname:  string, phone:  string):  Promise<string  |  any>`: allows to add a new user in the Stevygram DB; 
  - `addChat  =  async (id:  number, name:  string, description:  string, users:  string[]):  Promise<string  |  any>`: allows to add a new chat in the Stevygram DB;
  - `getAllChats  =  async ():  Promise<object  |  any`: returns all chats, as the name suggests 😝;

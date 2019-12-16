@@ -8,6 +8,7 @@ Created by [@irjne](https://github.com/irjne), [@clacchisi](https://github.com/c
 
 ## 📕 STRUCTURE
 
+
 All methods belong to the *index.ts* library.
 In particular, they are:
 

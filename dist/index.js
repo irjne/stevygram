@@ -133,7 +133,7 @@ exports.getInfoByChatId = (id) => __awaiter(void 0, void 0, void 0, function* ()
         if (id > obj.chats.length - 1)
             return false;
         //return [obj.chats[id].name, obj.chats[id].description];
-        return { name: obj.chats[id].name, description: obj.chats[id].description, users: obj.chats[id].users, lastMessage: obj.chats[id].lastMessage };
+        return { name: obj.chats[id].name, description: obj.chats[id].description, users: obj.chats[id].users, messages: obj.chats[id].messages };
     }
     catch (err) {
         return err;

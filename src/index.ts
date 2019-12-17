@@ -81,7 +81,7 @@ export const addChat = async (id: number, name: string, description: string, use
 export const getAllChats = async (user?: User): Promise<Chat[]> => {
     try {
         const readFile = promisify(fs.readFile);
-        let chats: Chat[]= JSON.parse(await readFile(__dirname + '/chats.json', 'utf-8')).chats as Chat[];
+        let chats: Chat[] = JSON.parse(await readFile(__dirname + '/chats.json', 'utf-8')).chats as Chat[];
         if (user) {
             chats = chats.filter(chat => {
                 return chat.users.includes(user.phone)
@@ -96,12 +96,12 @@ export const getAllChats = async (user?: User): Promise<Chat[]> => {
             }))
         }
         return Promise.all(chats.map(async chat => {
-            const lastMessage = chat.messages.pop() as Message;  
+            const lastMessage = chat.messages.pop() as Message;
             delete chat.users;
-            delete chat.messages; 
+            delete chat.messages;
             chat.lastMessage = lastMessage;
             chat.lastMessage.sender = await findUserByPhone(chat.lastMessage.sender as string);
-            return chat; 
+            return chat;
         }));
     }
     catch (err) {
@@ -109,7 +109,7 @@ export const getAllChats = async (user?: User): Promise<Chat[]> => {
     }
 }
 
-export const getAllUsers = async (findByName? :string): Promise<object | any> => {
+export const getAllUsers = async (findByName?: string): Promise<object | any> => {
     try {
         const readFile = promisify(fs.readFile);
         const usersByFile = await readFile(__dirname + '/users.json', 'utf-8');
@@ -153,7 +153,8 @@ export const getInfoByChatId = async (id: number): Promise<object[] | any> => {
         obj = JSON.parse(chats);
 
         if (id > obj.chats.length - 1) return false;
-        return [obj.chats[id].name, obj.chats[id].description];
+        //return [obj.chats[id].name, obj.chats[id].description];
+        return { name: obj.chats[id].name, description: obj.chats[id].description, users: obj.chats[id].users, lastMessage: obj.chats[id].lastMessage };
     }
     catch (err) {
         return err;

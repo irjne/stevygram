@@ -37,19 +37,19 @@ In particular, they are:
 You can use this path to access to the resources: 
 
  - ***chats***
-   - **GET** `localhost:3001/chats`: all chats in Stevygram;
-   - **GET** `localhost:3001/chats/:id/users`: all users of a specified chat;
-   - **GET** `localhost:3001/chats/:id`: all info of a specified chat;
-   - **GET** `localhost:3001/chats/:id/messages`: all messages of a specified chat;
-   - **POST** `localhost:3001/chats` + {id, name, description, users} : add a new chat;
-   - **PUT** `localhost:3001/chats/:id` +{name?, description?}: modifies info of a specified chat;
-   - **DELETE** `localhost:3001/chats/:id`: remove a specified chat.
+   - **GET** `/chats`: all chats in Stevygram;
+   - **GET** `/chats/:id/users`: all users of a specified chat;
+   - **GET** `/chats/:id`: all info of a specified chat;
+   - **GET** `/chats/:id/messages`: all messages of a specified chat;
+   - **POST** `/chats` + {id, name, description, users} : add a new chat;
+   - **PUT** `/chats/:id` +{name?, description?}: modifies info of a specified chat;
+   - **DELETE** `/chats/:id`: remove a specified chat.
 
  - ***users***
-   - **GET** `localhost:3001/users`: all users in Stevygram;
-   - **POST** `localhost:3001/users` + {phone, nickname?, name?, surname?} : add a new user;
-   - **PUT** `localhost:3001/users/:id` +{name?, description?}: modifies info of a specified chat;
-   - **DELETE** `localhost:3001/chats/:id`: remove a specified user.
+   - **GET** `/users`: all users in Stevygram;
+   - **POST** `/users` + {phone, nickname?, name?, surname?} : add a new user;
+   - **PUT** `/users/:id` +{name?, description?}: modifies info of a specified chat;
+   - **DELETE** `/chats/:id`: remove a specified user.
 
 
 

@@ -1,10 +1,10 @@
 import express from 'express';
-import { getAllUsers, addUser, changeUserByPhone, removeUserByPhone } from '../index';
+import { getAllUsers, addUser, changeUserByPhone, removeUserByPhone } from '../lib/users';
 import { body, param, validationResult, query } from 'express-validator';
 const router = express.Router();
 
 //GET - url: /, ritorna tutti gli utenti.
-router.get('/',  [
+router.get('/', [
     query('name')
         .isString()
         .trim()

@@ -14,19 +14,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const express_validator_1 = require("express-validator");
-const index_1 = require("../index");
+const chats_1 = require("../lib/chats");
+const users_1 = require("../lib/users");
 const router = express_1.default.Router();
 const middleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('sto passando dal middleware');
     if (req.query.user) {
-        res.locals.user = yield index_1.findUserByPhone(req.query.user);
+        res.locals.user = yield users_1.findUserByPhone(req.query.user);
     }
     next();
 });
 //GET - url: /, stampa tutte le chat
 router.get('/', middleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const result = yield index_1.getAllChats(res.locals.user);
+        const result = yield chats_1.getAllChats(res.locals.user);
         res.json(result);
     }
     catch (err) {
@@ -46,7 +47,7 @@ router.get('/:id/users', [
     }
     const id = req.params.id;
     try {
-        const result = yield index_1.getUsersByChatId(id);
+        const result = yield chats_1.getUsersByChatId(id);
         if (result == false)
             return res.status(404).send("Chat not found.");
         res.json(result);
@@ -68,7 +69,7 @@ router.get('/:id', [
     }
     const id = req.params.id;
     try {
-        const result = yield index_1.getInfoByChatId(id);
+        const result = yield chats_1.getInfoByChatId(id);
         if (result == false)
             return res.status(404).send(`Chat not found.`);
         res.json(result);
@@ -93,7 +94,7 @@ router.get('/:id/messages', [
     //filter: ?word="pippo", stampa tutti i messaggi contenenti la parola; 
     if (req.query.word) {
         try {
-            const result = yield index_1.searchByChatId(id, undefined, word);
+            const result = yield chats_1.searchByChatId(id, undefined, word);
             if (result == false)
                 return res.status(404).send(`Chat not found.`);
             res.json(result);
@@ -105,7 +106,7 @@ router.get('/:id/messages', [
     //filter: ?sender="id", stampa tutti i messaggi di un determinato utente.
     else if (req.query.sender) {
         try {
-            const result = yield index_1.searchByChatId(id, sender);
+            const result = yield chats_1.searchByChatId(id, sender);
             if (result == false)
                 return res.status(404).send(`Chat not found.`);
             res.json(result);
@@ -116,7 +117,7 @@ router.get('/:id/messages', [
     }
     else {
         try {
-            const result = yield index_1.getMessagesByChatId(id);
+            const result = yield chats_1.getMessagesByChatId(id);
             if (result == false)
                 return res.status(404).send(`Chat not found.`);
             res.json(result);
@@ -147,7 +148,7 @@ router.put('/:id', [
     const id = req.params.id;
     const { description, name } = req.body;
     try {
-        const result = yield index_1.changeInfoByChatId(id, name, description);
+        const result = yield chats_1.changeInfoByChatId(id, name, description);
         if (result == false)
             return res.status(404).send(`Chat not found.`);
         res.json(result);
@@ -180,7 +181,7 @@ router.post('/', [
     const { id, name, description, users } = req.body;
     const usersArray = users.split(users, ", ");
     try {
-        const result = yield index_1.addChat(id, name, description, usersArray);
+        const result = yield chats_1.addChat(id, name, description, usersArray);
         if (result == false)
             return res.status(404).send(`Chat not found.`);
         res.json(result);
@@ -202,7 +203,7 @@ router.delete('/:id', [
     }
     const id = req.params.id;
     try {
-        const result = yield index_1.removeChatById(id);
+        const result = yield chats_1.removeChatById(id);
         if (result == false)
             return res.status(404).send(`Chat not found.`);
         res.json(result);

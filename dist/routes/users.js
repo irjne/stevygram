@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const index_1 = require("../index");
+const users_1 = require("../lib/users");
 const express_validator_1 = require("express-validator");
 const router = express_1.default.Router();
 //GET - url: /, ritorna tutti gli utenti.
@@ -23,7 +23,7 @@ router.get('/', [
         .trim()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const users = yield index_1.getAllUsers(req.query.name);
+        const users = yield users_1.getAllUsers(req.query.name);
         res.json(users);
     }
     catch (err) {
@@ -46,7 +46,7 @@ router.put('/:phone', [
         return res.status(400).json({ errors: 'Missing params: ...' });
     }
     try {
-        const result = yield index_1.changeUserByPhone(phone, nickname, name, surname);
+        const result = yield users_1.changeUserByPhone(phone, nickname, name, surname);
         res.json(result);
     }
     catch (err) {
@@ -78,7 +78,7 @@ router.post('/', [
     }
     const { name, phone, surname, nickname } = req.body;
     try {
-        const result = yield index_1.addUser(nickname, name, surname, phone);
+        const result = yield users_1.addUser(nickname, name, surname, phone);
         res.json(result);
     }
     catch (err) {
@@ -97,7 +97,7 @@ router.delete('/:phone', [
     }
     let phone = req.params.phone;
     try {
-        const result = yield index_1.removeUserByPhone(phone);
+        const result = yield users_1.removeUserByPhone(phone);
         res.json(result);
     }
     catch (err) {

@@ -1,12 +1,6 @@
 import { promisify } from 'util';
+import { User, findUserByPhone } from './users';
 import * as fs from 'fs';
-
-export interface User {
-    name: string;
-    surname: string;
-    nickname: string;
-    phone: string;
-}
 
 export interface Message {
     sender: string | User;
@@ -24,35 +18,7 @@ export interface Chat {
 
 }
 
-export const addUser = async (nickname: string, name: string, surname: string, phone: string): Promise<string | any> => {
-    let obj = {
-        users: Array<any>()
-    };
-
-    try {
-        const readFile = promisify(fs.readFile);
-        const users = await readFile(__dirname + '/users.json', 'utf-8');
-        obj = JSON.parse(users);
-        let exists = false;
-
-        for (let i = 0; i < obj.users.length; i++) {
-            if (phone == obj.users[i].phone) {
-                return `User ${phone} already exists.`;
-            }
-        }
-
-        obj.users.push({ nickname, name, surname, phone });
-        let json = JSON.stringify(obj);
-        const writeFile = promisify(fs.writeFile);
-        await writeFile(__dirname + '/users.json', json, 'utf-8');
-
-        return `User ${nickname} added successfully.`;
-    }
-    catch (err) {
-        console.error(err);
-        return err;
-    }
-}
+export const directory = __dirname.replace("/lib", "/data");
 
 export const addChat = async (id: number, name: string, description: string, users: string[]): Promise<string | any> => {
     let obj = {
@@ -61,13 +27,13 @@ export const addChat = async (id: number, name: string, description: string, use
 
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(__dirname + '/chats.json', 'utf-8');
+        const chats = await readFile(directory + '/chats.json', 'utf-8');
         obj = JSON.parse(chats);
 
         obj.chats.push({ id, name, description, users });
         let json = JSON.stringify(obj);
         const writeFile = promisify(fs.writeFile);
-        await writeFile(__dirname + '/chats.json', json, 'utf-8');
+        await writeFile(directory + '/chats.json', json, 'utf-8');
         return `Chat \"${name}\" added successfully.`;
 
     }
@@ -79,7 +45,7 @@ export const addChat = async (id: number, name: string, description: string, use
 export const getAllChats = async (user?: User): Promise<Chat[]> => {
     try {
         const readFile = promisify(fs.readFile);
-        let chats: Chat[] = JSON.parse(await readFile(__dirname + '/chats.json', 'utf-8')).chats as Chat[];
+        let chats: Chat[] = JSON.parse(await readFile(directory + '/chats.json', 'utf-8')).chats as Chat[];
         if (user) {
             chats = chats.filter(chat => {
                 return chat.users.includes(user.phone)
@@ -107,21 +73,6 @@ export const getAllChats = async (user?: User): Promise<Chat[]> => {
     }
 }
 
-export const getAllUsers = async (findByName?: string): Promise<object | any> => {
-    try {
-        const readFile = promisify(fs.readFile);
-        const usersByFile = await readFile(__dirname + '/users.json', 'utf-8');
-        const users = JSON.parse(usersByFile).users;
-        if (!findByName) return users;
-        return users.filter((user: any) => {
-            return user.name === findByName;
-        })
-    }
-    catch (err) {
-        return err;
-    }
-}
-
 export const getUsersByChatId = async (id: number): Promise<object | any> => {
     let obj = {
         chats: Array<any>()
@@ -129,7 +80,7 @@ export const getUsersByChatId = async (id: number): Promise<object | any> => {
 
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(__dirname + '/chats.json', 'utf-8');
+        const chats = await readFile(directory + '/chats.json', 'utf-8');
         obj = JSON.parse(chats);
 
         if (id > obj.chats.length - 1) return false;
@@ -147,7 +98,7 @@ export const getInfoByChatId = async (id: number): Promise<object[] | any> => {
 
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(__dirname + '/chats.json', 'utf-8');
+        const chats = await readFile(directory + '/chats.json', 'utf-8');
         obj = JSON.parse(chats);
 
         if (id > obj.chats.length - 1) return false;
@@ -166,7 +117,7 @@ export const getMessagesByChatId = async (id: number): Promise<object | any> => 
 
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(__dirname + '/chats.json', 'utf-8');
+        const chats = await readFile(directory + '/chats.json', 'utf-8');
         obj = JSON.parse(chats);
 
         if (id > obj.chats.length - 1) return false;
@@ -186,7 +137,7 @@ export const changeInfoByChatId = async (id: number, name?: string, description?
 
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(__dirname + '/chats.json', 'utf-8');
+        const chats = await readFile(directory + '/chats.json', 'utf-8');
         obj = JSON.parse(chats);
 
         if (id > obj.chats.length - 1) return false;
@@ -202,49 +153,13 @@ export const changeInfoByChatId = async (id: number, name?: string, description?
         if (isFounded) {
             let json = JSON.stringify(obj);
             const writeFile = promisify(fs.writeFile);
-            await writeFile(__dirname + '/chats.json', json, 'utf-8');
+            await writeFile(directory + '/chats.json', json, 'utf-8');
 
             return `Chat ${name} changed successfully.`;
         }
         else { return `Chat ${name} not found.`; }
     }
     catch (err) {
-        return err;
-    }
-}
-
-export const changeUserByPhone = async (phone: string, nickname?: string, name?: string, surname?: string): Promise<string | any> => {
-    let obj = {
-        users: Array<any>()
-    };
-
-    let isFounded = false;
-
-    try {
-        const readFile = promisify(fs.readFile);
-        const users = await readFile(__dirname + '/users.json', 'utf-8');
-        obj = JSON.parse(users);
-        for (let i = 0; i < obj.users.length; i++) {
-            if (phone == obj.users[i].phone) {
-                if (nickname) obj.users[i].nickname = nickname;
-                if (name) obj.users[i].name = name;
-                if (surname) obj.users[i].surname = surname;
-                isFounded = true;
-                break;
-            }
-        }
-
-        if (isFounded) {
-            let json = JSON.stringify(obj);
-            const writeFile = promisify(fs.writeFile);
-            await writeFile(__dirname + '/users.json', json, 'utf-8');
-
-            return `User ${nickname} (${phone}) changed successfully.`;
-        }
-        else { return `User \"${phone}\" not found.`; }
-    }
-    catch (err) {
-        console.error(err);
         return err;
     }
 }
@@ -257,7 +172,7 @@ export const searchByChatId = async (id: number, sender?: string, word?: string)
 
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(__dirname + '/chats.json', 'utf-8');
+        const chats = await readFile(directory + '/chats.json', 'utf-8');
         obj = JSON.parse(chats);
         if (id > obj.chats.length - 1) return false;
 
@@ -328,7 +243,7 @@ export const removeChatById = async (id: number): Promise<string | any> => {
 
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(__dirname + '/chats.json', 'utf-8');
+        const chats = await readFile(directory + '/chats.json', 'utf-8');
         obj = JSON.parse(chats);
         if (id > obj.chats.length - 1) return false;
 
@@ -340,45 +255,8 @@ export const removeChatById = async (id: number): Promise<string | any> => {
         }
         let json = JSON.stringify(obj);
         const writeFile = promisify(fs.writeFile);
-        await writeFile(__dirname + '/chats.json', json, 'utf-8');
+        await writeFile(directory + '/chats.json', json, 'utf-8');
         return `Chat \"${id}\" removed successfully.`;
-    }
-    catch (err) {
-        return err;
-    }
-}
-
-export const removeUserByPhone = async (phone: string): Promise<string | any> => {
-    let obj = {
-        users: Array<any>()
-    };
-
-    try {
-        const readFile = promisify(fs.readFile);
-        const users = await readFile(__dirname + '/users.json', 'utf-8');
-        obj = JSON.parse(users);
-
-        for (let i = 0; i < obj.users.length; i++) {
-            if (phone == obj.users[i].phone) {
-                obj.users.splice(i, 1);
-                break;
-            }
-        }
-        let json = JSON.stringify(obj);
-        const writeFile = promisify(fs.writeFile);
-        await writeFile(__dirname + '/users.json', json, 'utf-8');
-        return `User ${phone} removed successfully.`;
-    }
-    catch (err) {
-        return err;
-    }
-}
-
-export const findUserByPhone = async (phone: string): Promise<User> => {
-    try {
-        const readFile = promisify(fs.readFile);
-        const users = JSON.parse(await readFile(__dirname + '/users.json', 'utf-8')).users;
-        return users.find((user: any) => user.phone === phone);
     }
     catch (err) {
         return err;

@@ -1,5 +1,6 @@
 import express from 'express';
 import { body, param, validationResult, sanitizeParam, query } from 'express-validator';
+
 import {
     getAllChats,
     getInfoByChatId,
@@ -9,14 +10,15 @@ import {
     addChat,
     removeChatById,
     searchByChatId,
-    findUserByPhone
-} from '../index';
+} from '../lib/chats';
+
+import { findUserByPhone } from '../lib/users';
 import { NextFunction } from 'express-serve-static-core';
 
 const router = express.Router();
 
 const middleware = async (req: any, res: any, next: NextFunction) => {
-    console.log('sto passando dal middleware');
+    //console.log('sto passando dal middleware');
     if (req.query.user) {
         res.locals.user = await findUserByPhone(req.query.user);
     }
@@ -36,8 +38,7 @@ router.get('/', middleware, async (req: any, res: any) => {
 //- url: /:id/users, stampa tutti gli utenti di una chat;
 router.get('/:id/users', [
     param('id')
-        .isNumeric()
-        .not().isEmpty(),
+        .isNumeric(),
     sanitizeParam('id').toInt()
 ], async (req: any, res: any) => {
     const errors = validationResult(req);
@@ -58,8 +59,7 @@ router.get('/:id/users', [
 //- url: /:id, stampa tutti i dati di una chat;
 router.get('/:id', [
     param('id')
-        .isNumeric()
-        .not().isEmpty(),
+        .isNumeric(),
     sanitizeParam('id').toInt()
 ], async (req: any, res: any) => {
     const errors = validationResult(req);
@@ -80,8 +80,7 @@ router.get('/:id', [
 // - url: /:id/messages, stampa tutti i messaggi di una chat:
 router.get('/:id/messages', [
     param('id')
-        .isNumeric()
-        .not().isEmpty(),
+        .isNumeric(),
     sanitizeParam('id').toInt()
 ], async (req: any, res: any) => {
     const errors = validationResult(req);
@@ -127,8 +126,7 @@ router.get('/:id/messages', [
 //PUT - url: /:id + BODY, modifica una chat dando un id.
 router.put('/:id', [
     param('id')
-        .isNumeric()
-        .not().isEmpty(),
+        .isNumeric(),
     body('description')
         .trim()
         .isString(),
@@ -191,8 +189,7 @@ router.post('/', [
 //DELETE - url: /:id, cancella la chat avendo l'id.
 router.delete('/:id', [
     param('id')
-        .isNumeric()
-        .not().isEmpty(),
+        .isNumeric(),
     sanitizeParam('id').toInt()
 ], async (req: any, res: any) => {
     const errors = validationResult(req);

@@ -18,7 +18,7 @@ const chats_1 = require("../lib/chats");
 const users_1 = require("../lib/users");
 const router = express_1.default.Router();
 const middleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('sto passando dal middleware');
+    //console.log('sto passando dal middleware');
     if (req.query.user) {
         res.locals.user = yield users_1.findUserByPhone(req.query.user);
     }
@@ -37,8 +37,7 @@ router.get('/', middleware, (req, res) => __awaiter(void 0, void 0, void 0, func
 //- url: /:id/users, stampa tutti gli utenti di una chat;
 router.get('/:id/users', [
     express_validator_1.param('id')
-        .isNumeric()
-        .not().isEmpty(),
+        .isNumeric(),
     express_validator_1.sanitizeParam('id').toInt()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);
@@ -59,8 +58,7 @@ router.get('/:id/users', [
 //- url: /:id, stampa tutti i dati di una chat;
 router.get('/:id', [
     express_validator_1.param('id')
-        .isNumeric()
-        .not().isEmpty(),
+        .isNumeric(),
     express_validator_1.sanitizeParam('id').toInt()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);
@@ -81,8 +79,7 @@ router.get('/:id', [
 // - url: /:id/messages, stampa tutti i messaggi di una chat:
 router.get('/:id/messages', [
     express_validator_1.param('id')
-        .isNumeric()
-        .not().isEmpty(),
+        .isNumeric(),
     express_validator_1.sanitizeParam('id').toInt()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);
@@ -130,18 +127,19 @@ router.get('/:id/messages', [
 //PUT - url: /:id + BODY, modifica una chat dando un id.
 router.put('/:id', [
     express_validator_1.param('id')
-        .isNumeric()
-        .not().isEmpty(),
+        .isNumeric(),
     express_validator_1.body('description')
         .trim()
         .isString(),
     express_validator_1.body('name')
         .trim()
-        .isString()
-        .not().isEmpty(),
+        .isString(),
+    //.not().isEmpty(),
     express_validator_1.sanitizeParam('id').toInt()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);
+    if (!req.body.description && !req.body.name)
+        return res.status(400).json({ errors: "Name or description are required" });
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
@@ -193,8 +191,7 @@ router.post('/', [
 //DELETE - url: /:id, cancella la chat avendo l'id.
 router.delete('/:id', [
     express_validator_1.param('id')
-        .isNumeric()
-        .not().isEmpty(),
+        .isNumeric(),
     express_validator_1.sanitizeParam('id').toInt()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);

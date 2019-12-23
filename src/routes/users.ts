@@ -31,7 +31,7 @@ router.put('/:phone', [
     const phone = req.params.phone;
     const { nickname, name, surname } = req.body;
     if (!nickname && !name && !surname) {
-        return res.status(400).json({ errors: 'Missing params: ...' });
+        return res.status(400).json({ errors: "Nickname or full name (name, surname) are required" });
     }
 
     try {

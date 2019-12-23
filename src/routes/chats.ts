@@ -132,11 +132,11 @@ router.put('/:id', [
         .isString(),
     body('name')
         .trim()
-        .isString()
-        .not().isEmpty(),
+        .isString(),
     sanitizeParam('id').toInt()
 ], async (req: any, res: any) => {
     const errors = validationResult(req);
+    if (!req.body.description && !req.body.name) return res.status(400).json({ errors: "Name or description are required" })
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }

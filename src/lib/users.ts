@@ -6,6 +6,7 @@ export interface User {
     surname: string;
     nickname: string;
     phone: string;
+    phonebook: string[];
 }
 
 export const directory = __dirname.replace("/lib", "/data");
@@ -19,7 +20,6 @@ export const addUser = async (nickname: string, name: string, surname: string, p
         const readFile = promisify(fs.readFile);
         const users = await readFile(directory + '/users.json', 'utf-8');
         obj = JSON.parse(users);
-        let exists = false;
 
         for (let i = 0; i < obj.users.length; i++) {
             if (phone == obj.users[i].phone) {
@@ -27,7 +27,8 @@ export const addUser = async (nickname: string, name: string, surname: string, p
             }
         }
 
-        obj.users.push({ nickname, name, surname, phone });
+        let phonebook = new Array<string>();
+        obj.users.push({ nickname, name, surname, phone, phonebook });
         let json = JSON.stringify(obj);
         const writeFile = promisify(fs.writeFile);
         await writeFile(directory + '/users.json', json, 'utf-8');
@@ -36,6 +37,27 @@ export const addUser = async (nickname: string, name: string, surname: string, p
     }
     catch (err) {
         console.error(err);
+        return err;
+    }
+}
+
+export const addInPhonebookByPhone = async (findByPhone: string, usersToAdd: string[]): Promise<object | any> => {
+    try {
+        const readFile = promisify(fs.readFile);
+        const usersByFile = await readFile(directory + '/users.json', 'utf-8');
+        const users = JSON.parse(usersByFile).users;
+        const user = await findUserByPhone(users);
+        for (const item of usersToAdd) {
+            user.phonebook.push(item);
+        }
+
+        let json = JSON.stringify(users);
+        const writeFile = promisify(fs.writeFile);
+        await writeFile(directory + '/users.json', json, 'utf-8');
+
+        return `User ${findByPhone}'s phonebook was successfully updated.`;
+    }
+    catch (err) {
         return err;
     }
 }

@@ -21,17 +21,13 @@ export interface Chat {
 export const directory = __dirname.replace("/lib", "/data");
 
 export const addChat = async (id: number, name: string, description: string, users: string[]): Promise<string | any> => {
-    let obj = {
-        chats: Array<any>()
-    };
-
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(directory + '/chats.json', 'utf-8');
-        obj = JSON.parse(chats);
+        const chatsByFile = await readFile(directory + '/chats.json', 'utf-8');
+        const chats = JSON.parse(chatsByFile).chats;
 
-        obj.chats.push({ id, name, description, users });
-        let json = JSON.stringify(obj);
+        chats.push({ id, name, description, users });
+        let json = JSON.stringify(chats);
         const writeFile = promisify(fs.writeFile);
         await writeFile(directory + '/chats.json', json, 'utf-8');
         return `Chat \"${name}\" added successfully.`;
@@ -74,17 +70,13 @@ export const getAllChats = async (user?: User): Promise<Chat[]> => {
 }
 
 export const getUsersByChatId = async (id: number): Promise<object | any> => {
-    let obj = {
-        chats: Array<any>()
-    };
-
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(directory + '/chats.json', 'utf-8');
-        obj = JSON.parse(chats);
+        const chatsByFile = await readFile(directory + '/chats.json', 'utf-8');
+        const chats = JSON.parse(chatsByFile).chats;
 
-        if (id > obj.chats.length - 1) return false;
-        return { users: obj.chats[id].users };
+        if (id > chats.length - 1) return false;
+        return { users: chats[id].users };
     }
     catch (err) {
         return err;
@@ -92,18 +84,13 @@ export const getUsersByChatId = async (id: number): Promise<object | any> => {
 }
 
 export const getInfoByChatId = async (id: number): Promise<object[] | any> => {
-    let obj = {
-        chats: Array<any>()
-    };
-
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(directory + '/chats.json', 'utf-8');
-        obj = JSON.parse(chats);
+        const chatsByFile = await readFile(directory + '/chats.json', 'utf-8');
+        const chats = JSON.parse(chatsByFile).chats;
 
-        if (id > obj.chats.length - 1) return false;
-        //return [obj.chats[id].name, obj.chats[id].description];
-        return { name: obj.chats[id].name, description: obj.chats[id].description, users: obj.chats[id].users, messages: obj.chats[id].messages };
+        if (id > chats.length - 1) return false;
+        return { name: chats[id].name, description: chats[id].description, users: chats[id].users, messages: chats[id].messages };
     }
     catch (err) {
         return err;
@@ -111,17 +98,13 @@ export const getInfoByChatId = async (id: number): Promise<object[] | any> => {
 }
 
 export const getMessagesByChatId = async (id: number): Promise<object | any> => {
-    let obj = {
-        chats: Array<any>()
-    };
-
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(directory + '/chats.json', 'utf-8');
-        obj = JSON.parse(chats);
+        const chatsByFile = await readFile(directory + '/chats.json', 'utf-8');
+        const chats = JSON.parse(chatsByFile).chats;
 
-        if (id > obj.chats.length - 1) return false;
-        return { messages: obj.chats[id].messages };
+        if (id > chats.length - 1) return false;
+        return { messages: chats[id].messages };
     }
     catch (err) {
         return err;
@@ -129,29 +112,25 @@ export const getMessagesByChatId = async (id: number): Promise<object | any> => 
 }
 
 export const changeInfoByChatId = async (id: number, name?: string, description?: string): Promise<string | any> => {
-    let obj = {
-        chats: Array<any>()
-    };
-
     let isFounded = false;
 
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(directory + '/chats.json', 'utf-8');
-        obj = JSON.parse(chats);
+        const chatsByFile = await readFile(directory + '/chats.json', 'utf-8');
+        const chats = JSON.parse(chatsByFile);
 
-        if (id > obj.chats.length - 1) return false;
-        for (let i = 0; i < obj.chats.length; i++) {
-            if (id == obj.chats[i].id) {
-                if (name) obj.chats[i].name = name;
-                if (description) obj.chats[i].description = description;
+        if (id > chats.length - 1) return false;
+        for (let i = 0; i < chats.length; i++) {
+            if (id == chats[i].id) {
+                if (name) chats[i].name = name;
+                if (description) chats[i].description = description;
                 isFounded = true;
                 break;
             }
         }
 
         if (isFounded) {
-            let json = JSON.stringify(obj);
+            let json = JSON.stringify(chats);
             const writeFile = promisify(fs.writeFile);
             await writeFile(directory + '/chats.json', json, 'utf-8');
 
@@ -165,16 +144,13 @@ export const changeInfoByChatId = async (id: number, name?: string, description?
 }
 
 export const searchByChatId = async (id: number, sender?: string, word?: string): Promise<string | any> => {
-    let obj = {
-        chats: Array<any>()
-    };
     let choice = -1;
 
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(directory + '/chats.json', 'utf-8');
-        obj = JSON.parse(chats);
-        if (id > obj.chats.length - 1) return false;
+        const chatsByFile = await readFile(directory + '/chats.json', 'utf-8');
+        const chats = JSON.parse(chatsByFile);
+        if (id > chats.length - 1) return false;
 
         if (sender) choice = 0;
         else if (word) choice = 1;
@@ -187,13 +163,13 @@ export const searchByChatId = async (id: number, sender?: string, word?: string)
         switch (choice) {
             case 0:
                 // search by sender
-                for (let i = 0; i < obj.chats.length; i++) {
-                    if (id == obj.chats[i].id) {
-                        for (let j = 0; j < obj.chats[i].messages.length; j++) {
-                            if (sender == obj.chats[i].messages[j].sender) {
+                for (let i = 0; i < chats.length; i++) {
+                    if (id == chats[i].id) {
+                        for (let j = 0; j < chats[i].messages.length; j++) {
+                            if (sender == chats[i].messages[j].sender) {
                                 result.messages[result.messages.length] = {
-                                    "body": obj.chats[i].messages[j].body,
-                                    "date": obj.chats[i].messages[j].date
+                                    "body": chats[i].messages[j].body,
+                                    "date": chats[i].messages[j].date
                                 }
 
                                 isFounded = true;
@@ -205,14 +181,14 @@ export const searchByChatId = async (id: number, sender?: string, word?: string)
 
             case 1:
                 // search by word
-                for (let i = 0; i < obj.chats.length; i++) {
-                    if (id == obj.chats[i].id) {
-                        for (let j = 0; j < obj.chats[i].messages.length; j++) {
-                            if (obj.chats[i].messages[j].body.includes(word)) {
+                for (let i = 0; i < chats.length; i++) {
+                    if (id == chats[i].id) {
+                        for (let j = 0; j < chats[i].messages.length; j++) {
+                            if (chats[i].messages[j].body.includes(word)) {
                                 result.messages[result.messages.length] = {
-                                    "sender": obj.chats[i].messages[j].sender,
-                                    "body": obj.chats[i].messages[j].body,
-                                    "date": obj.chats[i].messages[j].date
+                                    "sender": chats[i].messages[j].sender,
+                                    "body": chats[i].messages[j].body,
+                                    "date": chats[i].messages[j].date
                                 }
 
                                 isFounded = true;
@@ -237,23 +213,19 @@ export const searchByChatId = async (id: number, sender?: string, word?: string)
 }
 
 export const removeChatById = async (id: number): Promise<string | any> => {
-    let obj = {
-        chats: Array<any>()
-    };
-
     try {
         const readFile = promisify(fs.readFile);
-        const chats = await readFile(directory + '/chats.json', 'utf-8');
-        obj = JSON.parse(chats);
-        if (id > obj.chats.length - 1) return false;
+        const chatsByFile = await readFile(directory + '/chats.json', 'utf-8');
+        const chats = JSON.parse(chatsByFile).chats;
+        if (id > chats.length - 1) return false;
 
-        for (let i = 0; i < obj.chats.length; i++) {
-            if (id == obj.chats[i].id) {
-                obj.chats.splice(i, 1);
+        for (let i = 0; i < chats.length; i++) {
+            if (id == chats[i].id) {
+                chats.splice(i, 1);
                 break;
             }
         }
-        let json = JSON.stringify(obj);
+        let json = JSON.stringify(chats);
         const writeFile = promisify(fs.writeFile);
         await writeFile(directory + '/chats.json', json, 'utf-8');
         return `Chat \"${id}\" removed successfully.`;

@@ -12,24 +12,20 @@ export interface User {
 export const directory = __dirname.replace("/lib", "/data");
 
 export const addUser = async (nickname: string, name: string, surname: string, phone: string): Promise<string | any> => {
-    let obj = {
-        users: Array<any>()
-    };
-
     try {
         const readFile = promisify(fs.readFile);
-        const users = await readFile(directory + '/users.json', 'utf-8');
-        obj = JSON.parse(users);
+        const usersByFile = await readFile(directory + '/users.json', 'utf-8');
+        const users = JSON.parse(usersByFile).users;
 
-        for (let i = 0; i < obj.users.length; i++) {
-            if (phone == obj.users[i].phone) {
+        for (let i = 0; i < users.length; i++) {
+            if (phone == users[i].phone) {
                 return `User ${phone} already exists.`;
             }
         }
 
         let phonebook = new Array<string>();
-        obj.users.push({ nickname, name, surname, phone, phonebook });
-        let json = JSON.stringify(obj);
+        users.push({ nickname, name, surname, phone, phonebook });
+        let json = JSON.stringify(users);
         const writeFile = promisify(fs.writeFile);
         await writeFile(directory + '/users.json', json, 'utf-8');
 
@@ -78,28 +74,24 @@ export const getAllUsers = async (findByName?: string): Promise<object | any> =>
 }
 
 export const changeUserByPhone = async (phone: string, nickname?: string, name?: string, surname?: string): Promise<string | any> => {
-    let obj = {
-        users: Array<any>()
-    };
-
     let isFounded = false;
 
     try {
         const readFile = promisify(fs.readFile);
-        const users = await readFile(directory + '/users.json', 'utf-8');
-        obj = JSON.parse(users);
-        for (let i = 0; i < obj.users.length; i++) {
-            if (phone == obj.users[i].phone) {
-                if (nickname) obj.users[i].nickname = nickname;
-                if (name) obj.users[i].name = name;
-                if (surname) obj.users[i].surname = surname;
+        const usersByFile = await readFile(directory + '/users.json', 'utf-8');
+        const users = JSON.parse(usersByFile).users;
+        for (let i = 0; i < users.length; i++) {
+            if (phone == users[i].phone) {
+                if (nickname) users[i].nickname = nickname;
+                if (name) users[i].name = name;
+                if (surname) users[i].surname = surname;
                 isFounded = true;
                 break;
             }
         }
 
         if (isFounded) {
-            let json = JSON.stringify(obj);
+            let json = JSON.stringify(users);
             const writeFile = promisify(fs.writeFile);
             await writeFile(directory + '/users.json', json, 'utf-8');
 
@@ -114,22 +106,18 @@ export const changeUserByPhone = async (phone: string, nickname?: string, name?:
 }
 
 export const removeUserByPhone = async (phone: string): Promise<string | any> => {
-    let obj = {
-        users: Array<any>()
-    };
-
     try {
         const readFile = promisify(fs.readFile);
-        const users = await readFile(directory + '/users.json', 'utf-8');
-        obj = JSON.parse(users);
+        const usersByFile = await readFile(directory + '/users.json', 'utf-8');
+        const users = JSON.parse(usersByFile).users;
 
-        for (let i = 0; i < obj.users.length; i++) {
-            if (phone == obj.users[i].phone) {
-                obj.users.splice(i, 1);
+        for (let i = 0; i < users.length; i++) {
+            if (phone == users[i].phone) {
+                users.splice(i, 1);
                 break;
             }
         }
-        let json = JSON.stringify(obj);
+        let json = JSON.stringify(users);
         const writeFile = promisify(fs.writeFile);
         await writeFile(directory + '/users.json', json, 'utf-8');
         return `User ${phone} removed successfully.`;

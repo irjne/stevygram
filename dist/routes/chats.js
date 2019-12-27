@@ -134,7 +134,6 @@ router.put('/:id', [
     express_validator_1.body('name')
         .trim()
         .isString(),
-    //.not().isEmpty(),
     express_validator_1.sanitizeParam('id').toInt()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);

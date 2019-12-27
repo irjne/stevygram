@@ -20,27 +20,42 @@ const util_1 = require("util");
 const fs = __importStar(require("fs"));
 exports.directory = __dirname.replace("/lib", "/data");
 exports.addUser = (nickname, name, surname, phone) => __awaiter(void 0, void 0, void 0, function* () {
-    let obj = {
-        users: Array()
-    };
     try {
         const readFile = util_1.promisify(fs.readFile);
-        const users = yield readFile(exports.directory + '/users.json', 'utf-8');
-        obj = JSON.parse(users);
-        let exists = false;
-        for (let i = 0; i < obj.users.length; i++) {
-            if (phone == obj.users[i].phone) {
+        const usersByFile = yield readFile(exports.directory + '/users.json', 'utf-8');
+        const users = JSON.parse(usersByFile).users;
+        for (let i = 0; i < users.length; i++) {
+            if (phone == users[i].phone) {
                 return `User ${phone} already exists.`;
             }
         }
-        obj.users.push({ nickname, name, surname, phone });
-        let json = JSON.stringify(obj);
+        let phonebook = new Array();
+        users.push({ nickname, name, surname, phone, phonebook });
+        let json = JSON.stringify(users);
         const writeFile = util_1.promisify(fs.writeFile);
         yield writeFile(exports.directory + '/users.json', json, 'utf-8');
         return `User ${nickname} added successfully.`;
     }
     catch (err) {
         console.error(err);
+        return err;
+    }
+});
+exports.addInPhonebookByPhone = (findByPhone, usersToAdd) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const readFile = util_1.promisify(fs.readFile);
+        const usersByFile = yield readFile(exports.directory + '/users.json', 'utf-8');
+        const users = JSON.parse(usersByFile).users;
+        const user = yield exports.findUserByPhone(users);
+        for (const item of usersToAdd) {
+            user.phonebook.push(item);
+        }
+        let json = JSON.stringify(users);
+        const writeFile = util_1.promisify(fs.writeFile);
+        yield writeFile(exports.directory + '/users.json', json, 'utf-8');
+        return `User ${findByPhone}'s phonebook was successfully updated.`;
+    }
+    catch (err) {
         return err;
     }
 });
@@ -60,28 +75,25 @@ exports.getAllUsers = (findByName) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.changeUserByPhone = (phone, nickname, name, surname) => __awaiter(void 0, void 0, void 0, function* () {
-    let obj = {
-        users: Array()
-    };
     let isFounded = false;
     try {
         const readFile = util_1.promisify(fs.readFile);
-        const users = yield readFile(exports.directory + '/users.json', 'utf-8');
-        obj = JSON.parse(users);
-        for (let i = 0; i < obj.users.length; i++) {
-            if (phone == obj.users[i].phone) {
+        const usersByFile = yield readFile(exports.directory + '/users.json', 'utf-8');
+        const users = JSON.parse(usersByFile).users;
+        for (let i = 0; i < users.length; i++) {
+            if (phone == users[i].phone) {
                 if (nickname)
-                    obj.users[i].nickname = nickname;
+                    users[i].nickname = nickname;
                 if (name)
-                    obj.users[i].name = name;
+                    users[i].name = name;
                 if (surname)
-                    obj.users[i].surname = surname;
+                    users[i].surname = surname;
                 isFounded = true;
                 break;
             }
         }
         if (isFounded) {
-            let json = JSON.stringify(obj);
+            let json = JSON.stringify(users);
             const writeFile = util_1.promisify(fs.writeFile);
             yield writeFile(exports.directory + '/users.json', json, 'utf-8');
             return `User ${nickname} (${phone}) changed successfully.`;
@@ -96,20 +108,17 @@ exports.changeUserByPhone = (phone, nickname, name, surname) => __awaiter(void 0
     }
 });
 exports.removeUserByPhone = (phone) => __awaiter(void 0, void 0, void 0, function* () {
-    let obj = {
-        users: Array()
-    };
     try {
         const readFile = util_1.promisify(fs.readFile);
-        const users = yield readFile(exports.directory + '/users.json', 'utf-8');
-        obj = JSON.parse(users);
-        for (let i = 0; i < obj.users.length; i++) {
-            if (phone == obj.users[i].phone) {
-                obj.users.splice(i, 1);
+        const usersByFile = yield readFile(exports.directory + '/users.json', 'utf-8');
+        const users = JSON.parse(usersByFile).users;
+        for (let i = 0; i < users.length; i++) {
+            if (phone == users[i].phone) {
+                users.splice(i, 1);
                 break;
             }
         }
-        let json = JSON.stringify(obj);
+        let json = JSON.stringify(users);
         const writeFile = util_1.promisify(fs.writeFile);
         yield writeFile(exports.directory + '/users.json', json, 'utf-8');
         return `User ${phone} removed successfully.`;

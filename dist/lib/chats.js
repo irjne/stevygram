@@ -69,16 +69,13 @@ exports.getAllChats = (user) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getUsersByChatId = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    let obj = {
-        chats: Array()
-    };
     try {
         const readFile = util_1.promisify(fs.readFile);
-        const chats = yield readFile(exports.directory + '/chats.json', 'utf-8');
-        obj = JSON.parse(chats);
-        if (id > obj.chats.length - 1)
+        const chatsByFile = yield readFile(exports.directory + '/chats.json', 'utf-8');
+        const chats = JSON.parse(chatsByFile).chats;
+        if (id > chats.length - 1)
             return false;
-        return { users: obj.chats[id].users };
+        return { users: chats[id].users };
     }
     catch (err) {
         return err;

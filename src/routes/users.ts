@@ -1,8 +1,8 @@
 import express from 'express';
-import { getAllUsers, addUser, changeUserByPhone, removeUserByPhone } from '../lib/users';
+import { getAllUsers, addUser, changeUserByPhone, removeUserByPhone, findUserByPhone } from '../lib/users';
 import { body, param, validationResult, query } from 'express-validator';
-import jwt from "jsonwebtoken";
-const fs = require("fs");
+import jwt from 'jsonwebtoken';
+
 const router = express.Router();
 
 //GET - url: /, ritorna tutti gli utenti.
@@ -97,11 +97,11 @@ router.delete('/:phone', [
     }
 })
 
-router.post('/login/:name/:surname', [
-    param('name')
+router.post('/login/:phone/:name', [
+    param('phone')
         .isString()
         .trim(),
-    param('surname')
+    param('name')
         .isString()
         .trim()
 ], async (req: any, res: any) => {
@@ -111,16 +111,15 @@ router.post('/login/:name/:surname', [
     }
 
     let name = req.params.name;
-    let surname = req.params.surname;
-    const result = await getAllUsers(name);
+    let phone = req.params.phone;
+    const result = await findUserByPhone(phone);
     //console.log(result);
     var user;
     try {
-        for (let index = 0; index < result.length; index++) {
-            if (result[index].surname == surname) {
-                user = result[index];
-                break;
-            }
+        if (result.name == name) {
+            user = result;
+        } else {
+            return res.status(401);
         }
         const payload = {
             name: user.name,
@@ -140,17 +139,7 @@ router.post('/login/:name/:surname', [
         const privateKey = "MEgCQQCnJterqEoG9+o5TbAKQUH9+rs9exD25ES1gG1vvKELNqhMaOvEAbzUFq64j55jnWIJiawSWQsPZ2yBJ3uXkWSnAgMBAAE=";
         var token = jwt.sign(payload, privateKey);
         console.log("Token - " + token);
-        /*
-        var verifyOptions = {
-            issuer: i,
-            subject: s,
-            audience: a,
-            expiresIn: "12h",
-            algorithm: ["RS256"]
-        };
-        var legit = jwt.verify(token, publicKEY, verifyOptions);
-        console.log("\nJWT verification result: " + JSON.stringify(legit));
-        */
+
         return res.status(201).json({ token: token });
 
     } catch (err) {

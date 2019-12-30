@@ -46,9 +46,12 @@ exports.addInPhonebookByPhone = (findByPhone, usersToAdd) => __awaiter(void 0, v
         const readFile = util_1.promisify(fs.readFile);
         const usersByFile = yield readFile(exports.directory + '/users.json', 'utf-8');
         const users = JSON.parse(usersByFile).users;
-        const user = yield exports.findUserByPhone(users);
-        for (const item of usersToAdd) {
-            user.phonebook.push(item);
+        for (let i = 0; i < users.length; i++) {
+            if (findByPhone == users[i].phone) {
+                for (let j = 0; j < usersToAdd.length; j++) {
+                    users[i].phonebook.push(usersToAdd[j]);
+                }
+            }
         }
         let json = JSON.stringify(users);
         const writeFile = util_1.promisify(fs.writeFile);

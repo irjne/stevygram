@@ -17,7 +17,7 @@ import { NextFunction } from 'express-serve-static-core';
 
 const router = express.Router();
 
-const middleware = async (req: any, res: any, next: NextFunction) => {
+const authorization = async (req: any, res: any, next: NextFunction) => {
     //console.log('sto passando dal middleware');
     if (req.query.user) {
         res.locals.user = await findUserByPhone(req.query.user);
@@ -26,7 +26,7 @@ const middleware = async (req: any, res: any, next: NextFunction) => {
 }
 
 //GET - url: /, stampa tutte le chat
-router.get('/', middleware, async (req: any, res: any) => {
+router.get('/', authorization, async (req: any, res: any) => {
     try {
         const result = await getAllChats(res.locals.user);
         res.json(result);

@@ -21,15 +21,12 @@ const users_1 = require("./users");
 const fs = __importStar(require("fs"));
 exports.directory = __dirname.replace("/lib", "/data");
 exports.addChat = (id, name, description, users) => __awaiter(void 0, void 0, void 0, function* () {
-    let obj = {
-        chats: Array()
-    };
     try {
         const readFile = util_1.promisify(fs.readFile);
-        const chats = yield readFile(exports.directory + '/chats.json', 'utf-8');
-        obj = JSON.parse(chats);
-        obj.chats.push({ id, name, description, users });
-        let json = JSON.stringify(obj);
+        const chatsByFile = yield readFile(exports.directory + '/chats.json', 'utf-8');
+        const chats = JSON.parse(chatsByFile).chats;
+        chats.push({ id, name, description, users });
+        let json = JSON.stringify(chats);
         const writeFile = util_1.promisify(fs.writeFile);
         yield writeFile(exports.directory + '/chats.json', json, 'utf-8');
         return `Chat \"${name}\" added successfully.`;
@@ -82,61 +79,51 @@ exports.getUsersByChatId = (id) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.getInfoByChatId = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    let obj = {
-        chats: Array()
-    };
     try {
         const readFile = util_1.promisify(fs.readFile);
-        const chats = yield readFile(exports.directory + '/chats.json', 'utf-8');
-        obj = JSON.parse(chats);
-        if (id > obj.chats.length - 1)
+        const chatsByFile = yield readFile(exports.directory + '/chats.json', 'utf-8');
+        const chats = JSON.parse(chatsByFile).chats;
+        if (id > chats.length - 1)
             return false;
-        //return [obj.chats[id].name, obj.chats[id].description];
-        return { name: obj.chats[id].name, description: obj.chats[id].description, users: obj.chats[id].users, messages: obj.chats[id].messages };
+        return { name: chats[id].name, description: chats[id].description, users: chats[id].users, messages: chats[id].messages };
     }
     catch (err) {
         return err;
     }
 });
 exports.getMessagesByChatId = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    let obj = {
-        chats: Array()
-    };
     try {
         const readFile = util_1.promisify(fs.readFile);
-        const chats = yield readFile(exports.directory + '/chats.json', 'utf-8');
-        obj = JSON.parse(chats);
-        if (id > obj.chats.length - 1)
+        const chatsByFile = yield readFile(exports.directory + '/chats.json', 'utf-8');
+        const chats = JSON.parse(chatsByFile).chats;
+        if (id > chats.length - 1)
             return false;
-        return { messages: obj.chats[id].messages };
+        return { messages: chats[id].messages };
     }
     catch (err) {
         return err;
     }
 });
 exports.changeInfoByChatId = (id, name, description) => __awaiter(void 0, void 0, void 0, function* () {
-    let obj = {
-        chats: Array()
-    };
     let isFounded = false;
     try {
         const readFile = util_1.promisify(fs.readFile);
-        const chats = yield readFile(exports.directory + '/chats.json', 'utf-8');
-        obj = JSON.parse(chats);
-        if (id > obj.chats.length - 1)
+        const chatsByFile = yield readFile(exports.directory + '/chats.json', 'utf-8');
+        const chats = JSON.parse(chatsByFile);
+        if (id > chats.length - 1)
             return false;
-        for (let i = 0; i < obj.chats.length; i++) {
-            if (id == obj.chats[i].id) {
+        for (let i = 0; i < chats.length; i++) {
+            if (id == chats[i].id) {
                 if (name)
-                    obj.chats[i].name = name;
+                    chats[i].name = name;
                 if (description)
-                    obj.chats[i].description = description;
+                    chats[i].description = description;
                 isFounded = true;
                 break;
             }
         }
         if (isFounded) {
-            let json = JSON.stringify(obj);
+            let json = JSON.stringify(chats);
             const writeFile = util_1.promisify(fs.writeFile);
             yield writeFile(exports.directory + '/chats.json', json, 'utf-8');
             return `Chat ${name} changed successfully.`;
@@ -150,15 +137,12 @@ exports.changeInfoByChatId = (id, name, description) => __awaiter(void 0, void 0
     }
 });
 exports.searchByChatId = (id, sender, word) => __awaiter(void 0, void 0, void 0, function* () {
-    let obj = {
-        chats: Array()
-    };
     let choice = -1;
     try {
         const readFile = util_1.promisify(fs.readFile);
-        const chats = yield readFile(exports.directory + '/chats.json', 'utf-8');
-        obj = JSON.parse(chats);
-        if (id > obj.chats.length - 1)
+        const chatsByFile = yield readFile(exports.directory + '/chats.json', 'utf-8');
+        const chats = JSON.parse(chatsByFile);
+        if (id > chats.length - 1)
             return false;
         if (sender)
             choice = 0;
@@ -171,13 +155,13 @@ exports.searchByChatId = (id, sender, word) => __awaiter(void 0, void 0, void 0,
         switch (choice) {
             case 0:
                 // search by sender
-                for (let i = 0; i < obj.chats.length; i++) {
-                    if (id == obj.chats[i].id) {
-                        for (let j = 0; j < obj.chats[i].messages.length; j++) {
-                            if (sender == obj.chats[i].messages[j].sender) {
+                for (let i = 0; i < chats.length; i++) {
+                    if (id == chats[i].id) {
+                        for (let j = 0; j < chats[i].messages.length; j++) {
+                            if (sender == chats[i].messages[j].sender) {
                                 result.messages[result.messages.length] = {
-                                    "body": obj.chats[i].messages[j].body,
-                                    "date": obj.chats[i].messages[j].date
+                                    "body": chats[i].messages[j].body,
+                                    "date": chats[i].messages[j].date
                                 };
                                 isFounded = true;
                             }
@@ -187,14 +171,14 @@ exports.searchByChatId = (id, sender, word) => __awaiter(void 0, void 0, void 0,
                 break;
             case 1:
                 // search by word
-                for (let i = 0; i < obj.chats.length; i++) {
-                    if (id == obj.chats[i].id) {
-                        for (let j = 0; j < obj.chats[i].messages.length; j++) {
-                            if (obj.chats[i].messages[j].body.includes(word)) {
+                for (let i = 0; i < chats.length; i++) {
+                    if (id == chats[i].id) {
+                        for (let j = 0; j < chats[i].messages.length; j++) {
+                            if (chats[i].messages[j].body.includes(word)) {
                                 result.messages[result.messages.length] = {
-                                    "sender": obj.chats[i].messages[j].sender,
-                                    "body": obj.chats[i].messages[j].body,
-                                    "date": obj.chats[i].messages[j].date
+                                    "sender": chats[i].messages[j].sender,
+                                    "body": chats[i].messages[j].body,
+                                    "date": chats[i].messages[j].date
                                 };
                                 isFounded = true;
                             }
@@ -218,22 +202,19 @@ exports.searchByChatId = (id, sender, word) => __awaiter(void 0, void 0, void 0,
     }
 });
 exports.removeChatById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    let obj = {
-        chats: Array()
-    };
     try {
         const readFile = util_1.promisify(fs.readFile);
-        const chats = yield readFile(exports.directory + '/chats.json', 'utf-8');
-        obj = JSON.parse(chats);
-        if (id > obj.chats.length - 1)
+        const chatsByFile = yield readFile(exports.directory + '/chats.json', 'utf-8');
+        const chats = JSON.parse(chatsByFile).chats;
+        if (id > chats.length - 1)
             return false;
-        for (let i = 0; i < obj.chats.length; i++) {
-            if (id == obj.chats[i].id) {
-                obj.chats.splice(i, 1);
+        for (let i = 0; i < chats.length; i++) {
+            if (id == chats[i].id) {
+                chats.splice(i, 1);
                 break;
             }
         }
-        let json = JSON.stringify(obj);
+        let json = JSON.stringify(chats);
         const writeFile = util_1.promisify(fs.writeFile);
         yield writeFile(exports.directory + '/chats.json', json, 'utf-8');
         return `Chat \"${id}\" removed successfully.`;

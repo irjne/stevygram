@@ -14,6 +14,6 @@ app.use(body_parser_1.default.urlencoded({ extended: false }));
 app.use(body_parser_1.default.json());
 app.use('/users', users_1.default);
 app.use('/chats', chats_1.default);
-app.listen(3000, () => console.log('🙌 Server is running!'));
+app.listen(3003, () => console.log('🙌 Server is running!'));
 module.exports = app;
 //# sourceMappingURL=app.js.map

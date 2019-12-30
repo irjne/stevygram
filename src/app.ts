@@ -13,5 +13,5 @@ app.use(bodyParser.json());
 app.use('/users', users);
 app.use('/chats', chats);
 
-app.listen(3000, () => console.log('🙌 Server is running!'));
+app.listen(3003, () => console.log('🙌 Server is running!'));
 module.exports = app;

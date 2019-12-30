@@ -121,7 +121,7 @@ router.post('/login/:phone/:name', [
     let phone = req.params.phone;
     const result = yield users_1.findUserByPhone(phone);
     //console.log(result);
-    var user;
+    let user;
     try {
         if (result.name == name) {
             user = result;
@@ -130,10 +130,10 @@ router.post('/login/:phone/:name', [
             return res.status(401);
         }
         const payload = {
-            name: user.name,
-            surname: user.surname
+            phone: user.phone,
+            password: user.name
         };
-        console.log(payload);
+        //console.log(payload);
         var i = "Mysoft corp"; // Issuer
         var s = "some@user.com"; // Subject
         var a = "http://mysoftcorp.in"; // Audience// SIGNING OPTIONS
@@ -146,7 +146,7 @@ router.post('/login/:phone/:name', [
         };
         const privateKey = "MEgCQQCnJterqEoG9+o5TbAKQUH9+rs9exD25ES1gG1vvKELNqhMaOvEAbzUFq64j55jnWIJiawSWQsPZ2yBJ3uXkWSnAgMBAAE=";
         var token = jsonwebtoken_1.default.sign(payload, privateKey);
-        console.log("Token - " + token);
+        //console.log("Token - " + token);
         return res.status(201).json({ token: token });
     }
     catch (err) {

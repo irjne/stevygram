@@ -15,6 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const users_1 = require("../lib/users");
 const express_validator_1 = require("express-validator");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const fs = require("fs");
 const router = express_1.default.Router();
 //GET - url: /, ritorna tutti gli utenti.
 router.get('/', [
@@ -99,6 +101,65 @@ router.delete('/:phone', [
     try {
         const result = yield users_1.removeUserByPhone(phone);
         res.json(result);
+    }
+    catch (err) {
+        return res.status(500).send(`Unexpected error: ${err}`);
+    }
+}));
+router.post('/login/:name/:surname', [
+    express_validator_1.param('name')
+        .isString()
+        .trim(),
+    express_validator_1.param('surname')
+        .isString()
+        .trim()
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const errors = express_validator_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    let name = req.params.name;
+    let surname = req.params.surname;
+    const result = yield users_1.getAllUsers(name);
+    //console.log(result);
+    var user;
+    try {
+        for (let index = 0; index < result.length; index++) {
+            if (result[index].surname == surname) {
+                user = result[index];
+                break;
+            }
+        }
+        const payload = {
+            name: user.name,
+            surname: user.surname
+        };
+        console.log(payload);
+        var i = "Mysoft corp"; // Issuer
+        var s = "some@user.com"; // Subject
+        var a = "http://mysoftcorp.in"; // Audience// SIGNING OPTIONS
+        var signOptions = {
+            issuer: i,
+            subject: s,
+            audience: a,
+            expiresIn: "12h",
+            algorithm: "RS256"
+        };
+        const privateKey = "MEgCQQCnJterqEoG9+o5TbAKQUH9+rs9exD25ES1gG1vvKELNqhMaOvEAbzUFq64j55jnWIJiawSWQsPZ2yBJ3uXkWSnAgMBAAE=";
+        var token = jsonwebtoken_1.default.sign(payload, privateKey);
+        console.log("Token - " + token);
+        /*
+        var verifyOptions = {
+            issuer: i,
+            subject: s,
+            audience: a,
+            expiresIn: "12h",
+            algorithm: ["RS256"]
+        };
+        var legit = jwt.verify(token, publicKEY, verifyOptions);
+        console.log("\nJWT verification result: " + JSON.stringify(legit));
+        */
+        return res.status(201).json({ token: token });
     }
     catch (err) {
         return res.status(500).send(`Unexpected error: ${err}`);

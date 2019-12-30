@@ -17,7 +17,7 @@ const express_validator_1 = require("express-validator");
 const chats_1 = require("../lib/chats");
 const users_1 = require("../lib/users");
 const router = express_1.default.Router();
-const middleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const authorization = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     //console.log('sto passando dal middleware');
     if (req.query.user) {
         res.locals.user = yield users_1.findUserByPhone(req.query.user);
@@ -25,7 +25,7 @@ const middleware = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     next();
 });
 //GET - url: /, stampa tutte le chat
-router.get('/', middleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/', authorization, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield chats_1.getAllChats(res.locals.user);
         res.json(result);

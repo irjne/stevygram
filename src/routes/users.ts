@@ -1,6 +1,8 @@
 import express from 'express';
 import { getAllUsers, addUser, changeUserByPhone, removeUserByPhone } from '../lib/users';
 import { body, param, validationResult, query } from 'express-validator';
+import jwt from "jsonwebtoken";
+const fs = require("fs");
 const router = express.Router();
 
 //GET - url: /, ritorna tutti gli utenti.
@@ -90,6 +92,67 @@ router.delete('/:phone', [
     try {
         const result = await removeUserByPhone(phone);
         res.json(result);
+    } catch (err) {
+        return res.status(500).send(`Unexpected error: ${err}`);
+    }
+})
+
+router.post('/login/:name/:surname', [
+    param('name')
+        .isString()
+        .trim(),
+    param('surname')
+        .isString()
+        .trim()
+], async (req: any, res: any) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+
+    let name = req.params.name;
+    let surname = req.params.surname;
+    const result = await getAllUsers(name);
+    //console.log(result);
+    var user;
+    try {
+        for (let index = 0; index < result.length; index++) {
+            if (result[index].surname == surname) {
+                user = result[index];
+                break;
+            }
+        }
+        const payload = {
+            name: user.name,
+            surname: user.surname
+        };
+        console.log(payload);
+        var i = "Mysoft corp"; // Issuer
+        var s = "some@user.com"; // Subject
+        var a = "http://mysoftcorp.in"; // Audience// SIGNING OPTIONS
+        var signOptions = {
+            issuer: i,
+            subject: s,
+            audience: a,
+            expiresIn: "12h",
+            algorithm: "RS256"
+        };
+        const privateKey = "MEgCQQCnJterqEoG9+o5TbAKQUH9+rs9exD25ES1gG1vvKELNqhMaOvEAbzUFq64j55jnWIJiawSWQsPZ2yBJ3uXkWSnAgMBAAE=";
+        var token = jwt.sign(payload, privateKey);
+        console.log("Token - " + token);
+        /*
+        var verifyOptions = {
+            issuer: i,
+            subject: s,
+            audience: a,
+            expiresIn: "12h",
+            algorithm: ["RS256"]
+        };
+        var legit = jwt.verify(token, publicKEY, verifyOptions);
+        console.log("\nJWT verification result: " + JSON.stringify(legit));
+        */
+        return res.status(201).json({ token: token });
+
     } catch (err) {
         return res.status(500).send(`Unexpected error: ${err}`);
     }

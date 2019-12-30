@@ -42,9 +42,13 @@ export const addInPhonebookByPhone = async (findByPhone: string, usersToAdd: str
         const readFile = promisify(fs.readFile);
         const usersByFile = await readFile(directory + '/users.json', 'utf-8');
         const users = JSON.parse(usersByFile).users;
-        const user = await findUserByPhone(users);
-        for (const item of usersToAdd) {
-            user.phonebook.push(item);
+
+        for (let i = 0; i < users.length; i++) {
+            if (findByPhone == users[i].phone) {
+                for (let j = 0; j < usersToAdd.length; j++) {
+                    users[i].phonebook.push(usersToAdd[j]);
+                }
+            }
         }
 
         let json = JSON.stringify(users);

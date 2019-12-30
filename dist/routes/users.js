@@ -127,7 +127,7 @@ router.post('/login/:phone/:name', [
             user = result;
         }
         else {
-            return res.status(401);
+            return res.status(401).send(`Login credentials arent' valid. Please, try again.`);
         }
         const payload = {
             phone: user.phone,

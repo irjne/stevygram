@@ -4,7 +4,9 @@
             "id": 0,
             "name": "EIPIAI🐝",
             "description": "class's group",
-			"admin":["3495689878"],
+            "admin": [
+                "3495689878"
+            ],
             "users": [
                 "3495689878",
                 "3406452104",
@@ -57,7 +59,9 @@
             "id": 1,
             "name": "StevyGram💾",
             "description": "gruppo di lavoro",
-			"admin":["3896869619"],
+            "admin": [
+                "3896869619"
+            ],
             "users": [
                 "3896869619",
                 "3466457463",
@@ -92,7 +96,7 @@
             "id": 2,
             "name": "Chat",
             "description": "",
-			"admin":["3896869619"],
+            "admin": [],
             "users": [
                 "3896869619",
                 "3466457463"
@@ -107,6 +111,43 @@
                     "sender": "3466457463",
                     "body": "Tutto bene, grazie, tu?",
                     "date": "2019-11-15, 10:05"
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "name": "Chat",
+            "description": "",
+            "admin": [],
+            "users": [
+                "3451691678",
+                "3497740026"
+            ],
+            "messages": [
+                {
+                    "sender": "3451691678",
+                    "body": "Hei man",
+                    "date": "2020-01-02, 10:00"
+                },
+                {
+                    "sender": "3451691678",
+                    "body": "ti ricordi che avevamo appuntamento alle 10.30??",
+                    "date": "2020-01-02, 10:01"
+                },
+                {
+                    "sender": "3451691678",
+                    "body": "ci 6?",
+                    "date": "2020-01-02, 10:35"
+                },
+                {
+                    "sender": "3497740026",
+                    "body": "Oi scusa bro, mi sono addormentato",
+                    "date": "2020-01-02, 11:21"
+                },
+                {
+                    "sender": "3451691678",
+                    "body": "1 ora di ritardooo! Forza che ti aspettiamo",
+                    "date": "2020-01-02, 11:25"
                 }
             ]
         }

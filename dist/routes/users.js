@@ -77,7 +77,7 @@ router.post('/', [
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-    const { name, phone, surname, nickname } = req.body;
+    const { nickname, name, surname, phone } = req.body;
     try {
         const result = yield users_1.addUser(nickname, name, surname, phone);
         res.json(result);

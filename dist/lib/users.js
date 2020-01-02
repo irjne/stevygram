@@ -31,7 +31,7 @@ exports.addUser = (nickname, name, surname, phone) => __awaiter(void 0, void 0, 
         }
         let phonebook = new Array();
         users.push({ nickname, name, surname, phone, phonebook });
-        let json = JSON.stringify(users);
+        let json = JSON.stringify({ "users": users });
         const writeFile = util_1.promisify(fs.writeFile);
         yield writeFile(exports.directory + '/users.json', json, 'utf-8');
         return `User ${nickname} added successfully.`;

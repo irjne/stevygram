@@ -25,7 +25,7 @@ export const addUser = async (nickname: string, name: string, surname: string, p
 
         let phonebook = new Array<string>();
         users.push({ nickname, name, surname, phone, phonebook });
-        let json = JSON.stringify(users);
+        let json = JSON.stringify({ "users": users });
         const writeFile = promisify(fs.writeFile);
         await writeFile(directory + '/users.json', json, 'utf-8');
 

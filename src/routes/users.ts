@@ -140,7 +140,7 @@ router.post('/login/:phone/:name', [
         var token = jwt.sign(payload, privateKey);
         //console.log("Token - " + token);
 
-        return res.status(201).json({ token: token });
+        return res.status(201).json(token);
     } catch (err) {
         return res.status(500).send(`Unexpected error: ${err}`);
     }

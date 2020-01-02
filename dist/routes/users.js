@@ -147,7 +147,7 @@ router.post('/login/:phone/:name', [
         const privateKey = "MEgCQQCnJterqEoG9+o5TbAKQUH9+rs9exD25ES1gG1vvKELNqhMaOvEAbzUFq64j55jnWIJiawSWQsPZ2yBJ3uXkWSnAgMBAAE=";
         var token = jsonwebtoken_1.default.sign(payload, privateKey);
         //console.log("Token - " + token);
-        return res.status(201).json({ token: token });
+        return res.status(201).json(token);
     }
     catch (err) {
         return res.status(500).send(`Unexpected error: ${err}`);

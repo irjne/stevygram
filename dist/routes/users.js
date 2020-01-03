@@ -30,7 +30,7 @@ const authorization = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         algorithm: ["HS384"]
     };
     if (req.query.token) {
-        let legit = jsonwebtoken_1.default.verify(req.query.token, publicKey, verifyOptions);
+        let legit = jsonwebtoken_1.default.verify(req.query.token, publicKey, { algorithms: ["HS384"] });
         console.log("\nJWT verification result: " + JSON.stringify(legit));
     }
     next();
@@ -157,7 +157,7 @@ router.post('/login/:phone/:name', [
             expiresIn: "12h",
             algorithm: "HS256"
         });
-        console.log("Token - " + token);
+        //console.log("Token - " + token);
         return res.status(201).json(token);
     }
     catch (err) {

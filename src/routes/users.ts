@@ -8,18 +8,9 @@ const router = express.Router();
 
 const authorization = async (req: any, res: any, next: NextFunction) => {
     const publicKey = "MEgCQQCnJterqEoG9+o5TbAKQUH9+rs9exD25ES1gG1vvKELNqhMaOvEAbzUFq64j55jnWIJiawSWQsPZ2yBJ3uXkWSnAgMBAAE=";
-    var i = "Mysoft corp"; // Issuer
-    var s = "some@user.com"; // Subject
-    var a = "http://mysoftcorp.in"; // Audience// SIGNING OPTIONS
-    var verifyOptions = {
-        issuer: i,
-        subject: s,
-        audience: a,
-        expiresIn: "12h",
-        algorithm: ["HS384"]
-    };
+
     if (req.query.token) {
-        let legit = jwt.verify(req.query.token, publicKey, verifyOptions);
+        let legit = jwt.verify(req.query.token, publicKey, { algorithms: ["HS384"] });
         console.log("\nJWT verification result: " + JSON.stringify(legit));
     }
     next();
@@ -152,7 +143,7 @@ router.post('/login/:phone/:name', [
             expiresIn: "12h",
             algorithm: "HS256"
         });
-        console.log("Token - " + token);
+        //console.log("Token - " + token);
 
         return res.status(201).json(token);
     } catch (err) {

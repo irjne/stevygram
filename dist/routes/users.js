@@ -17,8 +17,26 @@ const users_1 = require("../lib/users");
 const express_validator_1 = require("express-validator");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const router = express_1.default.Router();
+const authorization = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const publicKey = "MEgCQQCnJterqEoG9+o5TbAKQUH9+rs9exD25ES1gG1vvKELNqhMaOvEAbzUFq64j55jnWIJiawSWQsPZ2yBJ3uXkWSnAgMBAAE=";
+    var i = "Mysoft corp"; // Issuer
+    var s = "some@user.com"; // Subject
+    var a = "http://mysoftcorp.in"; // Audience// SIGNING OPTIONS
+    var verifyOptions = {
+        issuer: i,
+        subject: s,
+        audience: a,
+        expiresIn: "12h",
+        algorithm: ["HS384"]
+    };
+    if (req.query.token) {
+        let legit = jsonwebtoken_1.default.verify(req.query.token, publicKey, verifyOptions);
+        console.log("\nJWT verification result: " + JSON.stringify(legit));
+    }
+    next();
+});
 //GET - url: /, ritorna tutti gli utenti.
-router.get('/', [
+router.get('/', authorization, [
     express_validator_1.query('name')
         .isString()
         .trim()
@@ -134,19 +152,12 @@ router.post('/login/:phone/:name', [
             password: user.name
         };
         //console.log(payload);
-        var i = "Mysoft corp"; // Issuer
-        var s = "some@user.com"; // Subject
-        var a = "http://mysoftcorp.in"; // Audience// SIGNING OPTIONS
-        var signOptions = {
-            issuer: i,
-            subject: s,
-            audience: a,
+        const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
+        var token = jsonwebtoken_1.default.sign(payload, privateKey, {
             expiresIn: "12h",
-            algorithm: "RS256"
-        };
-        const privateKey = "MEgCQQCnJterqEoG9+o5TbAKQUH9+rs9exD25ES1gG1vvKELNqhMaOvEAbzUFq64j55jnWIJiawSWQsPZ2yBJ3uXkWSnAgMBAAE=";
-        var token = jsonwebtoken_1.default.sign(payload, privateKey);
-        //console.log("Token - " + token);
+            algorithm: "HS256"
+        });
+        console.log("Token - " + token);
         return res.status(201).json(token);
     }
     catch (err) {

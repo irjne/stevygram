@@ -5,15 +5,15 @@ import jwt from 'jsonwebtoken';
 import { NextFunction } from 'express-serve-static-core';
 
 const router = express.Router();
-
+const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
 const authorization = async (req: any, res: any, next: NextFunction) => {
     try {
         var token = req.params.token;
-        const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
         var legit = jwt.verify(token, privateKey);
         console.log("\nJWT verification result: " + JSON.stringify(legit));
     } catch (error) {
         console.log(error);
+        return res.status(500).send(`Unexpected error: ${error}`);
     }
     next();
 }
@@ -80,7 +80,6 @@ router.post('/', [
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-
     const { nickname, name, surname, phone } = req.body;
     try {
         const result = await addUser(nickname, name, surname, phone);
@@ -100,7 +99,6 @@ router.delete('/:phone', [
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-
     let phone = req.params.phone;
     try {
         const result = await removeUserByPhone(phone);
@@ -122,7 +120,6 @@ router.post('/login/:phone/:name', [
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-
     let name = req.params.name;
     let phone = req.params.phone;
     const result = await findUserByPhone(phone);
@@ -139,11 +136,8 @@ router.post('/login/:phone/:name', [
             password: user.name
         };
         //console.log(payload);
-
-        const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
         var token = jwt.sign(payload, privateKey);
         console.log("Token -  " + token);
-
         return res.status(201).json(token);
     } catch (err) {
         return res.status(500).send(`Unexpected error: ${err}`);
@@ -159,7 +153,6 @@ router.post("/verify/:token",
         }
         try {
             var token = req.params.token;
-            const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
             var legit = jwt.verify(token, privateKey);
             console.log("\nJWT verification result: " + JSON.stringify(legit));
         } catch (error) {
@@ -167,4 +160,5 @@ router.post("/verify/:token",
         }
     }
 );
+
 export default router; 

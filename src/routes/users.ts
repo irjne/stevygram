@@ -7,17 +7,19 @@ import { NextFunction } from 'express-serve-static-core';
 const router = express.Router();
 
 const authorization = async (req: any, res: any, next: NextFunction) => {
-    const publicKey = "MEgCQQCnJterqEoG9+o5TbAKQUH9+rs9exD25ES1gG1vvKELNqhMaOvEAbzUFq64j55jnWIJiawSWQsPZ2yBJ3uXkWSnAgMBAAE=";
-
-    if (req.query.token) {
-        let legit = jwt.verify(req.query.token, publicKey, { algorithms: ["HS384"] });
+    try {
+        var token = req.params.token;
+        const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
+        var legit = jwt.verify(token, privateKey);
         console.log("\nJWT verification result: " + JSON.stringify(legit));
+    } catch (error) {
+        console.log(error);
     }
     next();
 }
 
 //GET - url: /, ritorna tutti gli utenti.
-router.get('/', authorization, [
+router.get('/:token', authorization, [
     query('name')
         .isString()
         .trim()
@@ -139,11 +141,8 @@ router.post('/login/:phone/:name', [
         //console.log(payload);
 
         const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
-        var token = jwt.sign(payload, privateKey, {
-            expiresIn: "12h",
-            algorithm: "HS256"
-        });
-        //console.log("Token - " + token);
+        var token = jwt.sign(payload, privateKey);
+        console.log("Token -  " + token);
 
         return res.status(201).json(token);
     } catch (err) {
@@ -151,4 +150,21 @@ router.post('/login/:phone/:name', [
     }
 })
 
+router.post("/verify/:token",
+    param("token").isString().trim(),
+    async (req: any, res: any) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+        try {
+            var token = req.params.token;
+            const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
+            var legit = jwt.verify(token, privateKey);
+            console.log("\nJWT verification result: " + JSON.stringify(legit));
+        } catch (error) {
+            console.log(error);
+        }
+    }
+);
 export default router; 

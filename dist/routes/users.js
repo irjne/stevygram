@@ -20,25 +20,36 @@ const router = express_1.default.Router();
 const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
 const authorization = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        var token = req.params.token;
-        var legit = jsonwebtoken_1.default.verify(token, privateKey);
-        console.log("\nJWT verification result: " + JSON.stringify(legit));
+        let token = req.query.token;
+        let legit = jsonwebtoken_1.default.verify(token, privateKey);
+        //console.log("\nJWT verification result: " + JSON.stringify(legit));
+        const user = users_1.findUserByPhone(Object.values(legit)[0]);
+        if (user) {
+            res.locals.user = user;
+            next();
+        }
     }
     catch (error) {
-        console.log(error);
+        // console.log(error);
         return res.status(500).send(`Unexpected error: ${error}`);
     }
-    next();
+    //next();
 });
 //GET - url: /, ritorna tutti gli utenti.
-router.get('/:token', authorization, [
+router.get('/', [
     express_validator_1.query('name')
         .isString()
         .trim()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const users = yield users_1.getAllUsers(req.query.name);
-        res.json(users);
+        if (res.locals.user) { //verificare il funzionamento di locals
+            const phonebook = yield users_1.getPhonebook(res.locals.user);
+            res.json(phonebook);
+        }
+        else {
+            const users = yield users_1.getAllUsers(req.query.name);
+            res.json(users);
+        }
     }
     catch (err) {
         return res.status(500).send(`Unexpected error: ${err}`);

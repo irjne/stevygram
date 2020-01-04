@@ -77,6 +77,23 @@ export const getAllUsers = async (findByName?: string): Promise<object | any> =>
     }
 }
 
+export const getPhonebook = async (phone: string): Promise<object | any> => {
+    try {
+        const readFile = promisify(fs.readFile);
+        const usersByFile = await readFile(directory + '/users.json', 'utf-8');
+        const users = JSON.parse(usersByFile).users;
+        const user = users.find((user: any) => user.phone === phone);
+        const phonebook = user.phonebook;
+
+        console.log(phonebook);
+
+        return phonebook;
+    }
+    catch (err) {
+        return err;
+    }
+}
+
 export const changeUserByPhone = async (phone: string, nickname?: string, name?: string, surname?: string): Promise<string | any> => {
     let isFounded = false;
 

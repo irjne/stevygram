@@ -5,6 +5,7 @@
             "name": "Davide",
             "surname": "Aita",
             "phone": "3495689878",
+            "password": "",
             "phonebook": [
                 "3406452104",
                 "3505801056",
@@ -16,6 +17,7 @@
             "name": "Simone",
             "surname": "Aiello",
             "phone": "3406452104",
+            "password": "",
             "phonebook": [
                 "3495689878",
                 "3886538378",
@@ -27,6 +29,7 @@
             "name": "Manuel",
             "surname": "Amato",
             "phone": "3505801056",
+            "password": "",
             "phonebook": [
                 "3406452104",
                 "3886538378",
@@ -38,6 +41,7 @@
             "name": "Matteo",
             "surname": "Annaro",
             "phone": "3333331751",
+            "password": "",
             "phonebook": [
                 "3290077252",
                 "3505801056",
@@ -49,6 +53,7 @@
             "name": "Alessandro",
             "surname": "Bazzano",
             "phone": "3284618420",
+            "password": "",
             "phonebook": [
                 "3886538378",
                 "3457064103",
@@ -60,6 +65,7 @@
             "name": "Fabrizio",
             "surname": "Cannizzaro",
             "phone": "3886538378",
+            "password": "",
             "phonebook": [
                 "3515900310",
                 "3497740026",
@@ -71,6 +77,7 @@
             "name": "Gaetano",
             "surname": "Carfì",
             "phone": "3515900310",
+            "password": "",
             "phonebook": [
                 "3457064103",
                 "3497740026",
@@ -82,6 +89,7 @@
             "name": "Manuel",
             "surname": "Caruso",
             "phone": "3290077252",
+            "password": "",
             "phonebook": [
                 "3457064103",
                 "3497740026",
@@ -93,6 +101,7 @@
             "name": "Matteo",
             "surname": "Di Cara",
             "phone": "3497740026",
+            "password": "",
             "phonebook": [
                 "3284618420",
                 "3505801056",
@@ -104,6 +113,7 @@
             "name": "Manuel",
             "surname": "Caruso",
             "phone": "3290077252",
+            "password": "",
             "phonebook": [
                 "3457064103",
                 "3497740026",
@@ -115,6 +125,7 @@
             "name": "Corrado",
             "surname": "Di Battista",
             "phone": "3457064103",
+            "password": "",
             "phonebook": [
                 "3896869619",
                 "3497740026",
@@ -126,6 +137,7 @@
             "name": "Giusy",
             "surname": "Giangravè",
             "phone": "3896869619",
+            "password": "",
             "phonebook": [
                 "3472438170",
                 "3466457463",
@@ -137,6 +149,7 @@
             "name": "Daria",
             "surname": "Gilletti",
             "phone": "3466457463",
+            "password": "",
             "phonebook": [
                 "3914303308",
                 "3472438170",
@@ -148,6 +161,7 @@
             "name": "Antonio",
             "surname": "Guglielmino",
             "phone": "3472438170",
+            "password": "",
             "phonebook": [
                 "3914303308",
                 "3466457463",
@@ -159,6 +173,7 @@
             "name": "Dario",
             "surname": "Laganà",
             "phone": "3914303308",
+            "password": "",
             "phonebook": [
                 "3896869619",
                 "3466457463",
@@ -170,6 +185,7 @@
             "name": "Claudio",
             "surname": "Landolfo",
             "phone": "3451691678",
+            "password": "",
             "phonebook": [
                 "3472438170",
                 "3466457463",
@@ -181,6 +197,7 @@
             "name": "PierAntonio",
             "surname": "Petralia",
             "phone": "3890439101",
+            "password": "",
             "phonebook": [
                 "3478591903",
                 "3466457463",
@@ -192,6 +209,7 @@
             "name": "Pierpaolo",
             "surname": "Pistorio",
             "phone": "3478591903",
+            "password": "",
             "phonebook": [
                 "3896869619",
                 "3466457463",
@@ -203,6 +221,7 @@
             "name": "Giuseppe",
             "surname": "Puglia",
             "phone": "389911170",
+            "password": "",
             "phonebook": [
                 "3451691678",
                 "3466457463",
@@ -214,6 +233,7 @@
             "name": "Domenico",
             "surname": "Signore Fiore",
             "phone": "3286239190",
+            "password": "",
             "phonebook": [
                 "3472438170",
                 "3466457463",
@@ -225,6 +245,7 @@
             "name": "Enrico",
             "surname": "Terranova",
             "phone": "3207279432",
+            "password": "",
             "phonebook": [
                 "3207279432",
                 "3466457463",
@@ -236,6 +257,7 @@
             "name": "Davide",
             "surname": "Turzo",
             "phone": "3470670303",
+            "password": "",
             "phonebook": [
                 "3207279432",
                 "3466457463",
@@ -247,6 +269,7 @@
             "name": "Gabriele",
             "surname": "Zagarella",
             "phone": "345431312",
+            "password": "",
             "phonebook": [
                 "3207279432",
                 "3466457463",

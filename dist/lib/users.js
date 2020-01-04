@@ -77,6 +77,20 @@ exports.getAllUsers = (findByName) => __awaiter(void 0, void 0, void 0, function
         return err;
     }
 });
+exports.getPhonebook = (phone) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const readFile = util_1.promisify(fs.readFile);
+        const usersByFile = yield readFile(exports.directory + '/users.json', 'utf-8');
+        const users = JSON.parse(usersByFile).users;
+        const user = users.find((user) => user.phone === phone);
+        const phonebook = user.phonebook;
+        console.log(phonebook);
+        return phonebook;
+    }
+    catch (err) {
+        return err;
+    }
+});
 exports.changeUserByPhone = (phone, nickname, name, surname) => __awaiter(void 0, void 0, void 0, function* () {
     let isFounded = false;
     try {

@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllUsers, addUser, changeUserByPhone, removeUserByPhone, findUserByPhone } from '../lib/users';
+import { getAllUsers, addUser, changeUserByPhone, removeUserByPhone, findUserByPhone, getPhonebook } from '../lib/users';
 import { body, param, validationResult, query } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import { NextFunction } from 'express-serve-static-core';
@@ -8,25 +8,37 @@ const router = express.Router();
 const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
 const authorization = async (req: any, res: any, next: NextFunction) => {
     try {
-        var token = req.params.token;
-        var legit = jwt.verify(token, privateKey);
-        console.log("\nJWT verification result: " + JSON.stringify(legit));
+        let token = req.query.token;
+        let legit = jwt.verify(token, privateKey);
+        //console.log("\nJWT verification result: " + JSON.stringify(legit));
+
+        const user = findUserByPhone(Object.values(legit)[0]);
+        if (user) {
+            res.locals.user = user;
+            next();
+        }
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         return res.status(500).send(`Unexpected error: ${error}`);
     }
-    next();
+    //next();
 }
 
 //GET - url: /, ritorna tutti gli utenti.
-router.get('/:token', authorization, [
+router.get('/', authorization, [
     query('name')
         .isString()
         .trim()
 ], async (req: any, res: any) => {
     try {
-        const users = await getAllUsers(req.query.name);
-        res.json(users);
+        if (res.locals.user) { //verificare il funzionamento di locals
+            const phonebook = await getPhonebook(res.locals.user);
+            res.json(phonebook);
+        }
+        else {
+            const users = await getAllUsers(req.query.name);
+            res.json(users);
+        }
     } catch (err) {
         return res.status(500).send(`Unexpected error: ${err}`);
     }

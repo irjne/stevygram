@@ -1,10 +1,11 @@
 import express from 'express';
-import { getAllUsers, addUser, changeUserByPhone, removeUserByPhone, findUserByPhone, getPhonebook } from '../lib/users';
+import { getAllUsers, addUser, changeUserByPhone, removeUserByPhone, findUserByPhone, getPhonebook, User } from '../lib/users';
 import { body, param, validationResult, query } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import { NextFunction } from 'express-serve-static-core';
 
 const router = express.Router();
+let userOnSession: User;
 const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
 const authorization = async (req: any, res: any, next: NextFunction) => {
     try {
@@ -12,9 +13,9 @@ const authorization = async (req: any, res: any, next: NextFunction) => {
         let legit = jwt.verify(token, privateKey);
         //console.log("\nJWT verification result: " + JSON.stringify(legit));
 
-        const user = findUserByPhone(Object.values(legit)[0]);
+        const user = await findUserByPhone(Object.values(legit)[0]);
         if (user) {
-            res.locals.user = user;
+            userOnSession = user;
             next();
         }
     } catch (error) {
@@ -31,9 +32,8 @@ router.get('/', authorization, [
         .trim()
 ], async (req: any, res: any) => {
     try {
-        if (res.locals.user) { //verificare il funzionamento di locals
-            const phonebook = await getPhonebook(res.locals.user);
-            res.json(phonebook);
+        if (userOnSession) { //verificare il funzionamento di locals
+            res.json(userOnSession.phonebook);
         }
         else {
             const users = await getAllUsers(req.query.name);

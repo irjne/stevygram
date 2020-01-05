@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllUsers, addUser, changeUserByPhone, removeUserByPhone, findUserByPhone, getPhonebook, User } from '../lib/users';
+import { getAllUsers, addUser, changeUserByPhone, removeUserByPhone, findUserByPhone, User } from '../lib/users';
 import { body, param, validationResult, query } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import { NextFunction } from 'express-serve-static-core';

@@ -94,11 +94,35 @@ export const getInfoByChatId = async (id: number, user?: User): Promise<object[]
 
         const chat = chats[id];
         let chatName: string;
-        if (user && chat.users.length === 2) {
-            const otherUserPhone = user.phone === chat.users[0] ? chat.users[1] : chat.users[0];
-            const otherUser = await findUserByPhone(otherUserPhone);
-            chatName = `${otherUser.name} ${otherUser.surname}`;
-            return { name: chatName, description: chat.description, users: chat.users, messages: chat.messages };
+        if (user) {
+            let contacts: string[] = [];
+            for (let i = 0; i < chat.users.length; i++) {
+                let contact = chat.users[i];
+                let contactInfo = await findUserByPhone(contact);
+                if (contact != user.phone && user.phonebook.includes(contact)) {
+                    contacts.push(" " + contactInfo.name + " " + contactInfo.surname);
+                }
+                else if (contact != user.phone) contacts.push(" " + contactInfo.nickname);
+            }
+
+            let messages: Message[] = [];
+            for (let i = 0; i < chat.messages.length; i++) {
+                let message = chat.messages[i];
+                let sender = await findUserByPhone(message.sender);
+                if (sender.phone != user.phone && user.phonebook.includes(sender.phone)) {
+                    messages.push({ sender: sender.name + " " + sender.surname, body: message.body, date: message.date });
+                }
+                else if (sender.phone != user.phone) messages.push({ sender: sender.nickname, body: message.body, date: message.date });
+                else messages.push({ sender: "Me", body: message.body, date: message.date });
+            }
+
+            if (chat.users.length === 2) {
+                const otherUserPhone = user.phone === chat.users[0] ? chat.users[1] : chat.users[0];
+                const otherUser = await findUserByPhone(otherUserPhone);
+                chatName = `${otherUser.name} ${otherUser.surname}`;
+                return { name: chatName, description: chat.description, users: contacts, messages: messages };
+            }
+            else return { name: chat.name, description: chat.description, users: contacts, messages: messages };
         }
         else return { name: chat.name, description: chat.description, users: chat.users, messages: chat.messages };
     }

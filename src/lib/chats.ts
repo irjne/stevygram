@@ -41,7 +41,8 @@ export const addChat = async (id: number, name: string, description: string, use
 export const getAllChats = async (user?: User): Promise<Chat[]> => {
     try {
         const readFile = promisify(fs.readFile);
-        let chats: Chat[] = JSON.parse(await readFile(directory + '/chats.json', 'utf-8')).chats as Chat[];
+        const chatsByFile = await readFile(directory + '/chats.json', 'utf-8');
+        let chats: Chat[] = JSON.parse(chatsByFile).chats;
         if (user) {
             chats = chats.filter(chat => {
                 return chat.users.includes(user.phone)
@@ -83,14 +84,23 @@ export const getUsersByChatId = async (id: number): Promise<object | any> => {
     }
 }
 
-export const getInfoByChatId = async (id: number): Promise<object[] | any> => {
+export const getInfoByChatId = async (id: number, user?: User): Promise<object[] | any> => {
     try {
         const readFile = promisify(fs.readFile);
         const chatsByFile = await readFile(directory + '/chats.json', 'utf-8');
         const chats = JSON.parse(chatsByFile).chats;
 
         if (id > chats.length - 1) return false;
-        return { name: chats[id].name, description: chats[id].description, users: chats[id].users, messages: chats[id].messages };
+
+        const chat = chats[id];
+        let chatName: string;
+        if (user && chat.users.length === 2) {
+            const otherUserPhone = user.phone === chat.users[0] ? chat.users[1] : chat.users[0];
+            const otherUser = await findUserByPhone(otherUserPhone);
+            chatName = `${otherUser.name} ${otherUser.surname}`;
+            return { name: chatName, description: chat.description, users: chat.users, messages: chat.messages };
+        }
+        else return { name: chat.name, description: chat.description, users: chat.users, messages: chat.messages };
     }
     catch (err) {
         return err;

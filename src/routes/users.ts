@@ -1,13 +1,13 @@
 import express from 'express';
-import { getAllUsers, addUser, changeUserByPhone, removeUserByPhone, findUserByPhone, User } from '../lib/users';
+import { User, getAllUsers, addUser, changeUserByPhone, removeUserByPhone, findUserByPhone, getPhonebookInfoByPhone } from '../lib/users';
 import { body, param, validationResult, query } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import { NextFunction } from 'express-serve-static-core';
 
 const router = express.Router();
-let userOnSession: User;
+export let userOnSession: User;
 const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
-const authorization = async (req: any, res: any, next: NextFunction) => {
+export const authorization = async (req: any, res: any, next: NextFunction) => {
     try {
         let token = req.query.token;
         let legit = jwt.verify(token, privateKey);
@@ -33,7 +33,8 @@ router.get('/', authorization, [
 ], async (req: any, res: any) => {
     try {
         if (userOnSession) { //verificare il funzionamento di locals
-            res.json(userOnSession.phonebook);
+            const phonebook = await getPhonebookInfoByPhone(userOnSession.phone);
+            res.json(phonebook);
         }
         else {
             const users = await getAllUsers(req.query.name);
@@ -149,28 +150,11 @@ router.post('/login/:phone/:name', [
         };
         //console.log(payload);
         var token = jwt.sign(payload, privateKey);
-        console.log("Token -  " + token);
+        //console.log("Token -  " + token);
         return res.status(201).json(token);
     } catch (err) {
         return res.status(500).send(`Unexpected error: ${err}`);
     }
 })
-
-router.post("/verify/:token",
-    param("token").isString().trim(),
-    async (req: any, res: any) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
-        try {
-            var token = req.params.token;
-            var legit = jwt.verify(token, privateKey);
-            console.log("\nJWT verification result: " + JSON.stringify(legit));
-        } catch (error) {
-            console.log(error);
-        }
-    }
-);
 
 export default router; 

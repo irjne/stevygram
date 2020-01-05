@@ -77,17 +77,25 @@ exports.getAllUsers = (findByName) => __awaiter(void 0, void 0, void 0, function
         return err;
     }
 });
-exports.getPhonebook = (phone) => __awaiter(void 0, void 0, void 0, function* () {
+exports.getPhonebookInfoByPhone = (phone) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);
         const usersByFile = yield readFile(exports.directory + '/users.json', 'utf-8');
         const users = JSON.parse(usersByFile).users;
-        const user = users.find((user) => user.phone === phone);
-        const phonebook = user.phonebook;
-        console.log(phonebook);
-        return phonebook;
+        let phonebook = [];
+        for (let i = 0; i < users.length; i++) {
+            if (phone == users[i].phone) {
+                phonebook = users[i].phonebook;
+            }
+        }
+        let phonebookInfo = [];
+        for (let i = 0; i < phonebook.length; i++) {
+            phonebookInfo.push(users.find((user) => phonebook[i] === user.phone));
+        }
+        return phonebookInfo;
     }
     catch (err) {
+        console.error(err);
         return err;
     }
 });

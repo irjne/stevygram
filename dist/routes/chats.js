@@ -14,21 +14,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const express_validator_1 = require("express-validator");
+const users_1 = require("./users");
 const chats_1 = require("../lib/chats");
-const users_1 = require("../lib/users");
 const router = express_1.default.Router();
-const authorization = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    //console.log('sto passando dal middleware');
-    if (req.query.user) {
-        res.locals.user = yield users_1.findUserByPhone(req.query.user);
-    }
-    next();
-});
 //GET - url: /, stampa tutte le chat
-router.get('/', authorization, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/', users_1.authorization, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const result = yield chats_1.getAllChats(res.locals.user);
-        res.json(result);
+        let chats;
+        if (users_1.userOnSession) {
+            chats = yield chats_1.getAllChats(users_1.userOnSession);
+        }
+        else
+            chats = yield chats_1.getAllChats();
+        res.json(chats);
     }
     catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);
@@ -67,10 +65,15 @@ router.get('/:id', [
     }
     const id = req.params.id;
     try {
-        const result = yield chats_1.getInfoByChatId(id);
-        if (result == false)
+        let info;
+        if (users_1.userOnSession) {
+            info = yield chats_1.getInfoByChatId(id, users_1.userOnSession);
+        }
+        else
+            info = yield chats_1.getInfoByChatId(id);
+        if (info == false)
             return res.status(404).send(`Chat not found.`);
-        res.json(result);
+        res.json(info);
     }
     catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);

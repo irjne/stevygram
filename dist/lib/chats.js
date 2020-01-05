@@ -38,7 +38,8 @@ exports.addChat = (id, name, description, users) => __awaiter(void 0, void 0, vo
 exports.getAllChats = (user) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);
-        let chats = JSON.parse(yield readFile(exports.directory + '/chats.json', 'utf-8')).chats;
+        const chatsByFile = yield readFile(exports.directory + '/chats.json', 'utf-8');
+        let chats = JSON.parse(chatsByFile).chats;
         if (user) {
             chats = chats.filter(chat => {
                 return chat.users.includes(user.phone);
@@ -78,14 +79,23 @@ exports.getUsersByChatId = (id) => __awaiter(void 0, void 0, void 0, function* (
         return err;
     }
 });
-exports.getInfoByChatId = (id) => __awaiter(void 0, void 0, void 0, function* () {
+exports.getInfoByChatId = (id, user) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);
         const chatsByFile = yield readFile(exports.directory + '/chats.json', 'utf-8');
         const chats = JSON.parse(chatsByFile).chats;
         if (id > chats.length - 1)
             return false;
-        return { name: chats[id].name, description: chats[id].description, users: chats[id].users, messages: chats[id].messages };
+        const chat = chats[id];
+        let chatName;
+        if (user && chat.users.length === 2) {
+            const otherUserPhone = user.phone === chat.users[0] ? chat.users[1] : chat.users[0];
+            const otherUser = yield users_1.findUserByPhone(otherUserPhone);
+            chatName = `${otherUser.name} ${otherUser.surname}`;
+            return { name: chatName, description: chat.description, users: chat.users, messages: chat.messages };
+        }
+        else
+            return { name: chat.name, description: chat.description, users: chat.users, messages: chat.messages };
     }
     catch (err) {
         return err;

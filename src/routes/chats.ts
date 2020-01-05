@@ -1,5 +1,6 @@
 import express from 'express';
 import { body, param, validationResult, sanitizeParam, query } from 'express-validator';
+import { userOnSession, authorization } from './users';
 
 import {
     getAllChats,
@@ -12,24 +13,17 @@ import {
     searchByChatId,
 } from '../lib/chats';
 
-import { findUserByPhone } from '../lib/users';
-import { NextFunction } from 'express-serve-static-core';
-
 const router = express.Router();
-
-const authorization = async (req: any, res: any, next: NextFunction) => {
-    //console.log('sto passando dal middleware');
-    if (req.query.user) {
-        res.locals.user = await findUserByPhone(req.query.user);
-    }
-    next();
-}
 
 //GET - url: /, stampa tutte le chat
 router.get('/', authorization, async (req: any, res: any) => {
     try {
-        const result = await getAllChats(res.locals.user);
-        res.json(result);
+        let chats;
+        if (userOnSession) {
+            chats = await getAllChats(userOnSession);
+        }
+        else chats = await getAllChats();
+        res.json(chats);
     } catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);
     }
@@ -69,9 +63,13 @@ router.get('/:id', [
 
     const id = req.params.id;
     try {
-        const result = await getInfoByChatId(id);
-        if (result == false) return res.status(404).send(`Chat not found.`);
-        res.json(result);
+        let info;
+        if (userOnSession) {
+            info = await getInfoByChatId(id, userOnSession);
+        }
+        else info = await getInfoByChatId(id);
+        if (info == false) return res.status(404).send(`Chat not found.`);
+        res.json(info);
     } catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);
     }

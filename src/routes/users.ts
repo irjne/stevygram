@@ -3,6 +3,7 @@ import { User, getAllUsers, addUser, changeUserByPhone, removeUserByPhone, findU
 import { body, param, validationResult, query } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import { NextFunction } from 'express-serve-static-core';
+import bcrypt from 'bcrypt';
 
 const router = express.Router();
 export let userOnSession: User;
@@ -71,36 +72,42 @@ router.put('/:phone', [
 })
 
 //POST - url: /, aggiunge un utente nell'app + BODY.
-router.post('/', [
-    body('nickname')
-        .isString()
-        .not().isEmpty()
-        .trim(),
-    body('name')
-        .isString()
-        .not().isEmpty()
-        .trim(),
-    body('surname')
-        .isString()
-        .not().isEmpty()
-        .trim(),
-    body('phone')
-        .isString()
-        .not().isEmpty()
-        .trim()
-], async (req: any, res: any) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
-    const { nickname, name, surname, phone } = req.body;
-    try {
-        const result = await addUser(nickname, name, surname, phone);
-        res.json(result);
-    } catch (err) {
-        return res.status(500).send(`Unexpected error: ${err}`);
-    }
-})
+router.post('/',
+    [
+        body('nickname')
+            .isString()
+            .not().isEmpty()
+            .trim(),
+        body('name')
+            .isString()
+            .not().isEmpty()
+            .trim(),
+        body('surname')
+            .isString()
+            .not().isEmpty()
+            .trim(),
+        body('phone')
+            .isString()
+            .not().isEmpty()
+            .trim(),
+        body('password')
+            .isString()
+            .not().isEmpty()
+            .trim()
+    ],
+    async (req: any, res: any) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+        const { nickname, name, surname, phone, password } = req.body;
+        try {
+            const result = await addUser(nickname, name, surname, phone, password);
+            res.json(result);
+        } catch (err) {
+            return res.status(500).send(`Unexpected error: ${err}`);
+        }
+    })
 
 //DELETE - url: /:id, cancella l'utente avendo l'id.
 router.delete('/:phone', [

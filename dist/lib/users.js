@@ -15,11 +15,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const util_1 = require("util");
 const fs = __importStar(require("fs"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
 exports.directory = __dirname.replace("/lib", "/data");
-exports.addUser = (nickname, name, surname, phone) => __awaiter(void 0, void 0, void 0, function* () {
+exports.addUser = (nickname, name, surname, phone, password) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);
         const usersByFile = yield readFile(exports.directory + '/users.json', 'utf-8');
@@ -29,8 +33,13 @@ exports.addUser = (nickname, name, surname, phone) => __awaiter(void 0, void 0, 
                 return `User ${phone} already exists.`;
             }
         }
+        // hashing and salting password
+        const salt = yield bcrypt_1.default.genSalt(5);
+        console.log(password);
+        let hashedPassword = yield bcrypt_1.default.hash(password, salt);
+        console.log(hashedPassword);
         let phonebook = new Array();
-        users.push({ nickname, name, surname, phone, phonebook });
+        users.push({ nickname, name, surname, phone, phonebook, hashedPassword });
         let json = JSON.stringify({ "users": users });
         const writeFile = util_1.promisify(fs.writeFile);
         yield writeFile(exports.directory + '/users.json', json, 'utf-8');

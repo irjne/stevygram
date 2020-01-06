@@ -1,5 +1,6 @@
 import { promisify } from 'util';
 import * as fs from 'fs';
+import bcrypt from 'bcrypt';
 
 export interface User {
     name: string;
@@ -11,20 +12,21 @@ export interface User {
 
 export const directory = __dirname.replace("/lib", "/data");
 
-export const addUser = async (nickname: string, name: string, surname: string, phone: string): Promise<string | any> => {
+export const addUser = async (nickname: string, name: string, surname: string, phone: string, password: string): Promise<string | any> => {
     try {
         const readFile = promisify(fs.readFile);
         const usersByFile = await readFile(directory + '/users.json', 'utf-8');
         const users = JSON.parse(usersByFile).users;
-
         for (let i = 0; i < users.length; i++) {
             if (phone == users[i].phone) {
                 return `User ${phone} already exists.`;
             }
         }
-
+        // hashing and salting password
+        const salt = await bcrypt.genSalt(5);
+        let hashedPassword = await bcrypt.hash(password, salt);
         let phonebook = new Array<string>();
-        users.push({ nickname, name, surname, phone, phonebook });
+        users.push({ nickname, name, surname, phone, phonebook, hashedPassword });
         let json = JSON.stringify({ "users": users });
         const writeFile = promisify(fs.writeFile);
         await writeFile(directory + '/users.json', json, 'utf-8');

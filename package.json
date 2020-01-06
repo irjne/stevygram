@@ -13,6 +13,8 @@
   "author": "Daria Gilletti, Giusy Giangravè, Dario Laganà, Claudio Landolfo",
   "license": "ISC",
   "dependencies": {
+    "@types/bcrypt": "^3.0.0",
+    "bcrypt": "^3.0.7",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",

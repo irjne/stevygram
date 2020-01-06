@@ -95,15 +95,19 @@ router.post('/', [
     express_validator_1.body('phone')
         .isString()
         .not().isEmpty()
+        .trim(),
+    express_validator_1.body('password')
+        .isString()
+        .not().isEmpty()
         .trim()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-    const { nickname, name, surname, phone } = req.body;
+    const { nickname, name, surname, phone, password } = req.body;
     try {
-        const result = yield users_1.addUser(nickname, name, surname, phone);
+        const result = yield users_1.addUser(nickname, name, surname, phone, password);
         res.json(result);
     }
     catch (err) {

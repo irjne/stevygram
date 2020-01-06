@@ -7,11 +7,13 @@ export interface User {
     surname: string;
     nickname: string;
     phone: string;
+    password: string;
     phonebook: string[];
 }
 
 export const directory = __dirname.replace("/lib", "/data");
 
+//? creates a new user in stevygram environment 
 export const addUser = async (nickname: string, name: string, surname: string, phone: string, password: string): Promise<string | any> => {
     try {
         const readFile = promisify(fs.readFile);
@@ -26,7 +28,7 @@ export const addUser = async (nickname: string, name: string, surname: string, p
         const salt = await bcrypt.genSalt(5);
         let hashedPassword = await bcrypt.hash(password, salt);
         let phonebook = new Array<string>();
-        users.push({ nickname, name, surname, phone, phonebook, hashedPassword });
+        users.push({ nickname, name, surname, phone, phonebook, password: hashedPassword });
         let json = JSON.stringify({ "users": users });
         const writeFile = promisify(fs.writeFile);
         await writeFile(directory + '/users.json', json, 'utf-8');
@@ -39,6 +41,28 @@ export const addUser = async (nickname: string, name: string, surname: string, p
     }
 }
 
+//? generates users passwords and store them in users data JSON
+const generateHashedPassword = async (): Promise<any> => {
+    try {
+        const readFile = promisify(fs.readFile);
+        const usersByFile = await readFile(directory + '/users.json', 'utf-8');
+        const users = JSON.parse(usersByFile).users;
+
+        for (let i = 0; i < users.length; i++) {
+            const salt = await bcrypt.genSalt(5);
+            users[i].password = await bcrypt.hash(users[i].name, salt);
+        }
+
+        let json = JSON.stringify({ "users": users });
+        const writeFile = promisify(fs.writeFile);
+        await writeFile(directory + '/users.json', json, 'utf-8');
+    }
+    catch (err) {
+        return err;
+    }
+}
+
+//? creates an existing user in a phonebook 
 export const addInPhonebookByPhone = async (findByPhone: string, usersToAdd: string[]): Promise<object | any> => {
     try {
         const readFile = promisify(fs.readFile);
@@ -64,6 +88,7 @@ export const addInPhonebookByPhone = async (findByPhone: string, usersToAdd: str
     }
 }
 
+//? returns all users of stevygram or specific users (by name)
 export const getAllUsers = async (findByName?: string): Promise<object | any> => {
     try {
         const readFile = promisify(fs.readFile);
@@ -79,6 +104,7 @@ export const getAllUsers = async (findByName?: string): Promise<object | any> =>
     }
 }
 
+//? returns all contacts of a specific phonebook
 export const getPhonebookInfoByPhone = async (phone: string): Promise<User | any> => {
     try {
         const readFile = promisify(fs.readFile);
@@ -104,6 +130,7 @@ export const getPhonebookInfoByPhone = async (phone: string): Promise<User | any
     }
 }
 
+//? modifies a specif user info (by phone)
 export const changeUserByPhone = async (phone: string, nickname?: string, name?: string, surname?: string): Promise<string | any> => {
     let isFounded = false;
 
@@ -136,6 +163,7 @@ export const changeUserByPhone = async (phone: string, nickname?: string, name?:
     }
 }
 
+//? deletes a specific user (by phone)
 export const removeUserByPhone = async (phone: string): Promise<string | any> => {
     try {
         const readFile = promisify(fs.readFile);
@@ -158,11 +186,12 @@ export const removeUserByPhone = async (phone: string): Promise<string | any> =>
     }
 }
 
+//? returns a specific user (by phone)
 export const findUserByPhone = async (phone: string): Promise<User> => {
     try {
         const readFile = promisify(fs.readFile);
         const users = JSON.parse(await readFile(directory + '/users.json', 'utf-8')).users;
-        return users.find((user: any) => user.phone === phone);
+        return users.find((user: User) => user.phone === phone);
     }
     catch (err) {
         return err;

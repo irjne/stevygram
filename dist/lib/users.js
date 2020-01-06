@@ -23,6 +23,7 @@ const util_1 = require("util");
 const fs = __importStar(require("fs"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 exports.directory = __dirname.replace("/lib", "/data");
+//? creates a new user in stevygram environment 
 exports.addUser = (nickname, name, surname, phone, password) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);
@@ -35,11 +36,9 @@ exports.addUser = (nickname, name, surname, phone, password) => __awaiter(void 0
         }
         // hashing and salting password
         const salt = yield bcrypt_1.default.genSalt(5);
-        console.log(password);
         let hashedPassword = yield bcrypt_1.default.hash(password, salt);
-        console.log(hashedPassword);
         let phonebook = new Array();
-        users.push({ nickname, name, surname, phone, phonebook, hashedPassword });
+        users.push({ nickname, name, surname, phone, phonebook, password: hashedPassword });
         let json = JSON.stringify({ "users": users });
         const writeFile = util_1.promisify(fs.writeFile);
         yield writeFile(exports.directory + '/users.json', json, 'utf-8');
@@ -50,6 +49,25 @@ exports.addUser = (nickname, name, surname, phone, password) => __awaiter(void 0
         return err;
     }
 });
+//? generates users passwords and store them in users data JSON
+const generateHashedPassword = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const readFile = util_1.promisify(fs.readFile);
+        const usersByFile = yield readFile(exports.directory + '/users.json', 'utf-8');
+        const users = JSON.parse(usersByFile).users;
+        for (let i = 0; i < users.length; i++) {
+            const salt = yield bcrypt_1.default.genSalt(5);
+            users[i].password = yield bcrypt_1.default.hash(users[i].name, salt);
+        }
+        let json = JSON.stringify({ "users": users });
+        const writeFile = util_1.promisify(fs.writeFile);
+        yield writeFile(exports.directory + '/users.json', json, 'utf-8');
+    }
+    catch (err) {
+        return err;
+    }
+});
+//? creates an existing user in a phonebook 
 exports.addInPhonebookByPhone = (findByPhone, usersToAdd) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);
@@ -71,6 +89,7 @@ exports.addInPhonebookByPhone = (findByPhone, usersToAdd) => __awaiter(void 0, v
         return err;
     }
 });
+//? returns all users of stevygram or specific users (by name)
 exports.getAllUsers = (findByName) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);
@@ -86,6 +105,7 @@ exports.getAllUsers = (findByName) => __awaiter(void 0, void 0, void 0, function
         return err;
     }
 });
+//? returns all contacts of a specific phonebook
 exports.getPhonebookInfoByPhone = (phone) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);
@@ -108,6 +128,7 @@ exports.getPhonebookInfoByPhone = (phone) => __awaiter(void 0, void 0, void 0, f
         return err;
     }
 });
+//? modifies a specif user info (by phone)
 exports.changeUserByPhone = (phone, nickname, name, surname) => __awaiter(void 0, void 0, void 0, function* () {
     let isFounded = false;
     try {
@@ -141,6 +162,7 @@ exports.changeUserByPhone = (phone, nickname, name, surname) => __awaiter(void 0
         return err;
     }
 });
+//? deletes a specific user (by phone)
 exports.removeUserByPhone = (phone) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);
@@ -161,6 +183,7 @@ exports.removeUserByPhone = (phone) => __awaiter(void 0, void 0, void 0, functio
         return err;
     }
 });
+//? returns a specific user (by phone)
 exports.findUserByPhone = (phone) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);

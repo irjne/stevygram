@@ -3,6 +3,7 @@ export interface User {
     surname: string;
     nickname: string;
     phone: string;
+    password: string;
     phonebook: string[];
 }
 export declare const directory: string;

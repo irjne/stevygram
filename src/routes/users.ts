@@ -12,7 +12,6 @@ export const authorization = async (req: any, res: any, next: NextFunction) => {
     try {
         let token = req.query.token;
         let legit = jwt.verify(token, privateKey);
-        //console.log("\nJWT verification result: " + JSON.stringify(legit));
 
         const user = await findUserByPhone(Object.values(legit)[0]);
         if (user) {
@@ -20,10 +19,8 @@ export const authorization = async (req: any, res: any, next: NextFunction) => {
             next();
         }
     } catch (error) {
-        // console.log(error);
         return res.status(500).send(`Unexpected error: ${error}`);
     }
-    //next();
 }
 
 //GET - url: /, ritorna tutti gli utenti.
@@ -128,11 +125,11 @@ router.delete('/:phone', [
     }
 })
 
-router.post('/login/:phone/:name', [
-    param('phone')
+router.post('/login', [
+    body('phone')
         .isString()
         .trim(),
-    param('name')
+    body('password')
         .isString()
         .trim()
 ], async (req: any, res: any) => {
@@ -140,24 +137,24 @@ router.post('/login/:phone/:name', [
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-    let name = req.params.name;
-    let phone = req.params.phone;
-    const result = await findUserByPhone(phone);
-    //console.log(result);
-    let user;
     try {
-        if (result.name == name) {
-            user = result;
+        const phone = req.body.phone;
+        const password = req.body.password;
+        let foundUser = await findUserByPhone(phone);
+        let user;
+
+        const passwordVerification = await bcrypt.compare(password, foundUser.password);
+
+        if (passwordVerification) {
+            user = foundUser;
         } else {
-            return res.status(401).send(`Login credentials arent' valid. Please, try again.`);
+            return res.status(401).send(`Login credentials aren't valid. Please, try again.`);
         }
         const payload = {
             phone: user.phone,
-            password: user.name
+            password: user.password
         };
-        //console.log(payload);
         var token = jwt.sign(payload, privateKey);
-        //console.log("Token -  " + token);
         return res.status(201).json(token);
     } catch (err) {
         return res.status(500).send(`Unexpected error: ${err}`);

@@ -1,1 +1,278 @@
-{"users":[{"nickname":"Davide","name":"Davide","surname":"Aita","phone":"3495689878","password":"","phonebook":["3406452104","3505801056","3333331751"]},{"nickname":"DandelionSam","name":"Simone","surname":"Aiello","phone":"3406452104","password":"","phonebook":["3495689878","3886538378","3333331751"]},{"nickname":"Man","name":"Manuel","surname":"Amato","phone":"3505801056","password":"","phonebook":["3406452104","3886538378","3333331751"]},{"nickname":"TeoTeo","name":"Matteo","surname":"Annaro","phone":"3333331751","password":"","phonebook":["3290077252","3505801056","3472438170"]},{"nickname":"BazzaStyle","name":"Alessandro","surname":"Bazzano","phone":"3284618420","password":"","phonebook":["3886538378","3457064103","3472438170"]},{"nickname":"Fabrizio","name":"Fabrizio","surname":"Cannizzaro","phone":"3886538378","password":"","phonebook":["3515900310","3497740026","3472438170"]},{"nickname":"tano.carfi","name":"Gaetano","surname":"Carfì","phone":"3515900310","password":"","phonebook":["3457064103","3497740026","3290077252"]},{"nickname":"Nobodyof","name":"Manuel","surname":"Caruso","phone":"3290077252","password":"","phonebook":["3457064103","3497740026","3472438170"]},{"nickname":"erocookv5","name":"Matteo","surname":"Di Cara","phone":"3497740026","password":"","phonebook":["3284618420","3505801056","3290077252","3451691678"]},{"nickname":"corradodiba","name":"Corrado","surname":"Di Battista","phone":"3457064103","password":"","phonebook":["3896869619","3497740026","3290077252"]},{"nickname":"GlitchXCIV","name":"Giusy","surname":"Giangravè","phone":"3896869619","password":"","phonebook":["3472438170","3466457463","3472438170"]},{"nickname":"irjne","name":"Daria","surname":"Gilletti","phone":"3466457463","password":"","phonebook":["3914303308","3472438170","3290077252"]},{"nickname":"Elmo","name":"Antonio","surname":"Guglielmino","phone":"3472438170","password":"","phonebook":["3914303308","3466457463","3896869619"]},{"nickname":"Mercury96","name":"Dario","surname":"Laganà","phone":"3914303308","password":"","phonebook":["3896869619","3466457463","3472438170"]},{"nickname":"Clacchisi","name":"Claudio","surname":"Landolfo","phone":"3451691678","password":"","phonebook":["3472438170","3466457463","3896869619","3497740026"]},{"nickname":"Stealthz","name":"PierAntonio","surname":"Petralia","phone":"3890439101","password":"","phonebook":["3478591903","3466457463","3472438170"]},{"nickname":"Zelos","name":"Pierpaolo","surname":"Pistorio","phone":"3478591903","password":"","phonebook":["3896869619","3466457463","3451691678"]},{"nickname":"NBZeno01","name":"Giuseppe","surname":"Puglia","phone":"389911170","password":"","phonebook":["3451691678","3466457463","3472438170"]},{"nickname":"Rauros92","name":"Domenico","surname":"Signore Fiore","phone":"3286239190","password":"","phonebook":["3472438170","3466457463","3451691678"]},{"nickname":"Mascin99","name":"Enrico","surname":"Terranova","phone":"3207279432","password":"","phonebook":["3207279432","3466457463","3472438170"]},{"nickname":"Anubi95","name":"Davide","surname":"Turzo","phone":"3470670303","password":"","phonebook":["3207279432","3466457463","3472438170"]},{"nickname":"zaga","name":"Gabriele","surname":"Zagarella","phone":"345431312","password":"","phonebook":["3207279432","3466457463","3472438170"]},{"nickname":"mrossi","name":"Mario","surname":"Rossi","phone":"1111111111","phonebook":[],"hashedPassword":"$2b$20$UlKcquUeKHq4fytoOMy4EuA0.jowwePFNyss9Advf9V6tTIE8h8li"},{"nickname":"jdoe","name":"John","surname":"Doe","phone":"0000000000","phonebook":[],"hashedPassword":"$2b$05$xwQT6NOs5TcHpWuNq1lTaOjrIPsmSf0sMHAIEd9/eLqK63f/PZU5i"}]}
+{
+    "users": [
+        {
+            "nickname": "Davide",
+            "name": "Davide",
+            "surname": "Aita",
+            "phone": "3495689878",
+            "password": "$2b$05$Acsayo1dpNdsRIGRda8aNe3ccZ9RCABc0kMIjVS7wRzs58z63i8wS",
+            "phonebook": [
+                "3406452104",
+                "3505801056",
+                "3333331751"
+            ]
+        },
+        {
+            "nickname": "DandelionSam",
+            "name": "Simone",
+            "surname": "Aiello",
+            "phone": "3406452104",
+            "password": "$2b$05$FzxLHKxyNxeJ71Gqw91bu.tuFjpeS3zEraR4CdCP.PCQy93/W/6rK",
+            "phonebook": [
+                "3495689878",
+                "3886538378",
+                "3333331751"
+            ]
+        },
+        {
+            "nickname": "Man",
+            "name": "Manuel",
+            "surname": "Amato",
+            "phone": "3505801056",
+            "password": "$2b$05$7Z4ofZ/EK8jMOhK8xrMbNuhAdll1WaI5kPqqd616ItiKviGKlbICa",
+            "phonebook": [
+                "3406452104",
+                "3886538378",
+                "3333331751"
+            ]
+        },
+        {
+            "nickname": "TeoTeo",
+            "name": "Matteo",
+            "surname": "Annaro",
+            "phone": "3333331751",
+            "password": "$2b$05$15HvQ1UAeRCLltgG9QdsxeuZTyptu9Olo6.KEoMaEeIrrxpPn8StO",
+            "phonebook": [
+                "3290077252",
+                "3505801056",
+                "3472438170"
+            ]
+        },
+        {
+            "nickname": "BazzaStyle",
+            "name": "Alessandro",
+            "surname": "Bazzano",
+            "phone": "3284618420",
+            "password": "$2b$05$5HTHvwBFlMem8aUuRZ2Kzucj/AHwbHR3ght1K8L0s1RSeY4WnGC/q",
+            "phonebook": [
+                "3886538378",
+                "3457064103",
+                "3472438170"
+            ]
+        },
+        {
+            "nickname": "Fabrizio",
+            "name": "Fabrizio",
+            "surname": "Cannizzaro",
+            "phone": "3886538378",
+            "password": "$2b$05$Y45G/PhKFkMUwaDbKf0dAeX26/6UxobBTs19n1sKsgZexCPSVRraG",
+            "phonebook": [
+                "3515900310",
+                "3497740026",
+                "3472438170"
+            ]
+        },
+        {
+            "nickname": "tano.carfi",
+            "name": "Gaetano",
+            "surname": "Carfì",
+            "phone": "3515900310",
+            "password": "$2b$05$z.c/twYcjvyRqai/UdeD/e9GnqOsd6If8sQ48viGlyB1duBG6ZrYS",
+            "phonebook": [
+                "3457064103",
+                "3497740026",
+                "3290077252"
+            ]
+        },
+        {
+            "nickname": "Nobodyof",
+            "name": "Manuel",
+            "surname": "Caruso",
+            "phone": "3290077252",
+            "password": "$2b$05$HzCAtyC0ABkkjWr65TM/6OvolarFWbw4eDep6oSCFFNcSFqHvM6FC",
+            "phonebook": [
+                "3457064103",
+                "3497740026",
+                "3472438170"
+            ]
+        },
+        {
+            "nickname": "erocookv5",
+            "name": "Matteo",
+            "surname": "Di Cara",
+            "phone": "3497740026",
+            "password": "$2b$05$fmGD4oS4IPYohS0gQbr9quOpnZbtxIP840ix4uvAq8wLTBQmzURMi",
+            "phonebook": [
+                "3284618420",
+                "3505801056",
+                "3290077252",
+                "3451691678"
+            ]
+        },
+        {
+            "nickname": "corradodiba",
+            "name": "Corrado",
+            "surname": "Di Battista",
+            "phone": "3457064103",
+            "password": "$2b$05$cUvaiDyV3ty1LAugtadQv.r2wKVTzz6xe9NziXiKWVMt7Ttj540EC",
+            "phonebook": [
+                "3896869619",
+                "3497740026",
+                "3290077252"
+            ]
+        },
+        {
+            "nickname": "GlitchXCIV",
+            "name": "Giusy",
+            "surname": "Giangravè",
+            "phone": "3896869619",
+            "password": "$2b$05$yu0uvovPtmxAYcrRGjLf1uj73yuu3.8gS2SN069rTWb7Vg3viCbqS",
+            "phonebook": [
+                "3472438170",
+                "3466457463",
+                "3472438170"
+            ]
+        },
+        {
+            "nickname": "irjne",
+            "name": "Daria",
+            "surname": "Gilletti",
+            "phone": "3466457463",
+            "password": "$2b$05$PccuBzq89/1wmvj81b.ZaeXTmk//daJH.ckiuB270Hn3R/clUru/m",
+            "phonebook": [
+                "3914303308",
+                "3472438170",
+                "3290077252"
+            ]
+        },
+        {
+            "nickname": "Elmo",
+            "name": "Antonio",
+            "surname": "Guglielmino",
+            "phone": "3472438170",
+            "password": "$2b$05$BUiJuyV7I4MZFxyuWxTsH.cOZnXsinw62Fa7mYUPhH9fINJh7StsS",
+            "phonebook": [
+                "3914303308",
+                "3466457463",
+                "3896869619"
+            ]
+        },
+        {
+            "nickname": "Mercury96",
+            "name": "Dario",
+            "surname": "Laganà",
+            "phone": "3914303308",
+            "password": "$2b$05$ZLRtm5B3iIdBVuS9EsvY7eDNA.RLY.8Tv9UdKJe/9XXoXfp4.tbz2",
+            "phonebook": [
+                "3896869619",
+                "3466457463",
+                "3472438170"
+            ]
+        },
+        {
+            "nickname": "Clacchisi",
+            "name": "Claudio",
+            "surname": "Landolfo",
+            "phone": "3451691678",
+            "password": "$2b$05$eK9f82k4NJubr6vUn4Oel.y0I.txSshrlo/sfMyJoV4jeazBPgdQS",
+            "phonebook": [
+                "3472438170",
+                "3466457463",
+                "3896869619",
+                "3497740026"
+            ]
+        },
+        {
+            "nickname": "Stealthz",
+            "name": "PierAntonio",
+            "surname": "Petralia",
+            "phone": "3890439101",
+            "password": "$2b$05$CuZXVHYGz/.It.KisZ2ciuQ1q48R4Yd7cfDGtWMRs1qOWekgdBApy",
+            "phonebook": [
+                "3478591903",
+                "3466457463",
+                "3472438170"
+            ]
+        },
+        {
+            "nickname": "Zelos",
+            "name": "Pierpaolo",
+            "surname": "Pistorio",
+            "phone": "3478591903",
+            "password": "$2b$05$BfNFS7L5t2JXehZS6nGAe..t4D9eJ7YzYgih1q5cArAQYaju.ih9S",
+            "phonebook": [
+                "3896869619",
+                "3466457463",
+                "3451691678"
+            ]
+        },
+        {
+            "nickname": "NBZeno01",
+            "name": "Giuseppe",
+            "surname": "Puglia",
+            "phone": "389911170",
+            "password": "$2b$05$80Sd8D4ucgT6zd7Q5dWY5empGhMqYlbiQqgFXjEYtQNm/ZZcxbtlW",
+            "phonebook": [
+                "3451691678",
+                "3466457463",
+                "3472438170"
+            ]
+        },
+        {
+            "nickname": "Rauros92",
+            "name": "Domenico",
+            "surname": "Signore Fiore",
+            "phone": "3286239190",
+            "password": "$2b$05$81G5eO1LG43Q1G1ryG0juezFPmWH/CLY2hpQ2Ho8KuIyJVY2f/J5W",
+            "phonebook": [
+                "3472438170",
+                "3466457463",
+                "3451691678"
+            ]
+        },
+        {
+            "nickname": "Mascin99",
+            "name": "Enrico",
+            "surname": "Terranova",
+            "phone": "3207279432",
+            "password": "$2b$05$d9oto4EPC/3y6x8q7iOQvel4eFEJYqKkgvc.GCOOpK3/5ngzOIUDq",
+            "phonebook": [
+                "3207279432",
+                "3466457463",
+                "3472438170"
+            ]
+        },
+        {
+            "nickname": "Anubi95",
+            "name": "Davide",
+            "surname": "Turzo",
+            "phone": "3470670303",
+            "password": "$2b$05$Dlqd2Onko1rtz57ISv29B.JbyOvAv99npqgFmETWNtk9lfM1ZH5oa",
+            "phonebook": [
+                "3207279432",
+                "3466457463",
+                "3472438170"
+            ]
+        },
+        {
+            "nickname": "zaga",
+            "name": "Gabriele",
+            "surname": "Zagarella",
+            "phone": "345431312",
+            "password": "$2b$05$cMKzt425PBf/Q5IsjekQPeEdyoPGsZBY6W6/udGsb6txGJwGo1NfW",
+            "phonebook": [
+                "3207279432",
+                "3466457463",
+                "3472438170"
+            ]
+        },
+        {
+            "nickname": "MainframeTV",
+            "name": "Gabriele",
+            "surname": "Connelli",
+            "phone": "3482523775",
+            "phonebook": [],
+            "password": "$2b$05$V/cgAfAwGo75uQY8DORJV.5gUix8e2NeZY/zwmI3JQLTuhZiYDGYC"
+        }
+    ]
+}

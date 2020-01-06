@@ -20,6 +20,7 @@ const util_1 = require("util");
 const users_1 = require("./users");
 const fs = __importStar(require("fs"));
 exports.directory = __dirname.replace("/lib", "/data");
+//? creates a new chat in stevygram environment 
 exports.addChat = (id, name, description, users) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);
@@ -35,6 +36,7 @@ exports.addChat = (id, name, description, users) => __awaiter(void 0, void 0, vo
         return err;
     }
 });
+//? returns all the chats of stevygram or of a specific user (by entity)
 exports.getAllChats = (user) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);
@@ -66,6 +68,7 @@ exports.getAllChats = (user) => __awaiter(void 0, void 0, void 0, function* () {
         return err;
     }
 });
+//? returns all users of a specific chat (by id)
 exports.getUsersByChatId = (id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);
@@ -79,6 +82,7 @@ exports.getUsersByChatId = (id) => __awaiter(void 0, void 0, void 0, function* (
         return err;
     }
 });
+//? returns all chat info of a specific chat (by id)
 exports.getInfoByChatId = (id, user) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);
@@ -127,6 +131,7 @@ exports.getInfoByChatId = (id, user) => __awaiter(void 0, void 0, void 0, functi
         return err;
     }
 });
+//? returns all messages of a specific chat (by id)
 exports.getMessagesByChatId = (id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);
@@ -140,6 +145,7 @@ exports.getMessagesByChatId = (id) => __awaiter(void 0, void 0, void 0, function
         return err;
     }
 });
+//? modifies chat info of a specific chat (by id)
 exports.changeInfoByChatId = (id, name, description) => __awaiter(void 0, void 0, void 0, function* () {
     let isFounded = false;
     try {
@@ -172,6 +178,7 @@ exports.changeInfoByChatId = (id, name, description) => __awaiter(void 0, void 0
         return err;
     }
 });
+//? returns a specific chat (by id)
 exports.searchByChatId = (id, sender, word) => __awaiter(void 0, void 0, void 0, function* () {
     let choice = -1;
     try {
@@ -237,6 +244,7 @@ exports.searchByChatId = (id, sender, word) => __awaiter(void 0, void 0, void 0,
         return err;
     }
 });
+//? deletes a specific chat (by id)
 exports.removeChatById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);

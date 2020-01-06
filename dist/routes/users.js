@@ -16,13 +16,13 @@ const express_1 = __importDefault(require("express"));
 const users_1 = require("../lib/users");
 const express_validator_1 = require("express-validator");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
 const router = express_1.default.Router();
 const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
 exports.authorization = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let token = req.query.token;
         let legit = jsonwebtoken_1.default.verify(token, privateKey);
-        //console.log("\nJWT verification result: " + JSON.stringify(legit));
         const user = yield users_1.findUserByPhone(Object.values(legit)[0]);
         if (user) {
             exports.userOnSession = user;
@@ -30,10 +30,8 @@ exports.authorization = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         }
     }
     catch (error) {
-        // console.log(error);
         return res.status(500).send(`Unexpected error: ${error}`);
     }
-    //next();
 });
 //GET - url: /, ritorna tutti gli utenti.
 router.get('/', exports.authorization, [
@@ -133,11 +131,11 @@ router.delete('/:phone', [
         return res.status(500).send(`Unexpected error: ${err}`);
     }
 }));
-router.post('/login/:phone/:name', [
-    express_validator_1.param('phone')
+router.post('/login', [
+    express_validator_1.body('phone')
         .isString()
         .trim(),
-    express_validator_1.param('name')
+    express_validator_1.body('password')
         .isString()
         .trim()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -145,25 +143,23 @@ router.post('/login/:phone/:name', [
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-    let name = req.params.name;
-    let phone = req.params.phone;
-    const result = yield users_1.findUserByPhone(phone);
-    //console.log(result);
-    let user;
     try {
-        if (result.name == name) {
-            user = result;
+        const phone = req.body.phone;
+        const password = req.body.password;
+        let foundUser = yield users_1.findUserByPhone(phone);
+        let user;
+        const passwordVerification = yield bcrypt_1.default.compare(password, foundUser.password);
+        if (passwordVerification) {
+            user = foundUser;
         }
         else {
-            return res.status(401).send(`Login credentials arent' valid. Please, try again.`);
+            return res.status(401).send(`Login credentials aren't valid. Please, try again.`);
         }
         const payload = {
             phone: user.phone,
-            password: user.name
+            password: user.password
         };
-        //console.log(payload);
         var token = jsonwebtoken_1.default.sign(payload, privateKey);
-        //console.log("Token -  " + token);
         return res.status(201).json(token);
     }
     catch (err) {

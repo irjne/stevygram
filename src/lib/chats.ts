@@ -20,6 +20,7 @@ export interface Chat {
 
 export const directory = __dirname.replace("/lib", "/data");
 
+//? creates a new chat in stevygram environment 
 export const addChat = async (id: number, name: string, description: string, users: string[]): Promise<string | any> => {
     try {
         const readFile = promisify(fs.readFile);
@@ -38,6 +39,7 @@ export const addChat = async (id: number, name: string, description: string, use
     }
 }
 
+//? returns all the chats of stevygram or of a specific user (by entity)
 export const getAllChats = async (user?: User): Promise<Chat[]> => {
     try {
         const readFile = promisify(fs.readFile);
@@ -70,6 +72,7 @@ export const getAllChats = async (user?: User): Promise<Chat[]> => {
     }
 }
 
+//? returns all users of a specific chat (by id)
 export const getUsersByChatId = async (id: number): Promise<object | any> => {
     try {
         const readFile = promisify(fs.readFile);
@@ -84,6 +87,7 @@ export const getUsersByChatId = async (id: number): Promise<object | any> => {
     }
 }
 
+//? returns all chat info of a specific chat (by id)
 export const getInfoByChatId = async (id: number, user?: User): Promise<object[] | any> => {
     try {
         const readFile = promisify(fs.readFile);
@@ -131,6 +135,7 @@ export const getInfoByChatId = async (id: number, user?: User): Promise<object[]
     }
 }
 
+//? returns all messages of a specific chat (by id)
 export const getMessagesByChatId = async (id: number): Promise<object | any> => {
     try {
         const readFile = promisify(fs.readFile);
@@ -145,6 +150,7 @@ export const getMessagesByChatId = async (id: number): Promise<object | any> => 
     }
 }
 
+//? modifies chat info of a specific chat (by id)
 export const changeInfoByChatId = async (id: number, name?: string, description?: string): Promise<string | any> => {
     let isFounded = false;
 
@@ -177,6 +183,7 @@ export const changeInfoByChatId = async (id: number, name?: string, description?
     }
 }
 
+//? returns a specific chat (by id)
 export const searchByChatId = async (id: number, sender?: string, word?: string): Promise<string | any> => {
     let choice = -1;
 
@@ -246,6 +253,7 @@ export const searchByChatId = async (id: number, sender?: string, word?: string)
     }
 }
 
+//? deletes a specific chat (by id)
 export const removeChatById = async (id: number): Promise<string | any> => {
     try {
         const readFile = promisify(fs.readFile);

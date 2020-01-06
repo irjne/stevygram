@@ -2,6 +2,24 @@
     "chats": [
         {
             "id": 0,
+            "name": "Stevygram Bot",
+            "description": "Stevygram's bot",
+            "admin": [
+                ""
+            ],
+            "users": [
+                "000"
+            ],
+            "messages": [
+                {
+                    "sender": "000",
+                    "body": "Benvenuto in Stevygram. Inizia a chattare con i tuoi amici, in ben poca sicurezza!",
+                    "date": ""
+                }
+            ]
+        },
+        {
+            "id": 1,
             "name": "EIPIAI🐝",
             "description": "class's group",
             "admin": [
@@ -55,7 +73,7 @@
             ]
         },
         {
-            "id": 1,
+            "id": 2,
             "name": "StevyGram💾",
             "description": "gruppo di lavoro",
             "admin": [
@@ -92,7 +110,7 @@
             ]
         },
         {
-            "id": 2,
+            "id": 3,
             "name": "Chat",
             "description": "",
             "admin": [],
@@ -114,7 +132,7 @@
             ]
         },
         {
-            "id": 3,
+            "id": 4,
             "name": "Chat",
             "description": "",
             "admin": [],

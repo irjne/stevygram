@@ -1,5 +1,5 @@
 import express from 'express';
-import { User, getAllUsers, addUser, changeUserByPhone, removeUserByPhone, findUserByPhone, getPhonebookInfoByPhone } from '../lib/users';
+import { User, getAllUsers, addUser, changeUserByPhone, removeUserByPhone, findUserByPhone, getPhonebookInfoByPhone, addInPhonebookByPhone } from '../lib/users';
 import { body, param, validationResult, query } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import { NextFunction } from 'express-serve-static-core';
@@ -100,6 +100,28 @@ router.post('/',
         const { nickname, name, surname, phone, password } = req.body;
         try {
             const result = await addUser(nickname, name, surname, phone, password);
+            res.json(result);
+        } catch (err) {
+            return res.status(500).send(`Unexpected error: ${err}`);
+        }
+    })
+
+//POST - url: /add-contact, aggiunge un utente in una rubrica + BODY.
+router.post('/add-contact', authorization,
+    [
+        body('phone')
+            .isString()
+            .not().isEmpty()
+            .trim(),
+    ],
+    async (req: any, res: any) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+        const phone = req.body.phone;
+        try {
+            const result = await addInPhonebookByPhone(userOnSession.phone, phone);
             res.json(result);
         } catch (err) {
             return res.status(500).send(`Unexpected error: ${err}`);

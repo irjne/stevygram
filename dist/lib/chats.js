@@ -46,6 +46,10 @@ exports.getAllChats = (user) => __awaiter(void 0, void 0, void 0, function* () {
             chats = chats.filter(chat => {
                 return chat.users.includes(user.phone);
             });
+            if (chats.length == 0) {
+                chats.push(yield exports.getInfoByChatId(0));
+                return chats;
+            }
             chats = yield Promise.all(chats.map((chat) => __awaiter(void 0, void 0, void 0, function* () {
                 if (chat.users.length === 2) {
                     const otherUserPhone = user.phone === chat.users[0] ? chat.users[1] : chat.users[0];
@@ -119,13 +123,13 @@ exports.getInfoByChatId = (id, user) => __awaiter(void 0, void 0, void 0, functi
                 const otherUserPhone = user.phone === chat.users[0] ? chat.users[1] : chat.users[0];
                 const otherUser = yield users_1.findUserByPhone(otherUserPhone);
                 chatName = `${otherUser.name} ${otherUser.surname}`;
-                return { name: chatName, description: chat.description, users: contacts, messages: messages };
+                return { id: chat.id, name: chatName, description: chat.description, users: contacts, messages: messages };
             }
             else
-                return { name: chat.name, description: chat.description, users: contacts, messages: messages };
+                return { id: chat.id, name: chat.name, description: chat.description, users: contacts, messages: messages };
         }
         else
-            return { name: chat.name, description: chat.description, users: chat.users, messages: chat.messages };
+            return { id: chat.id, name: chat.name, description: chat.description, users: chat.users, messages: chat.messages };
     }
     catch (err) {
         return err;

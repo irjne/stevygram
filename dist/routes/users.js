@@ -112,6 +112,26 @@ router.post('/', [
         return res.status(500).send(`Unexpected error: ${err}`);
     }
 }));
+//POST - url: /add-contact, aggiunge un utente in una rubrica + BODY.
+router.post('/add-contact', exports.authorization, [
+    express_validator_1.body('phone')
+        .isString()
+        .not().isEmpty()
+        .trim(),
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const errors = express_validator_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    const phone = req.body.phone;
+    try {
+        const result = yield users_1.addInPhonebookByPhone(exports.userOnSession.phone, phone);
+        res.json(result);
+    }
+    catch (err) {
+        return res.status(500).send(`Unexpected error: ${err}`);
+    }
+}));
 //DELETE - url: /:id, cancella l'utente avendo l'id.
 router.delete('/:phone', [
     express_validator_1.param('phone')

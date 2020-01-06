@@ -49,6 +49,12 @@ export const getAllChats = async (user?: User): Promise<Chat[]> => {
             chats = chats.filter(chat => {
                 return chat.users.includes(user.phone)
             })
+
+            if (chats.length == 0) {
+                chats.push(await getInfoByChatId(0));
+                return chats;
+            }
+
             chats = await Promise.all(chats.map(async chat => {
                 if (chat.users.length === 2) {
                     const otherUserPhone = user.phone === chat.users[0] ? chat.users[1] : chat.users[0];
@@ -58,6 +64,7 @@ export const getAllChats = async (user?: User): Promise<Chat[]> => {
                 return chat;
             }))
         }
+
         return Promise.all(chats.map(async chat => {
             const lastMessage = chat.messages.pop() as Message;
             delete chat.users;
@@ -124,11 +131,11 @@ export const getInfoByChatId = async (id: number, user?: User): Promise<object[]
                 const otherUserPhone = user.phone === chat.users[0] ? chat.users[1] : chat.users[0];
                 const otherUser = await findUserByPhone(otherUserPhone);
                 chatName = `${otherUser.name} ${otherUser.surname}`;
-                return { name: chatName, description: chat.description, users: contacts, messages: messages };
+                return { id: chat.id, name: chatName, description: chat.description, users: contacts, messages: messages };
             }
-            else return { name: chat.name, description: chat.description, users: contacts, messages: messages };
+            else return { id: chat.id, name: chat.name, description: chat.description, users: contacts, messages: messages };
         }
-        else return { name: chat.name, description: chat.description, users: chat.users, messages: chat.messages };
+        else return { id: chat.id, name: chat.name, description: chat.description, users: chat.users, messages: chat.messages };
     }
     catch (err) {
         return err;

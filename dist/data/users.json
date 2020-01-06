@@ -1,6 +1,14 @@
 {
     "users": [
         {
+            "nickname": "StevygramBot",
+            "name": "Stevygram",
+            "surname": "Bot",
+            "phone": "000",
+            "password": "",
+            "phonebook": []
+        },
+        {
             "nickname": "Davide",
             "name": "Davide",
             "surname": "Aita",
@@ -142,7 +150,8 @@
             "phonebook": [
                 "3914303308",
                 "3472438170",
-                "3290077252"
+                "3290077252",
+                "3482523775"
             ]
         },
         {

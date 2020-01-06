@@ -151,6 +151,25 @@ router.delete('/:phone', [
         return res.status(500).send(`Unexpected error: ${err}`);
     }
 }));
+//DELETE - url: /:phone, cancella l'utente da una rubrica avendo il numero di telefono.
+router.delete('/remove-contact/:phone', exports.authorization, [
+    express_validator_1.param('phone')
+        .isString()
+        .trim()
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const errors = express_validator_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    let phone = req.params.phone;
+    try {
+        const result = yield users_1.removeInPhonebookByPhone(exports.userOnSession.phone, phone);
+        res.json(result);
+    }
+    catch (err) {
+        return res.status(500).send(`Unexpected error: ${err}`);
+    }
+}));
 router.post('/login', [
     express_validator_1.body('phone')
         .isString()

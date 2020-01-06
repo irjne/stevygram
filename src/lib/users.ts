@@ -184,6 +184,35 @@ export const removeUserByPhone = async (phone: string): Promise<string | any> =>
     }
 }
 
+//? deletes a specific contacts of a specific phonebook
+export const removeInPhonebookByPhone = async (phone: string, userToRemove: string): Promise<User | any> => {
+    try {
+        const readFile = promisify(fs.readFile);
+        const usersByFile = await readFile(directory + '/users.json', 'utf-8');
+        const users = JSON.parse(usersByFile).users;
+
+        for (let i = 0; i < users.length; i++) {
+            if (phone == users[i].phone) {
+                for (let j = 0; j < users[i].phonebook.length; j++) {
+                    if (users[i].phonebook[j] == userToRemove) {
+                        users[i].phonebook.splice(j, 1);
+                        break;
+                    }
+                }
+            }
+        }
+
+        let json = JSON.stringify({ "users": users });
+        const writeFile = promisify(fs.writeFile);
+        await writeFile(directory + '/users.json', json, 'utf-8');
+        return `User ${userToRemove} sucessfully removed.`;
+    }
+    catch (err) {
+        console.error(err);
+        return err;
+    }
+}
+
 //? returns a specific user (by phone)
 export const findUserByPhone = async (phone: string): Promise<User> => {
     try {

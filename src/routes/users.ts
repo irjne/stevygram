@@ -1,5 +1,5 @@
 import express from 'express';
-import { User, getAllUsers, addUser, changeUserByPhone, removeUserByPhone, findUserByPhone, getPhonebookInfoByPhone, addInPhonebookByPhone } from '../lib/users';
+import { User, getAllUsers, addUser, changeUserByPhone, removeUserByPhone, findUserByPhone, getPhonebookInfoByPhone, addInPhonebookByPhone, removeInPhonebookByPhone } from '../lib/users';
 import { body, param, validationResult, query } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import { NextFunction } from 'express-serve-static-core';
@@ -141,6 +141,25 @@ router.delete('/:phone', [
     let phone = req.params.phone;
     try {
         const result = await removeUserByPhone(phone);
+        res.json(result);
+    } catch (err) {
+        return res.status(500).send(`Unexpected error: ${err}`);
+    }
+})
+
+//DELETE - url: /:phone, cancella l'utente da una rubrica avendo il numero di telefono.
+router.delete('/remove-contact/:phone', authorization, [
+    param('phone')
+        .isString()
+        .trim()
+], async (req: any, res: any) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    let phone = req.params.phone;
+    try {
+        const result = await removeInPhonebookByPhone(userOnSession.phone, phone);
         res.json(result);
     } catch (err) {
         return res.status(500).send(`Unexpected error: ${err}`);

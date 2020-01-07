@@ -11,6 +11,7 @@ import {
     addChat,
     removeChatById,
     searchByChatId,
+    addNewMessageByChatId
 } from '../lib/chats';
 
 const router = express.Router();
@@ -150,11 +151,38 @@ router.put('/:id', [
     }
 })
 
-//POST - url: / + BODY, aggiunge una chat.
-router.post('/', [
+//PUT - url: /:id/messages + BODY, aggiunge un messaggio in una chat.
+router.put('/:id/messages', authorization, [
     param('id')
-        .isNumeric()
-        .not().isEmpty(),
+        .isNumeric(),
+    body('sender')
+        .trim()
+        .isString(),
+    body('body')
+        .isString(),
+    body('date')
+        .isString(),
+    sanitizeParam('id').toInt()
+], async (req: any, res: any) => {
+    const errors = validationResult(req);
+    if (!req.body.sender && !req.body.body && !req.body.date) return res.status(400).json({ errors: "Sender, body and date are required" })
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+
+    const id = req.params.id;
+    const { sender, body, date } = req.body;
+    try {
+        const result = await addNewMessageByChatId(id, sender, body, date);
+        if (result == false) return res.status(404).send(`The message isn't delivered.`);
+        res.json(result);
+    } catch (err) {
+        return res.status(400).send(`Unexpected error: ${err}`);
+    }
+})
+
+//POST - url: / + BODY, aggiunge una chat.
+router.post('/', authorization, [
     body('description')
         .trim()
         .isString(),
@@ -163,20 +191,24 @@ router.post('/', [
         .isString()
         .not().isEmpty(),
     body('users')
-        .isString()
-        .trim(),
-    sanitizeParam('id').toInt()
+        .trim()
 ], async (req: any, res: any) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
 
-    const { id, name, description, users } = req.body;
-    const usersArray = users.split(users, ", ");
+    const { name, description } = req.body;
+    let usersBody = req.body.users;
+    let users = usersBody.split(',');
+    users.push(userOnSession.phone);
+
+
+    let admin: string[] = [];
+    admin.push(userOnSession.phone);
 
     try {
-        const result = await addChat(id, name, description, usersArray);
+        const result = await addChat(name, description, users, admin);
         if (result == false) return res.status(404).send(`Chat not found.`);
         res.json(result);
     } catch (err) {

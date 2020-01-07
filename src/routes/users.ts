@@ -1,9 +1,19 @@
 import express from 'express';
-import { User, getAllUsers, addUser, changeUserByPhone, removeUserByPhone, findUserByPhone, getPhonebookInfoByPhone, addInPhonebookByPhone, removeInPhonebookByPhone } from '../lib/users';
 import { body, param, validationResult, query } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import { NextFunction } from 'express-serve-static-core';
 import bcrypt from 'bcrypt';
+import {
+    User,
+    getAllUsers,
+    addUser,
+    changeUserByPhone,
+    removeUserByPhone,
+    findUserByPhone,
+    getPhonebookInfoByPhone,
+    addInPhonebookByPhone,
+    removeInPhonebookByPhone
+} from '../lib/users';
 
 const router = express.Router();
 export let userOnSession: User;

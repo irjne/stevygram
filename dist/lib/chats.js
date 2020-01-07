@@ -21,13 +21,14 @@ const users_1 = require("./users");
 const fs = __importStar(require("fs"));
 exports.directory = __dirname.replace("/lib", "/data");
 //? creates a new chat in stevygram environment 
-exports.addChat = (id, name, description, users) => __awaiter(void 0, void 0, void 0, function* () {
+exports.addChat = (name, description, users, admin) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);
         const chatsByFile = yield readFile(exports.directory + '/chats.json', 'utf-8');
         const chats = JSON.parse(chatsByFile).chats;
-        chats.push({ id, name, description, users });
-        let json = JSON.stringify(chats);
+        let id = chats.length;
+        chats.push({ id, name, description, messages: [], admin, lastMessage: { sender: "", body: "", date: new Date }, users });
+        let json = JSON.stringify({ "chats": chats });
         const writeFile = util_1.promisify(fs.writeFile);
         yield writeFile(exports.directory + '/chats.json', json, 'utf-8');
         return `Chat \"${name}\" added successfully.`;
@@ -46,6 +47,10 @@ exports.getAllChats = (user) => __awaiter(void 0, void 0, void 0, function* () {
             chats = chats.filter(chat => {
                 return chat.users.includes(user.phone);
             });
+            if (chats.length == 0) {
+                chats.push(yield exports.getInfoByChatId(0));
+                return chats;
+            }
             chats = yield Promise.all(chats.map((chat) => __awaiter(void 0, void 0, void 0, function* () {
                 if (chat.users.length === 2) {
                     const otherUserPhone = user.phone === chat.users[0] ? chat.users[1] : chat.users[0];
@@ -119,13 +124,13 @@ exports.getInfoByChatId = (id, user) => __awaiter(void 0, void 0, void 0, functi
                 const otherUserPhone = user.phone === chat.users[0] ? chat.users[1] : chat.users[0];
                 const otherUser = yield users_1.findUserByPhone(otherUserPhone);
                 chatName = `${otherUser.name} ${otherUser.surname}`;
-                return { name: chatName, description: chat.description, users: contacts, messages: messages };
+                return { id: chat.id, name: chatName, description: chat.description, users: contacts, messages: messages };
             }
             else
-                return { name: chat.name, description: chat.description, users: contacts, messages: messages };
+                return { id: chat.id, name: chat.name, description: chat.description, users: contacts, messages: messages };
         }
         else
-            return { name: chat.name, description: chat.description, users: chat.users, messages: chat.messages };
+            return { id: chat.id, name: chat.name, description: chat.description, users: chat.users, messages: chat.messages };
     }
     catch (err) {
         return err;
@@ -165,7 +170,7 @@ exports.changeInfoByChatId = (id, name, description) => __awaiter(void 0, void 0
             }
         }
         if (isFounded) {
-            let json = JSON.stringify(chats);
+            let json = JSON.stringify({ "chats": chats });
             const writeFile = util_1.promisify(fs.writeFile);
             yield writeFile(exports.directory + '/chats.json', json, 'utf-8');
             return `Chat ${name} changed successfully.`;
@@ -173,6 +178,27 @@ exports.changeInfoByChatId = (id, name, description) => __awaiter(void 0, void 0
         else {
             return `Chat ${name} not found.`;
         }
+    }
+    catch (err) {
+        return err;
+    }
+});
+//? add a new message in a specific chat (by id)
+exports.addNewMessageByChatId = (id, sender, body, date) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const readFile = util_1.promisify(fs.readFile);
+        const chatsByFile = yield readFile(exports.directory + '/chats.json', 'utf-8');
+        const chats = JSON.parse(chatsByFile).chats;
+        for (let i = 0; i < chats.length; i++) {
+            if (chats[i].id == id) {
+                chats[i].messages.push({ sender, body, date });
+                break;
+            }
+        }
+        let json = JSON.stringify({ "chats": chats });
+        const writeFile = util_1.promisify(fs.writeFile);
+        yield writeFile(exports.directory + '/chats.json', json, 'utf-8');
+        return `Message added successfully.`;
     }
     catch (err) {
         return err;
@@ -258,7 +284,7 @@ exports.removeChatById = (id) => __awaiter(void 0, void 0, void 0, function* () 
                 break;
             }
         }
-        let json = JSON.stringify(chats);
+        let json = JSON.stringify({ "chats": chats });
         const writeFile = util_1.promisify(fs.writeFile);
         yield writeFile(exports.directory + '/chats.json', json, 'utf-8');
         return `Chat \"${id}\" removed successfully.`;

@@ -13,10 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const users_1 = require("../lib/users");
 const express_validator_1 = require("express-validator");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const users_1 = require("../lib/users");
 const router = express_1.default.Router();
 const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
 exports.authorization = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -112,6 +112,26 @@ router.post('/', [
         return res.status(500).send(`Unexpected error: ${err}`);
     }
 }));
+//POST - url: /add-contact, aggiunge un utente in una rubrica + BODY.
+router.post('/add-contact', exports.authorization, [
+    express_validator_1.body('phone')
+        .isString()
+        .not().isEmpty()
+        .trim(),
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const errors = express_validator_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    const phone = req.body.phone;
+    try {
+        const result = yield users_1.addInPhonebookByPhone(exports.userOnSession.phone, phone);
+        res.json(result);
+    }
+    catch (err) {
+        return res.status(500).send(`Unexpected error: ${err}`);
+    }
+}));
 //DELETE - url: /:id, cancella l'utente avendo l'id.
 router.delete('/:phone', [
     express_validator_1.param('phone')
@@ -125,6 +145,25 @@ router.delete('/:phone', [
     let phone = req.params.phone;
     try {
         const result = yield users_1.removeUserByPhone(phone);
+        res.json(result);
+    }
+    catch (err) {
+        return res.status(500).send(`Unexpected error: ${err}`);
+    }
+}));
+//DELETE - url: /:phone, cancella l'utente da una rubrica avendo il numero di telefono.
+router.delete('/remove-contact/:phone', exports.authorization, [
+    express_validator_1.param('phone')
+        .isString()
+        .trim()
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const errors = express_validator_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    let phone = req.params.phone;
+    try {
+        const result = yield users_1.removeInPhonebookByPhone(exports.userOnSession.phone, phone);
         res.json(result);
     }
     catch (err) {

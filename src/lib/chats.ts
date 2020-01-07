@@ -12,6 +12,7 @@ export interface Chat {
     id: number;
     name: string;
     description: string;
+    admin: string[];
     users: string[];
     messages: Message[];
     lastMessage: Message
@@ -21,14 +22,15 @@ export interface Chat {
 export const directory = __dirname.replace("/lib", "/data");
 
 //? creates a new chat in stevygram environment 
-export const addChat = async (id: number, name: string, description: string, users: string[]): Promise<string | any> => {
+export const addChat = async (name: string, description: string, users: string[], admin: string[]): Promise<string | any> => {
     try {
         const readFile = promisify(fs.readFile);
         const chatsByFile = await readFile(directory + '/chats.json', 'utf-8');
-        const chats = JSON.parse(chatsByFile).chats;
+        const chats: Chat[] = JSON.parse(chatsByFile).chats;
 
-        chats.push({ id, name, description, users });
-        let json = JSON.stringify(chats);
+        let id = chats.length;
+        chats.push({ id, name, description, messages: [], admin, lastMessage: { sender: "", body: "", date: new Date }, users });
+        let json = JSON.stringify({ "chats": chats });
         const writeFile = promisify(fs.writeFile);
         await writeFile(directory + '/chats.json', json, 'utf-8');
         return `Chat \"${name}\" added successfully.`;
@@ -49,6 +51,12 @@ export const getAllChats = async (user?: User): Promise<Chat[]> => {
             chats = chats.filter(chat => {
                 return chat.users.includes(user.phone)
             })
+
+            if (chats.length == 0) {
+                chats.push(await getInfoByChatId(0));
+                return chats;
+            }
+
             chats = await Promise.all(chats.map(async chat => {
                 if (chat.users.length === 2) {
                     const otherUserPhone = user.phone === chat.users[0] ? chat.users[1] : chat.users[0];
@@ -58,6 +66,7 @@ export const getAllChats = async (user?: User): Promise<Chat[]> => {
                 return chat;
             }))
         }
+
         return Promise.all(chats.map(async chat => {
             const lastMessage = chat.messages.pop() as Message;
             delete chat.users;
@@ -124,11 +133,11 @@ export const getInfoByChatId = async (id: number, user?: User): Promise<object[]
                 const otherUserPhone = user.phone === chat.users[0] ? chat.users[1] : chat.users[0];
                 const otherUser = await findUserByPhone(otherUserPhone);
                 chatName = `${otherUser.name} ${otherUser.surname}`;
-                return { name: chatName, description: chat.description, users: contacts, messages: messages };
+                return { id: chat.id, name: chatName, description: chat.description, users: contacts, messages: messages };
             }
-            else return { name: chat.name, description: chat.description, users: contacts, messages: messages };
+            else return { id: chat.id, name: chat.name, description: chat.description, users: contacts, messages: messages };
         }
-        else return { name: chat.name, description: chat.description, users: chat.users, messages: chat.messages };
+        else return { id: chat.id, name: chat.name, description: chat.description, users: chat.users, messages: chat.messages };
     }
     catch (err) {
         return err;
@@ -170,13 +179,38 @@ export const changeInfoByChatId = async (id: number, name?: string, description?
         }
 
         if (isFounded) {
-            let json = JSON.stringify(chats);
+            let json = JSON.stringify({ "chats": chats });
             const writeFile = promisify(fs.writeFile);
             await writeFile(directory + '/chats.json', json, 'utf-8');
 
             return `Chat ${name} changed successfully.`;
         }
         else { return `Chat ${name} not found.`; }
+    }
+    catch (err) {
+        return err;
+    }
+}
+
+//? add a new message in a specific chat (by id)
+export const addNewMessageByChatId = async (id: number, sender: string, body: string, date: Date): Promise<string | any> => {
+    try {
+        const readFile = promisify(fs.readFile);
+        const chatsByFile = await readFile(directory + '/chats.json', 'utf-8');
+        const chats = JSON.parse(chatsByFile).chats;
+
+        for (let i = 0; i < chats.length; i++) {
+            if (chats[i].id == id) {
+                chats[i].messages.push({ sender, body, date });
+                break;
+            }
+        }
+
+        let json = JSON.stringify({ "chats": chats });
+        const writeFile = promisify(fs.writeFile);
+        await writeFile(directory + '/chats.json', json, 'utf-8');
+
+        return `Message added successfully.`;
     }
     catch (err) {
         return err;
@@ -267,7 +301,7 @@ export const removeChatById = async (id: number): Promise<string | any> => {
                 break;
             }
         }
-        let json = JSON.stringify(chats);
+        let json = JSON.stringify({ "chats": chats });
         const writeFile = promisify(fs.writeFile);
         await writeFile(directory + '/chats.json', json, 'utf-8');
         return `Chat \"${id}\" removed successfully.`;

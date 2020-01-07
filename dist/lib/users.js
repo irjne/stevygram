@@ -68,22 +68,20 @@ const generateHashedPassword = () => __awaiter(void 0, void 0, void 0, function*
     }
 });
 //? creates an existing user in a phonebook 
-exports.addInPhonebookByPhone = (findByPhone, usersToAdd) => __awaiter(void 0, void 0, void 0, function* () {
+exports.addInPhonebookByPhone = (phone, userToAdd) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const readFile = util_1.promisify(fs.readFile);
         const usersByFile = yield readFile(exports.directory + '/users.json', 'utf-8');
         const users = JSON.parse(usersByFile).users;
         for (let i = 0; i < users.length; i++) {
-            if (findByPhone == users[i].phone) {
-                for (let j = 0; j < usersToAdd.length; j++) {
-                    users[i].phonebook.push(usersToAdd[j]);
-                }
+            if (phone == users[i].phone) {
+                users[i].phonebook.push(userToAdd);
             }
         }
-        let json = JSON.stringify(users);
+        let json = JSON.stringify({ "users": users });
         const writeFile = util_1.promisify(fs.writeFile);
         yield writeFile(exports.directory + '/users.json', json, 'utf-8');
-        return `User ${findByPhone}'s phonebook was successfully updated.`;
+        return `User ${phone}'s phonebook was successfully updated.`;
     }
     catch (err) {
         return err;
@@ -174,12 +172,38 @@ exports.removeUserByPhone = (phone) => __awaiter(void 0, void 0, void 0, functio
                 break;
             }
         }
-        let json = JSON.stringify(users);
+        let json = JSON.stringify({ "users": users });
         const writeFile = util_1.promisify(fs.writeFile);
         yield writeFile(exports.directory + '/users.json', json, 'utf-8');
         return `User ${phone} removed successfully.`;
     }
     catch (err) {
+        return err;
+    }
+});
+//? deletes a specific contacts of a specific phonebook
+exports.removeInPhonebookByPhone = (phone, userToRemove) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const readFile = util_1.promisify(fs.readFile);
+        const usersByFile = yield readFile(exports.directory + '/users.json', 'utf-8');
+        const users = JSON.parse(usersByFile).users;
+        for (let i = 0; i < users.length; i++) {
+            if (phone == users[i].phone) {
+                for (let j = 0; j < users[i].phonebook.length; j++) {
+                    if (users[i].phonebook[j] == userToRemove) {
+                        users[i].phonebook.splice(j, 1);
+                        break;
+                    }
+                }
+            }
+        }
+        let json = JSON.stringify({ "users": users });
+        const writeFile = util_1.promisify(fs.writeFile);
+        yield writeFile(exports.directory + '/users.json', json, 'utf-8');
+        return `User ${userToRemove} sucessfully removed.`;
+    }
+    catch (err) {
+        console.error(err);
         return err;
     }
 });

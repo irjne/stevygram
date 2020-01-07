@@ -29,7 +29,7 @@ export const addChat = async (name: string, description: string, users: string[]
         const chats: Chat[] = JSON.parse(chatsByFile).chats;
 
         let id = chats.length;
-        chats.push({ id, name, description, messages: [], admin, lastMessage: { sender: "", body: "", date: new Date }, users });
+        chats.push({ id, name, description, messages: [{ sender: "", body: "", date: new Date }], admin, lastMessage: { sender: "", body: "", date: new Date }, users });
         let json = JSON.stringify({ "chats": chats });
         const writeFile = promisify(fs.writeFile);
         await writeFile(directory + '/chats.json', json, 'utf-8');
@@ -137,7 +137,7 @@ export const getInfoByChatId = async (id: number, user?: User): Promise<object[]
             }
             else return { id: chat.id, name: chat.name, description: chat.description, users: contacts, messages: messages };
         }
-        else return { id: chat.id, name: chat.name, description: chat.description, users: chat.users, messages: chat.messages };
+        return { id: chat.id, name: chat.name, description: chat.description, users: chat.users, messages: chat.messages };
     }
     catch (err) {
         return err;

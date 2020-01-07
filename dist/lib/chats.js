@@ -27,7 +27,7 @@ exports.addChat = (name, description, users, admin) => __awaiter(void 0, void 0,
         const chatsByFile = yield readFile(exports.directory + '/chats.json', 'utf-8');
         const chats = JSON.parse(chatsByFile).chats;
         let id = chats.length;
-        chats.push({ id, name, description, messages: [], admin, lastMessage: { sender: "", body: "", date: new Date }, users });
+        chats.push({ id, name, description, messages: [{ sender: "", body: "", date: new Date }], admin, lastMessage: { sender: "", body: "", date: new Date }, users });
         let json = JSON.stringify({ "chats": chats });
         const writeFile = util_1.promisify(fs.writeFile);
         yield writeFile(exports.directory + '/chats.json', json, 'utf-8');
@@ -129,8 +129,8 @@ exports.getInfoByChatId = (id, user) => __awaiter(void 0, void 0, void 0, functi
             else
                 return { id: chat.id, name: chat.name, description: chat.description, users: contacts, messages: messages };
         }
-        else
-            return { id: chat.id, name: chat.name, description: chat.description, users: chat.users, messages: chat.messages };
+        console.log({ id: chat.id, name: chat.name, description: chat.description });
+        return { id: chat.id, name: chat.name, description: chat.description, users: chat.users, messages: chat.messages };
     }
     catch (err) {
         return err;

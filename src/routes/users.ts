@@ -3,6 +3,8 @@ import { body, param, validationResult, query } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import { NextFunction } from 'express-serve-static-core';
 import bcrypt from 'bcrypt';
+import mongoose from 'mongoose';
+const MongoClient = require('mongodb').MongoClient;
 import {
     User,
     getAllUsers,
@@ -211,5 +213,27 @@ router.post('/login', [
         return res.status(500).send(`Unexpected error: ${err}`);
     }
 })
+
+router.get("/test", (q, s, n) => {
+    const host = "mongodb+srv://matteo:BruceWayneV5@cluster0-q7lqh.mongodb.net/test?retryWrites=true&w=majority";
+    const dbName = 'stevygram0';
+    mongoose.connect(host + '/' + dbName, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    });
+    var db = mongoose.connection;
+    db.on('error', function () {
+        console.error('Connection	error!');
+    });
+    db.once('open', function () {
+        console.log('DB	connection	Ready');
+
+        db.collection("YourCollectionName", function (err: any, collection: any) {
+            collection.find({}).toArray(function (err: any, data: any) {
+                console.log(data); // it will print your collection data
+            })
+        });
+    });
+});
 
 export default router; 

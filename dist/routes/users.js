@@ -16,6 +16,8 @@ const express_1 = __importDefault(require("express"));
 const express_validator_1 = require("express-validator");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const mongoose_1 = __importDefault(require("mongoose"));
+const MongoClient = require('mongodb').MongoClient;
 const users_1 = require("../lib/users");
 const router = express_1.default.Router();
 const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
@@ -205,5 +207,25 @@ router.post('/login', [
         return res.status(500).send(`Unexpected error: ${err}`);
     }
 }));
+router.get("/test", (q, s, n) => {
+    const host = "mongodb+srv://matteo:BruceWayneV5@cluster0-q7lqh.mongodb.net/test?retryWrites=true&w=majority";
+    const dbName = 'stevygram0';
+    mongoose_1.default.connect(host + '/' + dbName, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    });
+    var db = mongoose_1.default.connection;
+    db.on('error', function () {
+        console.error('Connection	error!');
+    });
+    db.once('open', function () {
+        console.log('DB	connection	Ready');
+        db.collection("YourCollectionName", function (err, collection) {
+            collection.find({}).toArray(function (err, data) {
+                console.log(data); // it will print your collection data
+            });
+        });
+    });
+});
 exports.default = router;
 //# sourceMappingURL=users.js.map

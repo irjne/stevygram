@@ -129,7 +129,6 @@ exports.getInfoByChatId = (id, user) => __awaiter(void 0, void 0, void 0, functi
             else
                 return { id: chat.id, name: chat.name, description: chat.description, users: contacts, messages: messages };
         }
-        console.log({ id: chat.id, name: chat.name, description: chat.description });
         return { id: chat.id, name: chat.name, description: chat.description, users: chat.users, messages: chat.messages };
     }
     catch (err) {

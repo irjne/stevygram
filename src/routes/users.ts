@@ -215,7 +215,7 @@ router.post('/login', [
 })
 
 router.get("/test", (q, s, n) => {
-    const host = "mongodb+srv://matteo:BruceWayneV5@cluster0-q7lqh.mongodb.net/test?retryWrites=true&w=majority";
+    const host = "mongodb+srv://matteo:BWV5@cluster0-q7lqh.mongodb.net/test?retryWrites=true&w=majority";
     const dbName = 'stevygram0';
     mongoose.connect(host + '/' + dbName, {
         useNewUrlParser: true,

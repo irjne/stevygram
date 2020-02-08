@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 import { NextFunction } from 'express-serve-static-core';
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
-const MongoClient = require('mongodb').MongoClient;
 import {
     User,
     getAllUsers,
@@ -16,6 +15,22 @@ import {
     addInPhonebookByPhone,
     removeInPhonebookByPhone
 } from '../lib/users';
+
+mongoose.set('debug', true);
+const Schema = mongoose.Schema;
+// Defining users collection schema and model
+const usersSchema = new Schema({
+    _id: mongoose.Types.ObjectId,
+    name: String,
+    surname: String,
+    nickname: String,
+    phone: String,
+    password: String,
+    phonebook: [String]
+
+});
+
+let usersModel = mongoose.model<User>("user", usersSchema);
 
 const router = express.Router();
 export let userOnSession: User;
@@ -215,25 +230,43 @@ router.post('/login', [
 })
 
 router.get("/test", (q, s, n) => {
-    const host = "mongodb+srv://matteo:stevygram@cluster0-q7lqh.mongodb.net/test?retryWrites=true&w=majority";
-    const dbName = 'stevygram0';
-    mongoose.connect(host + '/' + dbName, {
+    const host = "mongodb+srv://matteo:stevygram@cluster0-q7lqh.mongodb.net/stevygram0?retryWrites=true&w=majority";
+    mongoose.connect(host, {
         useNewUrlParser: true,
         useUnifiedTopology: true
     });
     var db = mongoose.connection;
     db.on('error', function () {
-        console.error('Connection	error!');
+        console.error('Connection	error!\n');
     });
     db.once('open', function () {
-        console.log('DB	connection	Ready');
+        console.log('DB	connection	Ready\n');
+        //console.log(mongoose.connection.db.collections()); // [{ name: 'dbname.myCollection' }]
+    });
 
-        db.collection("YourCollectionName", function (err: any, collection: any) {
-            collection.find({}).toArray(function (err: any, data: any) {
-                console.log(data); // it will print your collection data
-            })
+
+    usersModel.find((err: any, users: any) => {
+        if (err) {
+            s.send("Error!");
+        } else {
+            s.send(users);
+        }
+    });
+
+    //Using MongoClient
+    /*
+    MongoClient.connect(host, function (err: any, db: any) {
+        if (err) throw err;
+        var dbo = db.db(dbName);
+        dbo.collection("users").find().toArray(function (err: any, result: any) {
+            if (err) throw err;
+            console.log(result);
+            db.close();
         });
     });
+    */
 });
+
+
 
 export default router; 

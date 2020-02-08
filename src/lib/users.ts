@@ -1,14 +1,16 @@
 import { promisify } from 'util';
 import * as fs from 'fs';
 import bcrypt from 'bcrypt';
+import mongoose from 'mongoose';
 
-export interface User {
-    name: string;
-    surname: string;
-    nickname: string;
-    phone: string;
-    password: string;
-    phonebook: string[];
+// Extended User interface with mongoose.Document
+export interface User extends mongoose.Document {
+    name: string, // all these "," were ";" once (Matteo)
+    surname: string,
+    nickname: string,
+    phone: string,
+    password: string,
+    phonebook: string[]
 }
 
 export const directory = __dirname.replace("/lib", "/data");

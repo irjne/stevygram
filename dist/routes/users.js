@@ -17,8 +17,20 @@ const express_validator_1 = require("express-validator");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const mongoose_1 = __importDefault(require("mongoose"));
-const MongoClient = require('mongodb').MongoClient;
 const users_1 = require("../lib/users");
+mongoose_1.default.set('debug', true);
+const Schema = mongoose_1.default.Schema;
+// Defining users collection schema and model
+const usersSchema = new Schema({
+    _id: mongoose_1.default.Types.ObjectId,
+    name: String,
+    surname: String,
+    nickname: String,
+    phone: String,
+    password: String,
+    phonebook: [String]
+});
+let usersModel = mongoose_1.default.model("user", usersSchema);
 const router = express_1.default.Router();
 const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
 exports.authorization = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -207,25 +219,40 @@ router.post('/login', [
         return res.status(500).send(`Unexpected error: ${err}`);
     }
 }));
-router.get("/test", (q, s, n) => {
-    const host = "mongodb+srv://matteo:stevygram@cluster0-q7lqh.mongodb.net/test?retryWrites=true&w=majority";
-    const dbName = 'stevygram0';
-    mongoose_1.default.connect(host + '/' + dbName, {
+router.get("/test", (q, s, n) => __awaiter(void 0, void 0, void 0, function* () {
+    const host = "mongodb+srv://matteo:stevygram@cluster0-q7lqh.mongodb.net/stevygram0?retryWrites=true&w=majority";
+    mongoose_1.default.connect(host, {
         useNewUrlParser: true,
         useUnifiedTopology: true
     });
     var db = mongoose_1.default.connection;
     db.on('error', function () {
-        console.error('Connection	error!');
+        console.error('Connection	error!\n');
     });
     db.once('open', function () {
-        console.log('DB	connection	Ready');
-        db.collection("YourCollectionName", function (err, collection) {
-            collection.find({}).toArray(function (err, data) {
-                console.log(data); // it will print your collection data
-            });
+        console.log('DB	connection	Ready\n');
+        //console.log(mongoose.connection.db.collections()); // [{ name: 'dbname.myCollection' }]
+    });
+    usersModel.find((err, users) => {
+        if (err) {
+            s.send("Error!");
+        }
+        else {
+            s.send(users);
+        }
+    });
+    //Using MongoClient
+    /*
+    MongoClient.connect(host, function (err: any, db: any) {
+        if (err) throw err;
+        var dbo = db.db(dbName);
+        dbo.collection("users").find().toArray(function (err: any, result: any) {
+            if (err) throw err;
+            console.log(result);
+            db.close();
         });
     });
-});
+    */
+}));
 exports.default = router;
 //# sourceMappingURL=users.js.map

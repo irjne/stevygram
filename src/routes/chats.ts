@@ -1,3 +1,4 @@
+/*
 import express from 'express';
 import { body, param, validationResult, sanitizeParam, query } from 'express-validator';
 import { userOnSession, authorization } from './users';
@@ -90,7 +91,7 @@ router.get('/:id/messages', [
     const id = req.params.id;
     const { sender, word } = req.query;
 
-    //filter: ?word="pippo", stampa tutti i messaggi contenenti la parola; 
+    //filter: ?word="pippo", stampa tutti i messaggi contenenti la parola;
     if (req.query.word) {
         try {
             const result = await searchByChatId(id, undefined, word);
@@ -237,4 +238,5 @@ router.delete('/:id', [
     }
 })
 
-export default router; 
+export default router;
+*/

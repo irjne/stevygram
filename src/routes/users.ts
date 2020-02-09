@@ -1,9 +1,11 @@
+/*
 import express from 'express';
 import { body, param, validationResult, query } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import { NextFunction } from 'express-serve-static-core';
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
+
 import {
     User,
     getAllUsers,
@@ -264,9 +266,10 @@ router.get("/test", (q, s, n) => {
             db.close();
         });
     });
+
     */
+/*
 });
 
-
-
-export default router; 
+export default router;
+*/

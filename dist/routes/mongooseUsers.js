@@ -156,6 +156,41 @@ router.put('/:phone', [
         return res.status(400).send(`Unexpected error: ${err}`);
     }
 }));
+// it adds a new phone to an user's phonebook
+router.put('/add-contact/:userPhone', [
+    express_validator_1.param('userPhone')
+        .isString()
+        .trim(),
+    express_validator_1.body('newPhone')
+        .isString()
+        .not().isEmpty()
+        .trim(),
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const errors = express_validator_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    const userPhone = req.params.userPhone;
+    const newPhone = req.body.newPhone;
+    try {
+        exports.usersMongoDBConnection();
+        const filter = { phone: userPhone };
+        // { upsert: true, new: true } are two optional settings. They make sure 
+        // a new contact will be added to user's phonebook just once. 
+        // Without them, it will happen twice.
+        let doc = yield usersModel.findOneAndUpdate(filter, { $push: { phonebook: newPhone } }, { upsert: true, new: true }, (err, user) => {
+            if (err) {
+                res.status(500).json({ "error": err });
+            }
+            else {
+                res.status(200).json({ "addingContactLog": user });
+            }
+        });
+    }
+    catch (err) {
+        return res.status(500).send(`Unexpected error: ${err}`);
+    }
+}));
 // it inserts a new user in database by body
 router.post('/', [
     express_validator_1.body('nickname')
@@ -194,39 +229,6 @@ router.post('/', [
         return res.status(500).send(`Unexpected error: ${err}`);
     }
 }));
-// it adds a new phone to an user's phonebook
-router.post('/add-contact/:userPhone', [
-    express_validator_1.param('userPhone')
-        .isString()
-        .trim(),
-    express_validator_1.body('newPhone')
-        .isString()
-        .not().isEmpty()
-        .trim(),
-], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const errors = express_validator_1.validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
-    const userPhone = req.params.userPhone;
-    const newPhone = req.body.newPhone;
-    try {
-        exports.usersMongoDBConnection();
-        const filter = { phone: userPhone };
-        // doc is the found document after updating was applied because of <<new: true>>
-        let doc = yield usersModel.updateOne(filter, { $push: { phonebook: newPhone } }, (err, user) => {
-            if (err) {
-                res.json({ "error": err });
-            }
-            else {
-                res.json({ "updatingLog": user });
-            }
-        });
-    }
-    catch (err) {
-        return res.status(500).send(`Unexpected error: ${err}`);
-    }
-}));
 // it deletes the user with this phone
 router.delete('/:phone', [
     express_validator_1.param('phone')
@@ -240,7 +242,7 @@ router.delete('/:phone', [
     let phone = req.params.phone;
     try {
         exports.usersMongoDBConnection();
-        usersModel.findOneAndRemove({ phone: phone }, (err, user) => {
+        yield usersModel.findOneAndRemove({ phone: phone }, (err, user) => {
             if (err) {
                 return res.status(500).send(err);
             }
@@ -249,6 +251,41 @@ router.delete('/:phone', [
                 userDeleted: user
             };
             return res.status(200).send(response);
+        });
+    }
+    catch (err) {
+        return res.status(500).send(`Unexpected error: ${err}`);
+    }
+}));
+// it deletes a contanct from an user's phonebook
+router.delete('/remove-contact/:userPhone', [
+    express_validator_1.param('userPhone')
+        .isString()
+        .trim(),
+    express_validator_1.body('contactPhone')
+        .isString()
+        .not().isEmpty()
+        .trim(),
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const errors = express_validator_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    const userPhone = req.params.userPhone;
+    const contactPhone = req.body.contactPhone;
+    try {
+        exports.usersMongoDBConnection();
+        const filter = { phone: userPhone };
+        // { upsert: true, new: true } are two optional settings. They make sure 
+        // a new contact will be added to user's phonebook just once. 
+        // Without them, it will happen twice.
+        let doc = yield usersModel.findOneAndUpdate(filter, { $pull: { phonebook: contactPhone } }, { upsert: true, new: true }, (err, user) => {
+            if (err) {
+                res.status(500).json({ "error": err });
+            }
+            else {
+                res.status(200).json({ "removingContactLog": user });
+            }
         });
     }
     catch (err) {

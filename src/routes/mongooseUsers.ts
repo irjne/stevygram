@@ -13,7 +13,7 @@ import {
 // this statement prints plain mongoDB queries on terminal
 mongoose.set('debug', true);
 
-// defining users collection schema and model
+// defining schema and model of users collection
 const Schema = mongoose.Schema;
 const usersSchema = new Schema({
     //_id: mongoose.Types.ObjectId,
@@ -26,23 +26,25 @@ const usersSchema = new Schema({
 });
 let usersModel = mongoose.model<User>("user", usersSchema);
 
+// initializing express router
 const router = express.Router();
-export let userOnSession: User;
+
+// token validation system: to be fixed 
+export let userOnSession: any;
 const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
-export const authorization = async (req: any, res: any, next: NextFunction) => {
+export const authorization = async (req: any, res: any, next: any) => {
     try {
-        let token = req.query.token;
-        let legit = jwt.verify(token, privateKey);
-        const user = await findUserByPhone(Object.values(legit)[0]);
-        if (user) {
-            userOnSession = user;
-            next();
-        }
+        const token = req.query.token;
+        const payload = await jwt.verify(token, privateKey);
+        console.log(payload);
+        return res.status(200).send(payload);
     } catch (error) {
+        console.log(error);
         return res.status(500).send(`Unexpected error: ${error}`);
     }
 };
 
+// connection to MongoDB database on cluster
 export const usersMongoDBConnection = async () => {
     const host = "mongodb+srv://matteo:stevygram@cluster0-q7lqh.mongodb.net/stevygram0?retryWrites=true&w=majority";
     mongoose.connect(host, {
@@ -213,16 +215,63 @@ router.post('/', [
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-    const { nickname, name, surname, phone } = req.body;
-    console.log("I'm here");
+    const nickname = req.body.nickname;
+    const name = req.body.name;
+    const surname = req.body.surname;
+    const phone = req.body.phone;
+    // password and its hashing
+    const salt = await bcrypt.genSalt(5);
+    let password = await bcrypt.hash(name, salt);
     try {
         usersMongoDBConnection();
-        let addingUser = new usersModel(req.body);
+        let addingUser = new usersModel({ nickname, name, surname, phone, password });
         addingUser.save(err => {
             if (err) return res.status(500).send(err);
             return res.status(200).send(addingUser);
         });
     } catch (err) {
+        return res.status(500).send(`Unexpected error: ${err}`);
+    }
+});
+
+// it returns a verbose message and a jwt token
+router.post('/login', [
+    body('phone')
+        .isString()
+        .not().isEmpty()
+        .trim(),
+    body('password')
+        .isString()
+        .not().isEmpty()
+        .trim(),
+], async (req: any, res: any, next: any) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    try {
+        usersMongoDBConnection();
+        const phone = req.body.phone;
+        const password = req.body.password;
+        let user = await usersModel.findOne({ phone: phone }).exec();
+        if (!user) {
+            return res.status(400).send({ message: "This username does not exist." });
+        }
+        if (!bcrypt.compareSync(password, user.password)) {
+            return res.status(400).send({ message: "The password is not valid." });
+        }
+        const token = jwt.sign(
+            { phone: phone, password: password },
+            privateKey,
+            { expiresIn: '5h' });
+        //authorization(token);
+        res.send({
+            message: "The username and password combination is correct!",
+            //user: user,
+            token: token
+        });
+    }
+    catch (err) {
         return res.status(500).send(`Unexpected error: ${err}`);
     }
 });
@@ -291,19 +340,31 @@ router.delete('/remove-contact/:userPhone', [
     }
 });
 
-router.get("/test", (q, s, n) => {
-    //Using MongoClient
+router.get("/test/:token", [
+    query('token')
+        .isString()
+        .trim()
+], async (q: any, s: any, n: any) => {
+    // const salt = await bcrypt.genSalt(5);
+    // let hashedPassword = await bcrypt.hash(password, salt);
+    // authorization
+}
     /*
-    MongoClient.connect(host, function (err: any, db: any) {
-        if (err) throw err;
-        var dbo = db.db(dbName);
-        dbo.collection("users").find().toArray(function (err: any, result: any) {
+    (q, s, n) => {
+        //Using MongoClient
+        
+        MongoClient.connect(host, function (err: any, db: any) {
             if (err) throw err;
-            console.log(result);
-            db.close();
+            var dbo = db.db(dbName);
+            dbo.collection("users").find().toArray(function (err: any, result: any) {
+                if (err) throw err;
+                console.log(result);
+                db.close();
+            });
         });
     });
-    */
-});
+        */
+);
+
 
 export default router;

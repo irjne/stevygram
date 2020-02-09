@@ -15,11 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const express_validator_1 = require("express-validator");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
 const mongoose_1 = __importDefault(require("mongoose"));
-const users_1 = require("../lib/users");
 // this statement prints plain mongoDB queries on terminal
 mongoose_1.default.set('debug', true);
-// defining users collection schema and model
+// defining schema and model of users collection
 const Schema = mongoose_1.default.Schema;
 const usersSchema = new Schema({
     //_id: mongoose.Types.ObjectId,
@@ -31,22 +31,21 @@ const usersSchema = new Schema({
     phonebook: [String]
 });
 let usersModel = mongoose_1.default.model("user", usersSchema);
+// initializing express router
 const router = express_1.default.Router();
 const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
-exports.authorization = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authorization = (token) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        let token = req.query.token;
-        let legit = jsonwebtoken_1.default.verify(token, privateKey);
-        const user = yield users_1.findUserByPhone(Object.values(legit)[0]);
-        if (user) {
-            exports.userOnSession = user;
-            next();
-        }
+        //const token = req.query.token;
+        const payload = yield jsonwebtoken_1.default.verify(token, privateKey);
+        console.log(payload);
     }
     catch (error) {
-        return res.status(500).send(`Unexpected error: ${error}`);
+        //return res.status(500).send(`Unexpected error: ${error}`);
+        console.log(error);
     }
 });
+// connection to MongoDB database on cluster
 exports.usersMongoDBConnection = () => __awaiter(void 0, void 0, void 0, function* () {
     const host = "mongodb+srv://matteo:stevygram@cluster0-q7lqh.mongodb.net/stevygram0?retryWrites=true&w=majority";
     mongoose_1.default.connect(host, {
@@ -176,8 +175,8 @@ router.put('/add-contact/:userPhone', [
         exports.usersMongoDBConnection();
         const filter = { phone: userPhone };
         // { upsert: true, new: true } are two optional settings. They make sure 
-        // a new contact will be added to user's phonebook just once. 
-        // Without them, it will happen twice.
+        // a new contact will be added to user's phonebook just once. Without 
+        // them, it will happen twice and the whole phonebook could be overwritten.
         let doc = yield usersModel.findOneAndUpdate(filter, { $push: { phonebook: newPhone } }, { upsert: true, new: true }, (err, user) => {
             if (err) {
                 res.status(500).json({ "error": err });
@@ -214,15 +213,58 @@ router.post('/', [
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-    const { nickname, name, surname, phone } = req.body;
-    console.log("I'm here");
+    const nickname = req.body.nickname;
+    const name = req.body.name;
+    const surname = req.body.surname;
+    const phone = req.body.phone;
+    // password and its hashing
+    const salt = yield bcrypt_1.default.genSalt(5);
+    let password = yield bcrypt_1.default.hash(name, salt);
     try {
         exports.usersMongoDBConnection();
-        let addingUser = new usersModel(req.body);
+        let addingUser = new usersModel({ nickname, name, surname, phone, password });
         addingUser.save(err => {
             if (err)
                 return res.status(500).send(err);
             return res.status(200).send(addingUser);
+        });
+    }
+    catch (err) {
+        return res.status(500).send(`Unexpected error: ${err}`);
+    }
+}));
+// it returns a verbose message and a jwt token
+router.post('/login', [
+    express_validator_1.body('phone')
+        .isString()
+        .not().isEmpty()
+        .trim(),
+    express_validator_1.body('password')
+        .isString()
+        .not().isEmpty()
+        .trim(),
+], (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const errors = express_validator_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    try {
+        exports.usersMongoDBConnection();
+        const phone = req.body.phone;
+        const password = req.body.password;
+        let user = yield usersModel.findOne({ phone: phone }).exec();
+        if (!user) {
+            return res.status(400).send({ message: "This username does not exist." });
+        }
+        if (!bcrypt_1.default.compareSync(password, user.password)) {
+            return res.status(400).send({ message: "The password is not valid." });
+        }
+        const token = jsonwebtoken_1.default.sign({ phone: phone, password: password }, privateKey, { expiresIn: '5h' });
+        exports.authorization(token);
+        res.send({
+            message: "The username and password combination is correct!",
+            //user: user,
+            token: token
         });
     }
     catch (err) {
@@ -276,9 +318,8 @@ router.delete('/remove-contact/:userPhone', [
     try {
         exports.usersMongoDBConnection();
         const filter = { phone: userPhone };
-        // { upsert: true, new: true } are two optional settings. They make sure 
-        // a new contact will be added to user's phonebook just once. 
-        // Without them, it will happen twice.
+        // just like post(/add-contact/:phone) case, but we use $pull operator
+        // because we are removing an element from an array.
         let doc = yield usersModel.findOneAndUpdate(filter, { $pull: { phonebook: contactPhone } }, { upsert: true, new: true }, (err, user) => {
             if (err) {
                 res.status(500).json({ "error": err });
@@ -292,9 +333,19 @@ router.delete('/remove-contact/:userPhone', [
         return res.status(500).send(`Unexpected error: ${err}`);
     }
 }));
-router.get("/test", (q, s, n) => {
+router.get("/test/:token", [
+    express_validator_1.query('token')
+        .isString()
+        .trim()
+], (q, s, n) => __awaiter(void 0, void 0, void 0, function* () {
+    // const salt = await bcrypt.genSalt(5);
+    // let hashedPassword = await bcrypt.hash(password, salt);
+    // authorization
+})
+/*
+(q, s, n) => {
     //Using MongoClient
-    /*
+    
     MongoClient.connect(host, function (err: any, db: any) {
         if (err) throw err;
         var dbo = db.db(dbName);
@@ -304,7 +355,8 @@ router.get("/test", (q, s, n) => {
             db.close();
         });
     });
-    */
 });
+    */
+);
 exports.default = router;
 //# sourceMappingURL=mongooseUsers.js.map

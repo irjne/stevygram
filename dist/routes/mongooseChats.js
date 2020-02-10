@@ -51,7 +51,7 @@ router.get('/', mongooseUsers_1.authorization, (req, res) => __awaiter(void 0, v
                     res.send(chats);
             });
         }
-        // sends all chats collection
+        // sends whole chats collection
         else
             chats = yield chatsModel.find((err, chats) => {
                 if (err) {

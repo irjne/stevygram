@@ -344,5 +344,29 @@ router.delete('/remove-contact/:userPhone', [
         return res.status(500).send(`Unexpected error: ${err}`);
     }
 }));
+router.patch("/hashNames", (q, s, n) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        exports.mongoDBConnection();
+        let users = yield usersModel.find((err, users) => __awaiter(void 0, void 0, void 0, function* () {
+            if (err)
+                return s.status(500).send(err);
+            console.log(users);
+            const salt = yield bcrypt_1.default.genSalt(5);
+            console.log(salt);
+            for (let index = 0; index < users.length; index++) {
+                console.log(users[index]);
+                const name = users[index].name;
+                const phone = users[index].phone;
+                let password = yield bcrypt_1.default.hash(name, salt);
+                let user = yield usersModel.findOneAndUpdate({ phone: phone }, { password: password }).exec();
+                console.log(index);
+            }
+            s.status(200).send(users);
+        }));
+    }
+    catch (error) {
+        s.status(500).send(error);
+    }
+}));
 exports.default = router;
 //# sourceMappingURL=mongooseUsers.js.map

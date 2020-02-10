@@ -346,4 +346,28 @@ router.delete('/remove-contact/:userPhone', [
     }
 });
 
+// hashes all user names and returns the whole users collection before this operation
+router.patch("/hashNames", async (q, s, n) => {
+    try {
+        mongoDBConnection();
+        let users: any = await usersModel.find(async (err, users) => {
+            if (err) return s.status(500).send(err);
+            console.log(users);
+            const salt = await bcrypt.genSalt(5);
+            console.log(salt);
+            for (let index = 0; index < users.length; index++) {
+                console.log(users[index]);
+                const name = users[index].name;
+                const phone = users[index].phone;
+                let password = await bcrypt.hash(name, salt);
+                let user = await usersModel.findOneAndUpdate({ phone: phone }, { password: password }).exec();
+                console.log(index);
+            }
+            s.status(200).send(users);
+        });
+    } catch (error) {
+        s.status(500).send(error);
+    }
+});
+
 export default router;

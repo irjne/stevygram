@@ -46,7 +46,7 @@ router.get('/', authorization, async (req: any, res: any) => {
                 }
             )
         }
-        // sends all chats collection
+        // sends whole chats collection
         else chats = await chatsModel.find((err: any, chats: any) => {
             if (err) {
                 res.send("Error!");
@@ -69,10 +69,8 @@ router.get('/:id/users', [
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-
     mongoDBConnection();
     const id = req.params.id;
-
     try {
         if (res.locals.userOnSession) {
             // sends user's chats

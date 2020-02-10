@@ -44,20 +44,12 @@ export const addUser = async (nickname: string, name: string, surname: string, p
 }
 
 //? generates users passwords and store them in users data JSON
-const generateHashedPassword = async (): Promise<any> => {
+const generateHashedPassword = async (password: String): Promise<any> => {
     try {
-        const readFile = promisify(fs.readFile);
-        const usersByFile = await readFile(directory + '/users.json', 'utf-8');
-        const users = JSON.parse(usersByFile).users;
+        const salt = await bcrypt.genSalt(5);
+        let hashedPassword = await bcrypt.hash(password, salt);
 
-        for (let i = 0; i < users.length; i++) {
-            const salt = await bcrypt.genSalt(5);
-            users[i].password = await bcrypt.hash(users[i].name, salt);
-        }
-
-        let json = JSON.stringify({ "users": users });
-        const writeFile = promisify(fs.writeFile);
-        await writeFile(directory + '/users.json', json, 'utf-8');
+        console.log(hashedPassword);
     }
     catch (err) {
         return err;

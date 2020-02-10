@@ -1,14 +1,15 @@
 import { promisify } from 'util';
 import { User, findUserByPhone } from './users';
 import * as fs from 'fs';
+import mongoose from 'mongoose';
 
-export interface Message {
-    sender: string | User;
+export interface Message extends mongoose.Document {
+    sender: string /*| User*/;
     body: string;
     date: Date;
 }
 
-export interface Chat {
+export interface Chat extends mongoose.Document {
     id: number;
     name: string;
     description: string;
@@ -22,7 +23,7 @@ export interface Chat {
 export const directory = __dirname.replace("/lib", "/data");
 
 //? creates a new chat in stevygram environment 
-export const addChat = async (name: string, description: string, users: string[], admin: string[]): Promise<string | any> => {
+/*export const addChat = async (name: string, description: string, users: string[], admin: string[]): Promise<string | any> => {
     try {
         const readFile = promisify(fs.readFile);
         const chatsByFile = await readFile(directory + '/chats.json', 'utf-8');
@@ -309,4 +310,4 @@ export const removeChatById = async (id: number): Promise<string | any> => {
     catch (err) {
         return err;
     }
-}
+}*/

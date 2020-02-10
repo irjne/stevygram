@@ -2,7 +2,7 @@ import express from 'express';
 import { body, param, validationResult, sanitizeParam, query } from 'express-validator';
 import { userOnSession, authorization } from './users';
 
-import {
+/*import {
     getAllChats,
     getInfoByChatId,
     getMessagesByChatId,
@@ -12,10 +12,11 @@ import {
     removeChatById,
     searchByChatId,
     addNewMessageByChatId
-} from '../lib/chats';
+} from '../lib/chats';*/
 
 const router = express.Router();
 
+/*
 //GET - url: /, stampa tutte le chat
 router.get('/', authorization, async (req: any, res: any) => {
     try {
@@ -236,5 +237,5 @@ router.delete('/:id', [
         return res.status(400).send(`Unexpected error: ${err}`);
     }
 })
-
+*/
 export default router;

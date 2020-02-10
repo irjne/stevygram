@@ -31,9 +31,7 @@ const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo
 export const authorization = async (req: any, res: any, next: any) => {
     try {
         const token = req.query.token;
-        const payload = await jwt.verify(token, privateKey);
-        //console.log(payload);
-        //return res.status(200).send(payload);
+        const payload = jwt.verify(token, privateKey);
         //locally (on server) storing user's phone on for userOnSession
         res.locals.userOnSession = Object.values(payload)[0];
         next();
@@ -44,7 +42,7 @@ export const authorization = async (req: any, res: any, next: any) => {
 };
 
 // connection to MongoDB database on cluster
-export const usersMongoDBConnection = async () => {
+export const mongoDBConnection = async () => {
     const host = "mongodb+srv://matteo:stevygram@cluster0-q7lqh.mongodb.net/stevygram0?retryWrites=true&w=majority";
     mongoose.connect(host, {
         useNewUrlParser: true,
@@ -64,7 +62,7 @@ export const usersMongoDBConnection = async () => {
 router.get('/', [
 ], authorization, async (req: any, res: any) => {
     try {
-        usersMongoDBConnection();
+        mongoDBConnection();
         usersModel.find((err: any, users: any) => {
             if (err) {
                 res.send("Error!");
@@ -85,7 +83,7 @@ router.get('/:phone', [
         .trim()
 ], authorization, async (req: any, res: any) => {
     try {
-        usersMongoDBConnection();
+        mongoDBConnection();
         let phone = req.params.phone;
         usersModel.find({ phone: phone }, (err: any, users: any) => {
             if (err) {
@@ -107,7 +105,7 @@ router.get('/:name', [
         .trim()
 ], authorization, async (req: any, res: any) => {
     try {
-        usersMongoDBConnection();
+        mongoDBConnection();
         let name = req.params.name;
         usersModel.find({ name: name }, (err: any, users: any) => {
             if (err) {
@@ -147,7 +145,7 @@ router.put('/:phone', [
         return res.status(400).json({ errors: "Nickname or fullname (name, surname) are required" });
     }
     try {
-        usersMongoDBConnection();
+        mongoDBConnection();
         const filter = { phone: phone };
         const update = {
             nickname: nickname,
@@ -181,7 +179,7 @@ router.put('/add-contact/:phone', [
     const phone = req.params.user;
     const contact = req.body.contact;
     try {
-        usersMongoDBConnection();
+        mongoDBConnection();
         const filter = { phone: phone };
         // { upsert: true, new: true } are two optional settings. They make sure 
         // a new contact will be added to user's phonebook just once. Without 
@@ -231,7 +229,7 @@ router.post('/', [
     const salt = await bcrypt.genSalt(5);
     let password = await bcrypt.hash(name, salt);
     try {
-        usersMongoDBConnection();
+        mongoDBConnection();
         let addingUser = new usersModel({ nickname, name, surname, phone, password });
         addingUser.save(err => {
             if (err) return res.status(500).send(err);
@@ -258,7 +256,7 @@ router.post('/login', [
         return res.status(422).json({ errors: errors.array() });
     }
     try {
-        usersMongoDBConnection();
+        mongoDBConnection();
         const phone = req.body.phone;
         const password = req.body.password;
         let user = await usersModel.findOne({ phone: phone }).exec();
@@ -296,7 +294,7 @@ router.delete('/:phone', [
     }
     let phone = req.params.phone;
     try {
-        usersMongoDBConnection();
+        mongoDBConnection();
         let user = await usersModel.findOneAndRemove({ phone: phone },
             (err, user) => {
                 if (err) {
@@ -330,7 +328,7 @@ router.delete('/remove-contact/:userPhone', [
     const userPhone = req.params.userPhone;
     const contactPhone = req.body.contactPhone;
     try {
-        usersMongoDBConnection();
+        mongoDBConnection();
         const filter = { phone: userPhone };
         // just like post(/add-contact/:phone) case, but we use $pull operator
         // because we are removing an element from an array.

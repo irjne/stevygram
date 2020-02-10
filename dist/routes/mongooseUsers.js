@@ -37,9 +37,8 @@ const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo
 exports.authorization = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const token = req.query.token;
-        const payload = yield jsonwebtoken_1.default.verify(token, privateKey);
-        //console.log(payload);
-        //return res.status(200).send(payload);
+        const payload = jsonwebtoken_1.default.verify(token, privateKey);
+        //locally (on server) storing user's phone on for userOnSession
         res.locals.userOnSession = Object.values(payload)[0];
         next();
     }
@@ -49,7 +48,7 @@ exports.authorization = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
     }
 });
 // connection to MongoDB database on cluster
-exports.usersMongoDBConnection = () => __awaiter(void 0, void 0, void 0, function* () {
+exports.mongoDBConnection = () => __awaiter(void 0, void 0, void 0, function* () {
     const host = "mongodb+srv://matteo:stevygram@cluster0-q7lqh.mongodb.net/stevygram0?retryWrites=true&w=majority";
     mongoose_1.default.connect(host, {
         useNewUrlParser: true,
@@ -67,7 +66,7 @@ exports.usersMongoDBConnection = () => __awaiter(void 0, void 0, void 0, functio
 // it returns all users
 router.get('/', [], exports.authorization, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        exports.usersMongoDBConnection();
+        exports.mongoDBConnection();
         usersModel.find((err, users) => {
             if (err) {
                 res.send("Error!");
@@ -86,9 +85,9 @@ router.get('/:phone', [
     express_validator_1.param('phone')
         .isString()
         .trim()
-], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+], exports.authorization, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        exports.usersMongoDBConnection();
+        exports.mongoDBConnection();
         let phone = req.params.phone;
         usersModel.find({ phone: phone }, (err, users) => {
             if (err) {
@@ -108,9 +107,9 @@ router.get('/:name', [
     express_validator_1.param('name')
         .isString()
         .trim()
-], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+], exports.authorization, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        exports.usersMongoDBConnection();
+        exports.mongoDBConnection();
         let name = req.params.name;
         usersModel.find({ name: name }, (err, users) => {
             if (err) {
@@ -139,7 +138,7 @@ router.put('/:phone', [
     express_validator_1.body('surname')
         .isString()
         .trim(),
-], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+], exports.authorization, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -150,7 +149,7 @@ router.put('/:phone', [
         return res.status(400).json({ errors: "Nickname or fullname (name, surname) are required" });
     }
     try {
-        exports.usersMongoDBConnection();
+        exports.mongoDBConnection();
         const filter = { phone: phone };
         const update = {
             nickname: nickname,
@@ -176,7 +175,7 @@ router.put('/add-contact/:phone', [
         .isString()
         .not().isEmpty()
         .trim(),
-], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+], exports.authorization, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -184,7 +183,7 @@ router.put('/add-contact/:phone', [
     const phone = req.params.user;
     const contact = req.body.contact;
     try {
-        exports.usersMongoDBConnection();
+        exports.mongoDBConnection();
         const filter = { phone: phone };
         // { upsert: true, new: true } are two optional settings. They make sure 
         // a new contact will be added to user's phonebook just once. Without 
@@ -220,7 +219,7 @@ router.post('/', [
         .isString()
         .not().isEmpty()
         .trim()
-], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+], exports.authorization, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -233,7 +232,7 @@ router.post('/', [
     const salt = yield bcrypt_1.default.genSalt(5);
     let password = yield bcrypt_1.default.hash(name, salt);
     try {
-        exports.usersMongoDBConnection();
+        exports.mongoDBConnection();
         let addingUser = new usersModel({ nickname, name, surname, phone, password });
         addingUser.save(err => {
             if (err)
@@ -261,7 +260,7 @@ router.post('/login', [
         return res.status(422).json({ errors: errors.array() });
     }
     try {
-        exports.usersMongoDBConnection();
+        exports.mongoDBConnection();
         const phone = req.body.phone;
         const password = req.body.password;
         let user = yield usersModel.findOne({ phone: phone }).exec();
@@ -288,14 +287,14 @@ router.delete('/:phone', [
     express_validator_1.param('phone')
         .isString()
         .trim()
-], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+], exports.authorization, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
     let phone = req.params.phone;
     try {
-        exports.usersMongoDBConnection();
+        exports.mongoDBConnection();
         let user = yield usersModel.findOneAndRemove({ phone: phone }, (err, user) => {
             if (err) {
                 return res.status(500).send(err);
@@ -320,7 +319,7 @@ router.delete('/remove-contact/:userPhone', [
         .isString()
         .not().isEmpty()
         .trim(),
-], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+], exports.authorization, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -328,7 +327,7 @@ router.delete('/remove-contact/:userPhone', [
     const userPhone = req.params.userPhone;
     const contactPhone = req.body.contactPhone;
     try {
-        exports.usersMongoDBConnection();
+        exports.mongoDBConnection();
         const filter = { phone: userPhone };
         // just like post(/add-contact/:phone) case, but we use $pull operator
         // because we are removing an element from an array.

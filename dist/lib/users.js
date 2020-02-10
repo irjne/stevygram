@@ -50,18 +50,11 @@ exports.addUser = (nickname, name, surname, phone, password) => __awaiter(void 0
     }
 });
 //? generates users passwords and store them in users data JSON
-const generateHashedPassword = () => __awaiter(void 0, void 0, void 0, function* () {
+const generateHashedPassword = (password) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const readFile = util_1.promisify(fs.readFile);
-        const usersByFile = yield readFile(exports.directory + '/users.json', 'utf-8');
-        const users = JSON.parse(usersByFile).users;
-        for (let i = 0; i < users.length; i++) {
-            const salt = yield bcrypt_1.default.genSalt(5);
-            users[i].password = yield bcrypt_1.default.hash(users[i].name, salt);
-        }
-        let json = JSON.stringify({ "users": users });
-        const writeFile = util_1.promisify(fs.writeFile);
-        yield writeFile(exports.directory + '/users.json', json, 'utf-8');
+        const salt = yield bcrypt_1.default.genSalt(5);
+        let hashedPassword = yield bcrypt_1.default.hash(password, salt);
+        console.log(hashedPassword);
     }
     catch (err) {
         return err;

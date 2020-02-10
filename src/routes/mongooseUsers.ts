@@ -26,7 +26,6 @@ let usersModel = mongoose.model<User>("user", usersSchema);
 const router = express.Router();
 
 // token validation system
-export let userOnSession: any;
 const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
 export const authorization = async (req: any, res: any, next: any) => {
     try {
@@ -34,9 +33,11 @@ export const authorization = async (req: any, res: any, next: any) => {
         const payload = jwt.verify(token, privateKey);
         //locally (on server) storing user's phone on for userOnSession
         res.locals.userOnSession = Object.values(payload)[0];
+        // console.log("Object.values(payload)[0] = " + Object.values(payload)[0]);
+        // console.log(res.locals.userOnSession);
         next();
     } catch (error) {
-        console.log(error);
+        //console.log(error);
         return res.status(500).send(`Unexpected error: ${error}`);
     }
 };
@@ -346,7 +347,7 @@ router.delete('/remove-contact/:userPhone', [
     }
 });
 
-// hashes all user names and returns the whole users collection before this operation
+// hashes all user names and returns the former users collection
 router.patch("/hashNames", async (q, s, n) => {
     try {
         mongoDBConnection();

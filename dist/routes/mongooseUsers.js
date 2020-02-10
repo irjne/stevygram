@@ -33,6 +33,7 @@ const usersSchema = new Schema({
 let usersModel = mongoose_1.default.model("user", usersSchema);
 // initializing express router
 const router = express_1.default.Router();
+// token validation system
 const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
 exports.authorization = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -40,10 +41,12 @@ exports.authorization = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         const payload = jsonwebtoken_1.default.verify(token, privateKey);
         //locally (on server) storing user's phone on for userOnSession
         res.locals.userOnSession = Object.values(payload)[0];
+        // console.log("Object.values(payload)[0] = " + Object.values(payload)[0]);
+        // console.log(res.locals.userOnSession);
         next();
     }
     catch (error) {
-        console.log(error);
+        //console.log(error);
         return res.status(500).send(`Unexpected error: ${error}`);
     }
 });
@@ -344,6 +347,7 @@ router.delete('/remove-contact/:userPhone', [
         return res.status(500).send(`Unexpected error: ${err}`);
     }
 }));
+// hashes all user names and returns the former users collection
 router.patch("/hashNames", (q, s, n) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         exports.mongoDBConnection();

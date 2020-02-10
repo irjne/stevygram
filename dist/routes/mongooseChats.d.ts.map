@@ -1,1 +1,1 @@
-{"version":3,"file":"mongooseChats.d.ts","sourceRoot":"","sources":["../../src/routes/mongooseChats.ts"],"names":[],"mappings":"AAgCA,QAAA,MAAM,MAAM,4CAAmB,CAAC;AAsEhC,eAAe,MAAM,CAAC"}
+{"version":3,"file":"mongooseChats.d.ts","sourceRoot":"","sources":["../../src/routes/mongooseChats.ts"],"names":[],"mappings":"AAgCA,QAAA,MAAM,MAAM,4CAAmB,CAAC;AAmEhC,eAAe,MAAM,CAAC"}

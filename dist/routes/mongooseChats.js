@@ -78,33 +78,29 @@ router.get('/:id/users', [
     }
     mongooseUsers_1.mongoDBConnection();
     const id = req.params.id;
+    console.log(id);
     try {
+        console.log(res.locals.userOnSession);
         if (res.locals.userOnSession) {
             // sends user's chats
-            let users = yield chatsModel.findOne({ id: id }, 'users', (err, chats) => {
-                if (err)
-                    res.send("Error!");
-                else
-                    res.send(users);
+            let users = yield chatsModel.findOne({ id: id }, 'users', (err, data) => {
+                if (err) {
+                    res.status(500).send(err);
+                    return;
+                }
+                else {
+                    res.status(200).send(data);
+                    return;
+                }
             });
+        }
+        else {
+            return res.status(500).send("Error: problem with res.locals.userOnSession");
         }
     }
     catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);
     }
 }));
-/*const generateHashedPassword = async (password: String): Promise<any> => {
-    try {
-        const salt = await bcrypt.genSalt(5);
-        let hashedPassword = await bcrypt.hash(password, salt);
-
-        console.log(hashedPassword);
-    }
-    catch (err) {
-        return err;
-    }
-}
-
-generateHashedPassword("Daria");*/
 exports.default = router;
 //# sourceMappingURL=mongooseChats.js.map

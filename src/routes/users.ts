@@ -1,4 +1,3 @@
-/*
 import express from 'express';
 import { body, param, validationResult, query } from 'express-validator';
 import jwt from 'jsonwebtoken';
@@ -231,45 +230,4 @@ router.post('/login', [
     }
 })
 
-router.get("/test", (q, s, n) => {
-    const host = "mongodb+srv://matteo:stevygram@cluster0-q7lqh.mongodb.net/stevygram0?retryWrites=true&w=majority";
-    mongoose.connect(host, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    });
-    var db = mongoose.connection;
-    db.on('error', function () {
-        console.error('Connection	error!\n');
-    });
-    db.once('open', function () {
-        console.log('DB	connection	Ready\n');
-        //console.log(mongoose.connection.db.collections()); // [{ name: 'dbname.myCollection' }]
-    });
-
-
-    usersModel.find((err: any, users: any) => {
-        if (err) {
-            s.send("Error!");
-        } else {
-            s.send(users);
-        }
-    });
-
-    //Using MongoClient
-    /*
-    MongoClient.connect(host, function (err: any, db: any) {
-        if (err) throw err;
-        var dbo = db.db(dbName);
-        dbo.collection("users").find().toArray(function (err: any, result: any) {
-            if (err) throw err;
-            console.log(result);
-            db.close();
-        });
-    });
-
-    */
-/*
-});
-
 export default router;
-*/

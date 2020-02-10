@@ -1,4 +1,3 @@
-/*
 import express from 'express';
 import { body, param, validationResult, sanitizeParam, query } from 'express-validator';
 import { userOnSession, authorization } from './users';
@@ -239,4 +238,3 @@ router.delete('/:id', [
 })
 
 export default router;
-*/

@@ -4,11 +4,7 @@ import jwt from 'jsonwebtoken';
 import { NextFunction } from 'express-serve-static-core';
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
-import {
-    User,
-    findUserByPhone,
-    addInPhonebookByPhone,
-} from '../lib/users';
+import { User } from '../lib/users';
 
 // this statement prints plain mongoDB queries on terminal
 mongoose.set('debug', true);
@@ -36,8 +32,11 @@ export const authorization = async (req: any, res: any, next: any) => {
     try {
         const token = req.query.token;
         const payload = await jwt.verify(token, privateKey);
-        console.log(payload);
-        return res.status(200).send(payload);
+        //console.log(payload);
+        //return res.status(200).send(payload);
+        //locally (on server) storing user's phone on for userOnSession
+        res.locals.userOnSession = Object.values(payload)[0];
+        next();
     } catch (error) {
         console.log(error);
         return res.status(500).send(`Unexpected error: ${error}`);
@@ -63,7 +62,7 @@ export const usersMongoDBConnection = async () => {
 
 // it returns all users
 router.get('/', [
-], async (req: any, res: any) => {
+], authorization, async (req: any, res: any) => {
     try {
         usersMongoDBConnection();
         usersModel.find((err: any, users: any) => {
@@ -84,7 +83,7 @@ router.get('/:phone', [
     param('phone')
         .isString()
         .trim()
-], async (req: any, res: any) => {
+], authorization, async (req: any, res: any) => {
     try {
         usersMongoDBConnection();
         let phone = req.params.phone;
@@ -103,10 +102,10 @@ router.get('/:phone', [
 
 // it returns all users with this name
 router.get('/:name', [
-    param('phone')
+    param('name')
         .isString()
         .trim()
-], async (req: any, res: any) => {
+], authorization, async (req: any, res: any) => {
     try {
         usersMongoDBConnection();
         let name = req.params.name;
@@ -127,8 +126,17 @@ router.get('/:name', [
 router.put('/:phone', [
     param('phone')
         .isString()
-        .trim()
-], async (req: any, res: any) => {
+        .trim(),
+    body('nickname')
+        .isString()
+        .trim(),
+    body('name')
+        .isString()
+        .trim(),
+    body('surname')
+        .isString()
+        .trim(),
+], authorization, async (req: any, res: any) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -157,29 +165,29 @@ router.put('/:phone', [
 });
 
 // it adds a new phone to an user's phonebook
-router.put('/add-contact/:userPhone', [
-    param('userPhone')
+router.put('/add-contact/:phone', [
+    param('phone')
         .isString()
         .trim(),
-    body('newPhone')
+    body('contact')
         .isString()
         .not().isEmpty()
         .trim(),
-], async (req: any, res: any) => {
+], authorization, async (req: any, res: any) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-    const userPhone = req.params.userPhone;
-    const newPhone = req.body.newPhone;
+    const phone = req.params.user;
+    const contact = req.body.contact;
     try {
         usersMongoDBConnection();
-        const filter = { phone: userPhone };
+        const filter = { phone: phone };
         // { upsert: true, new: true } are two optional settings. They make sure 
         // a new contact will be added to user's phonebook just once. Without 
         // them, it will happen twice and the whole phonebook could be overwritten.
         let doc = await usersModel.findOneAndUpdate(filter,
-            { $push: { phonebook: newPhone } }, { upsert: true, new: true },
+            { $push: { phonebook: contact } }, { upsert: true, new: true },
             (err, user) => {
                 if (err) {
                     res.status(500).json({ "error": err });
@@ -210,7 +218,7 @@ router.post('/', [
         .isString()
         .not().isEmpty()
         .trim()
-], async (req: any, res: any) => {
+], authorization, async (req: any, res: any) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -281,7 +289,7 @@ router.delete('/:phone', [
     param('phone')
         .isString()
         .trim()
-], async (req: any, res: any) => {
+], authorization, async (req: any, res: any) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -289,14 +297,14 @@ router.delete('/:phone', [
     let phone = req.params.phone;
     try {
         usersMongoDBConnection();
-        await usersModel.findOneAndRemove({ phone: phone },
+        let user = await usersModel.findOneAndRemove({ phone: phone },
             (err, user) => {
                 if (err) {
                     return res.status(500).send(err);
                 }
                 const response = {
-                    message: "Todo successfully deleted",
-                    userDeleted: user
+                    message: `User successfully deleted!`,
+                    user: user
                 };
                 return res.status(200).send(response);
             });
@@ -314,7 +322,7 @@ router.delete('/remove-contact/:userPhone', [
         .isString()
         .not().isEmpty()
         .trim(),
-], async (req: any, res: any) => {
+], authorization, async (req: any, res: any) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -339,32 +347,5 @@ router.delete('/remove-contact/:userPhone', [
         return res.status(500).send(`Unexpected error: ${err}`);
     }
 });
-
-router.get("/test/:token", [
-    query('token')
-        .isString()
-        .trim()
-], async (q: any, s: any, n: any) => {
-    // const salt = await bcrypt.genSalt(5);
-    // let hashedPassword = await bcrypt.hash(password, salt);
-    // authorization
-}
-    /*
-    (q, s, n) => {
-        //Using MongoClient
-        
-        MongoClient.connect(host, function (err: any, db: any) {
-            if (err) throw err;
-            var dbo = db.db(dbName);
-            dbo.collection("users").find().toArray(function (err: any, result: any) {
-                if (err) throw err;
-                console.log(result);
-                db.close();
-            });
-        });
-    });
-        */
-);
-
 
 export default router;

@@ -121,7 +121,10 @@ router.get('/:name', [
     }
 });
 
-// it modifies the user with this phone. You pass new values by body
+// it modifies the user with this phone. New data are passed by body.
+// Body must not have any empty field, otherwise it will save "" values.
+// It returns an user before and after modifying operation.
+// User before modifying is useful for client forms.
 router.put('/:phone', [
     param('phone')
         .isString()
@@ -153,11 +156,13 @@ router.put('/:phone', [
             name: name,
             surname: surname
         };
-        // doc is the found document after updating was applied because of <<new: true>>
-        let doc = await usersModel.findOneAndUpdate(filter, update, {
+        let user = await usersModel.find({ phone: phone }).exec();
+        // modifyingUser is the found document after updating was applied 
+        // because of <<new: true>>
+        let modifyingUser = await usersModel.findOneAndUpdate(filter, update, {
             new: true
         });
-        res.send(doc);
+        res.status(200).json({ "user": user, "modifyingUser": modifyingUser });
     } catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);
     }

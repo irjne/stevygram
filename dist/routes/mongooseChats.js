@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const express_validator_1 = require("express-validator");
+//import { }, userOnSession } from './users';
 const mongoose_1 = __importDefault(require("mongoose"));
 const mongooseUsers_1 = require("./mongooseUsers");
 // this statement prints plain mongoDB queries on terminal
@@ -232,8 +233,7 @@ router.put('/:id', mongooseUsers_1.authorization, [
     }
 }));
 // it adds a message, by body, to a chat by id. 
-// It returns this chat after this operation.
-// IT STILL DOESN'T WORK
+// It returns this chat document after this operation.
 router.put('/:id/add-message', mongooseUsers_1.authorization, [
     express_validator_1.param('id')
         .isNumeric(),
@@ -243,20 +243,17 @@ router.put('/:id/add-message', mongooseUsers_1.authorization, [
     express_validator_1.body('body')
         .trim()
         .isString(),
-    express_validator_1.body('date')
-        .trim()
-        .isString(),
     express_validator_1.sanitizeParam('id').toInt()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);
-    if (!req.body.sender && !req.body.body && !req.body.date) {
-        return res.status(400).json({ Error: "Sender, body and date are required" });
+    if (!req.body.sender && !req.body.body) {
+        return res.status(400).json({ Error: "Sender and body are required" });
     }
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
     const id = req.params.id;
-    const { sender, body, date } = req.body;
+    const { sender, body } = req.body;
     try {
         mongooseUsers_1.mongoDBConnection();
         console.log(req.body);
@@ -264,6 +261,9 @@ router.put('/:id/add-message', mongooseUsers_1.authorization, [
         // { upsert: true, new: true } are two optional settings. They make sure 
         // a new message will be added to chat messages array just once. Without 
         // them, it will happen twice and the whole messages array could be overwritten.
+        let date = new Date();
+        console.log(typeof (date));
+        console.log(date);
         let chat = yield chatsModel.findOneAndUpdate({ id: id }, { $push: { "messages": { sender: sender, body: body, date: date } } }, { upsert: true, new: true }).exec();
         if (chat) {
             return res.status(200).send(chat);
@@ -302,6 +302,50 @@ router.delete('/:id', mongooseUsers_1.authorization, [
     }
     else {
         return res.status(500).send("Error: there's a problem about res.locals.userOnSession");
+    }
+}));
+// it creates a new chat document and returns that
+router.post('/', mongooseUsers_1.authorization, [
+    express_validator_1.body('description')
+        .trim()
+        .isString(),
+    express_validator_1.body('name')
+        .trim()
+        .isString()
+        .not().isEmpty(),
+    express_validator_1.body('users')
+        .trim()
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const errors = express_validator_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    if (res.locals.userOnSession) {
+        const { name, description } = req.body;
+        let usersBody = req.body.users;
+        let users = usersBody.split(',');
+        users.push(res.locals.userOnSession);
+        let admin = [];
+        admin.push(res.locals.userOnSession);
+        let messages = [];
+        // unique numeric id creation
+        let d = new Date();
+        let id = d.valueOf();
+        try {
+            mongooseUsers_1.mongoDBConnection();
+            let addingChat = new chatsModel({ id, description, name, users, admin, messages });
+            addingChat.save(err => {
+                if (err)
+                    return res.status(500).send(err);
+                return res.status(200).send(addingChat);
+            });
+        }
+        catch (err) {
+            return res.status(500).send(`Unexpected error: ${err}`);
+        }
+    }
+    else {
+        return res.status(500).send("Error: There's a problem about res.locals.userOnSession");
     }
 }));
 exports.default = router;

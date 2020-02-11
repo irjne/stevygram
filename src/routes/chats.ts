@@ -1,241 +1,334 @@
-// import express from 'express';
-// import { body, param, validationResult, sanitizeParam, query } from 'express-validator';
-// import { userOnSession, authorization } from './users';
+import express from 'express';
+import { body, param, validationResult, sanitizeParam, query } from 'express-validator';
+//import { }, userOnSession } from './users';
+import mongoose from 'mongoose';
+import { Chat } from '../lib/chats';
+import { mongoDBConnection, authorization } from './users';
 
-// /*import {
-//     getAllChats,
-//     getInfoByChatId,
-//     getMessagesByChatId,
-//     getUsersByChatId,
-//     changeInfoByChatId,
-//     addChat,
-//     removeChatById,
-//     searchByChatId,
-//     addNewMessageByChatId
-// } from '../lib/chats';*/
+// this statement prints plain mongoDB queries on terminal
+mongoose.set('debug', true);
 
-// const router = express.Router();
+// defining schema and model of users collection
+const Schema = mongoose.Schema;
 
-// /*
-// //GET - url: /, stampa tutte le chat
-// router.get('/', authorization, async (req: any, res: any) => {
-//     try {
-//         let chats;
-//         if (userOnSession) {
-//             chats = await getAllChats(userOnSession);
-//         }
-//         else chats = await getAllChats();
-//         res.json(chats);
-//     } catch (err) {
-//         return res.status(400).send(`Unexpected error: ${err}`);
-//     }
-// })
+//let messagesModel = mongoose.model<Message>("message", messagesSchema);
 
-// //- url: /:id/users, stampa tutti gli utenti di una chat;
-// router.get('/:id/users', [
-//     param('id')
-//         .isNumeric(),
-//     sanitizeParam('id').toInt()
-// ], async (req: any, res: any) => {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) {
-//         return res.status(422).json({ errors: errors.array() });
-//     }
+const chatsSchema = new Schema({
+    id: Number,
+    name: String,
+    description: String,
+    admin: [String],
+    users: [String],
+    messages: [Object],
+    lastMessage: Object
+});
 
-//     const id = req.params.id;
-//     try {
-//         const result = await getUsersByChatId(id);
-//         if (result == false) return res.status(404).send("Chat not found.");
-//         res.json(result);
-//     } catch (err) {
-//         return res.status(400).send(`Unexpected error: ${err}`);
-//     }
-// })
+let chatsModel = mongoose.model<Chat>("chat", chatsSchema);
+const router = express.Router();
 
-// //- url: /:id, stampa tutti i dati di una chat;
-// router.get('/:id', [
-//     param('id')
-//         .isNumeric(),
-//     sanitizeParam('id').toInt()
-// ], async (req: any, res: any) => {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) {
-//         return res.status(422).json({ errors: errors.array() });
-//     }
+// returns either user's chats or whole chats collection 
+router.get('/', authorization, async (req: any, res: any) => {
+    try {
+        mongoDBConnection();
+        let chats: Chat[];
+        if (res.locals.userOnSession) {
+            // sends user's chats
+            chats = await chatsModel.find({ users: { "$in": [res.locals.userOnSession] } },
+                (err: any, chats: any) => {
+                    if (err) res.send("Error!");
+                    else res.send(chats);
+                }
+            )
+        }
+        // sends whole chats collection
+        else chats = await chatsModel.find((err: any, chats: any) => {
+            if (err) {
+                res.send("Error!");
+            } else {
+                res.send(chats);
+            }
+        })
+    } catch (err) {
+        return res.status(400).send(`Unexpected error: ${err}`);
+    }
+});
 
-//     const id = req.params.id;
-//     try {
-//         let info;
-//         if (userOnSession) {
-//             info = await getInfoByChatId(id, userOnSession);
-//         }
-//         else info = await getInfoByChatId(id);
-//         if (info == false) return res.status(404).send(`Chat not found.`);
-//         res.json(info);
-//     } catch (err) {
-//         return res.status(400).send(`Unexpected error: ${err}`);
-//     }
-// })
+// returns all user phones of a chat by its id
+router.get('/:id/users', [
+    param('id')
+        .isNumeric(),
+    sanitizeParam('id').toInt()
+], authorization, async (req: any, res: any) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    mongoDBConnection();
+    const id = req.params.id;
 
-// // - url: /:id/messages, stampa tutti i messaggi di una chat:
-// router.get('/:id/messages', [
-//     param('id')
-//         .isNumeric(),
-//     sanitizeParam('id').toInt()
-// ], async (req: any, res: any) => {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) {
-//         return res.status(422).json({ errors: errors.array() });
-//     }
+    try {
+        console.log(res.locals.userOnSession);
+        if (res.locals.userOnSession) {
+            // Mongoose async operations, like .save() and generic queries, 
+            // return thenables (i.e. values with a "then" method). 
+            // This means that you can do things like MyModel.findOne({}).then() 
+            // and await MyModel.findOne({}).exec() if you're using async/await.
+            let users: any;
+            users = await chatsModel.findOne({ id: id }, 'users').exec();
+            if (users) {
+                res.status(200).send(users);
+            } else {
+                res.status(500).send("Error: id invalid.");
+            }
+        }
+        else {
+            return res.status(500).send("Error: there's a problem about res.locals.userOnSession");
+        }
+    }
+    catch (err) {
+        return res.status(400).send(`Unexpected error: ${err}`);
+    }
+});
 
-//     const id = req.params.id;
-//     const { sender, word } = req.query;
+// returns all messages of a chat by its id
+router.get('/:id/messages', [
+    param('id')
+        .isNumeric(),
+    sanitizeParam('id').toInt()
+], authorization, async (req: any, res: any) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    mongoDBConnection();
+    const id = req.params.id;
+    try {
+        console.log(res.locals.userOnSession);
+        if (res.locals.userOnSession) {
+            // Mongoose async operations, like .save() and generic queries, 
+            // return thenables (i.e. values with a "then" method). 
+            // This means that you can do things like MyModel.findOne({}).then() 
+            // and await MyModel.findOne({}).exec() if you're using async/await.
+            let messages: any;
+            messages = await chatsModel.findOne({ id: id }, 'messages').exec();
+            if (messages) {
+                res.status(200).send(messages);
+            } else {
+                res.status(500).send("Error: id invalid.");
+            }
+        }
+        else {
+            return res.status(500).send("Error: there's a problem about res.locals.userOnSession");
+        }
+    }
+    catch (err) {
+        return res.status(400).send(`Unexpected error: ${err}`);
+    }
+});
 
-//     //filter: ?word="pippo", stampa tutti i messaggi contenenti la parola;
-//     if (req.query.word) {
-//         try {
-//             const result = await searchByChatId(id, undefined, word);
-//             if (result == false) return res.status(404).send(`Chat not found.`);
-//             res.json(result);
-//         } catch (err) {
-//             return res.status(400).send(`Unexpected error: ${err}`);
-//         }
-//     }
+// returns a chat document by its id
+router.get('/:id', [
+    param('id')
+        .isNumeric(),
+    sanitizeParam('id').toInt()
+], authorization, async (req: any, res: any) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    mongoDBConnection();
+    const id = req.params.id;
 
-//     //filter: ?sender="id", stampa tutti i messaggi di un determinato utente.
-//     else if (req.query.sender) {
-//         try {
-//             const result = await searchByChatId(id, sender);
-//             if (result == false) return res.status(404).send(`Chat not found.`);
-//             res.json(result);
-//         } catch (err) {
-//             return res.status(400).send(`Unexpected error: ${err}`);
-//         }
-//     }
-//     else {
-//         try {
-//             const result = await getMessagesByChatId(id);
-//             if (result == false) return res.status(404).send(`Chat not found.`);
-//             res.json(result);
-//         } catch (err) {
-//             return res.status(400).send(`Unexpected error: ${err}`);
-//         }
-//     }
-// })
+    try {
+        console.log(res.locals.userOnSession);
+        if (res.locals.userOnSession) {
+            // Mongoose async operations, like .save() and generic queries, 
+            // return thenables (i.e. values with a "then" method). 
+            // This means that you can do things like MyModel.findOne({}).then() 
+            // and await MyModel.findOne({}).exec() if you're using async/await.
+            let chat: any;
+            chat = await chatsModel.findOne({ id: id }).exec();
+            if (chat) {
+                res.status(200).send(chat);
+            } else {
+                res.status(500).send("Error: id invalid.");
+            }
+        }
+        else {
+            return res.status(500).send("Error: there's a problem about res.locals.userOnSession");
+        }
+    }
+    catch (err) {
+        return res.status(400).send(`Unexpected error: ${err}`);
+    }
+});
 
-// //PUT - url: /:id + BODY, modifica una chat dando un id.
-// router.put('/:id', [
-//     param('id')
-//         .isNumeric(),
-//     body('description')
-//         .trim()
-//         .isString(),
-//     body('name')
-//         .trim()
-//         .isString(),
-//     sanitizeParam('id').toInt()
-// ], async (req: any, res: any) => {
-//     const errors = validationResult(req);
-//     if (!req.body.description && !req.body.name) return res.status(400).json({ errors: "Name or description are required" })
-//     if (!errors.isEmpty()) {
-//         return res.status(422).json({ errors: errors.array() });
-//     }
+// it modifies the chat with this id. New data are passed by body.
+// Body must have at lest a not empty field, otherwise it will return an error.
+// It returns a chat before and after modifying operation.
+// Chat before modifying is useful for client forms.
+router.put('/:id', authorization, [
+    param('id')
+        .isNumeric(),
+    body('description')
+        .isString(),
+    body('name')
+        .isString(),
+    sanitizeParam('id').toInt()
+], async (req: any, res: any) => {
+    const errors = validationResult(req);
+    if (!req.body.description && !req.body.name) {
+        return res.status(400).json({
+            errors: "Either name or description are required"
+        });
+    }
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    const id = req.params.id;
+    const { description, name } = req.body;
+    try {
+        mongoDBConnection();
+        const id = req.params.id;
 
-//     const id = req.params.id;
-//     const { description, name } = req.body;
-//     try {
-//         const result = await changeInfoByChatId(id, name, description);
-//         if (result == false) return res.status(404).send(`Chat not found.`);
-//         res.json(result);
-//     } catch (err) {
-//         return res.status(400).send(`Unexpected error: ${err}`);
-//     }
-// })
+        if (res.locals.userOnSession) {
+            // Mongoose async operations, like .save() and generic queries, 
+            // return thenables (i.e. values next to a <<then>> method). 
+            // This means that you can do things like MyModel.findOne({}).then() 
+            // and await MyModel.findOne({}).exec() if you're using async/await.
+            const originalChat = await chatsModel.findOne({ id: id }).exec();
+            if (description !== "") {
+                const chat = await chatsModel.findOneAndUpdate({ id: id },
+                    { description: description }, {
+                    new: true
+                });
+            }
+            if (name !== "") {
+                const chat = await chatsModel.findOneAndUpdate({ id: id },
+                    { name: name }, {
+                    new: true
+                });
+            }
+            const modifiedChat = await chatsModel.findOne({ id: id }).exec();
+            res.status(200).json({ "chat": originalChat, "modifiedChat": modifiedChat });
+        }
+    } catch (err) {
+        return res.status(400).send(`Unexpected error: ${err}`);
+    }
+});
 
-// //PUT - url: /:id/messages + BODY, aggiunge un messaggio in una chat.
-// router.put('/:id/messages', authorization, [
-//     param('id')
-//         .isNumeric(),
-//     body('sender')
-//         .trim()
-//         .isString(),
-//     body('body')
-//         .isString(),
-//     body('date')
-//         .isString(),
-//     sanitizeParam('id').toInt()
-// ], async (req: any, res: any) => {
-//     const errors = validationResult(req);
-//     if (!req.body.sender && !req.body.body && !req.body.date) return res.status(400).json({ errors: "Sender, body and date are required" })
-//     if (!errors.isEmpty()) {
-//         return res.status(422).json({ errors: errors.array() });
-//     }
+// it adds a message, by body, to a chat by id. 
+// It returns this chat document after this operation.
+router.put('/:id/add-message', authorization, [
+    param('id')
+        .isNumeric(),
+    body('sender')
+        .trim()
+        .isString(),
+    body('body')
+        .trim()
+        .isString(),
+    sanitizeParam('id').toInt()
+], async (req: any, res: any) => {
+    const errors = validationResult(req);
+    if (!req.body.sender && !req.body.body) {
+        return res.status(400).json({ Error: "Sender and body are required" });
+    }
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    const id = req.params.id;
+    const { sender, body } = req.body;
+    try {
+        mongoDBConnection();
 
-//     const id = req.params.id;
-//     const { sender, body, date } = req.body;
-//     try {
-//         const result = await addNewMessageByChatId(id, sender, body, date);
-//         if (result == false) return res.status(404).send(`The message isn't delivered.`);
-//         res.json(result);
-//     } catch (err) {
-//         return res.status(400).send(`Unexpected error: ${err}`);
-//     }
-// })
+        // { upsert: true, new: true } are two optional settings. They make sure 
+        // a new message will be added to chat messages array just once. Without 
+        // them, it will happen twice and the whole messages array could be overwritten.
+        let date = new Date();
+        let chat = await chatsModel.findOneAndUpdate(
+            { id: id },
+            { $push: { "messages": { sender: sender, body: body, date: date } } },
+            { upsert: true, new: true }).exec();
+        if (chat) {
+            return res.status(200).send(chat);
+        } else {
+            return res.status(500).send("error!!!");
+        }
+    } catch (err) {
+        return res.status(400).send(`Unexpected error: ${err}`);
+    }
+});
 
-// //POST - url: / + BODY, aggiunge una chat.
-// router.post('/', authorization, [
-//     body('description')
-//         .trim()
-//         .isString(),
-//     body('name')
-//         .trim()
-//         .isString()
-//         .not().isEmpty(),
-//     body('users')
-//         .trim()
-// ], async (req: any, res: any) => {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) {
-//         return res.status(422).json({ errors: errors.array() });
-//     }
+// It removes a chat
+router.delete('/:id', authorization, [
+    param('id')
+        .isNumeric(),
+    sanitizeParam('id').toInt()
+], async (req: any, res: any) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    const id = req.params.id;
+    if (res.locals.userOnSession) {
+        try {
+            mongoDBConnection();
+            let chat = await chatsModel.findOneAndRemove({ id: id }).exec();
+            res.status(200).json({
+                message: "chat deleted successfully",
+                chat: chat
+            });
+        } catch (err) {
+            return res.status(400).send(`Unexpected error: ${err}`);
+        }
+    } else {
+        return res.status(500).send("Error: there's a problem about res.locals.userOnSession");
+    }
+});
 
-//     const { name, description } = req.body;
-//     let usersBody = req.body.users;
-//     let users = usersBody.split(',');
-//     users.push(userOnSession.phone);
+// it creates a new chat document and returns that
+router.post('/', authorization, [
+    body('description')
+        .trim()
+        .isString(),
+    body('name')
+        .trim()
+        .isString()
+        .not().isEmpty(),
+    body('users')
+        .trim()
+], async (req: any, res: any) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    if (res.locals.userOnSession) {
+        const { name, description } = req.body;
+        let usersBody = req.body.users;
+        let users = usersBody.split(',');
 
+        users.push(res.locals.userOnSession);
+        let admin: string[] = [];
+        admin.push(res.locals.userOnSession);
 
-//     let admin: string[] = [];
-//     admin.push(userOnSession.phone);
+        let messages: Object[] = [];
+        // unique numeric id creation
+        let d = new Date();
+        let id = d.valueOf();
+        try {
+            mongoDBConnection();
+            let chat = new chatsModel({ id, description, name, users, admin, messages });
+            chat.save(err => {
+                if (err) return res.status(500).send(err);
+                return res.status(200).send(chat);
+            });
+        } catch (err) {
+            return res.status(500).send(`Unexpected error: ${err}`);
+        }
+    } else {
+        return res.status(500).send("Error: There's a problem about res.locals.userOnSession");
+    }
+});
 
-//     try {
-//         const result = await addChat(name, description, users, admin);
-//         if (result == false) return res.status(404).send(`Chat not found.`);
-//         res.json(result);
-//     } catch (err) {
-//         return res.status(400).send(`Unexpected error: ${err}`);
-//     }
-// })
-
-// //DELETE - url: /:id, cancella la chat avendo l'id.
-// router.delete('/:id', [
-//     param('id')
-//         .isNumeric(),
-//     sanitizeParam('id').toInt()
-// ], async (req: any, res: any) => {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) {
-//         return res.status(422).json({ errors: errors.array() });
-//     }
-//     const id = req.params.id;
-
-//     try {
-//         const result = await removeChatById(id);
-//         if (result == false) return res.status(404).send(`Chat not found.`);
-//         res.json(result);
-//     } catch (err) {
-//         return res.status(400).send(`Unexpected error: ${err}`);
-//     }
-// })
-// */
-// export default router;
+export default router;

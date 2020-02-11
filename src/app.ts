@@ -17,5 +17,5 @@ app.use(bodyParser.json());
 app.use('/mongooseUsers', mongooseUsers);
 app.use('/mongooseChats', mongooseChats);
 
-app.listen(3003, () => console.log('🙌 Server is running!'));
+app.listen(3005, () => console.log('🙌 Server is running!'));
 module.exports = app;

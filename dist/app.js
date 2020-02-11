@@ -18,6 +18,6 @@ app.use(body_parser_1.default.json());
 //app.use('/chats', chats);
 app.use('/mongooseUsers', mongooseUsers_1.default);
 app.use('/mongooseChats', mongooseChats_1.default);
-app.listen(3003, () => console.log('🙌 Server is running!'));
+app.listen(3005, () => console.log('🙌 Server is running!'));
 module.exports = app;
 //# sourceMappingURL=app.js.map

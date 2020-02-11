@@ -128,7 +128,7 @@ router.get('/:name', [
     }
 }));
 // it modifies the user with this phone. New data are passed by body.
-// Body must not have any empty field, otherwise it will save "" values.
+// Body must have at least a not empty field, otherwise it will return error.
 // It returns an user before and after modifying operation.
 // User before modifying is useful for client forms.
 router.put('/:phone', [
@@ -136,14 +136,11 @@ router.put('/:phone', [
         .isString()
         .trim(),
     express_validator_1.body('nickname')
-        .isString()
-        .trim(),
+        .isString(),
     express_validator_1.body('name')
-        .isString()
-        .trim(),
+        .isString(),
     express_validator_1.body('surname')
-        .isString()
-        .trim(),
+        .isString(),
 ], exports.authorization, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);
     if (!errors.isEmpty()) {
@@ -157,18 +154,27 @@ router.put('/:phone', [
     try {
         exports.mongoDBConnection();
         const filter = { phone: phone };
-        const update = {
-            nickname: nickname,
-            name: name,
-            surname: surname
-        };
+        // storing original user document
         let user = yield usersModel.find({ phone: phone }).exec();
-        // modifyingUser is the found document after updating was applied 
-        // because of <<new: true>>
-        let modifyingUser = yield usersModel.findOneAndUpdate(filter, update, {
-            new: true
-        });
-        res.status(200).json({ "user": user, "modifyingUser": modifyingUser });
+        if (nickname !== "") {
+            // modifyingUser is the found document after updating was applied 
+            // because of <<new: true>>
+            let modifyingUser = yield usersModel.findOneAndUpdate(filter, { nickname: nickname }, { new: true });
+        }
+        if (name !== "") {
+            // modifyingUser is the found document after updating was applied 
+            // because of <<new: true>>
+            const salt = yield bcrypt_1.default.genSalt(5);
+            let password = yield bcrypt_1.default.hash(name, salt);
+            let modifyingUser = yield usersModel.findOneAndUpdate(filter, { name: name, password: password }, { new: true });
+        }
+        if (surname !== "") {
+            // modifyingUser is the found document after updating was applied 
+            // because of <<new: true>>
+            let modifyingUser = yield usersModel.findOneAndUpdate(filter, { surname: surname }, { new: true });
+        }
+        let modifiedUser = yield usersModel.find({ phone: phone }).exec();
+        res.status(200).json({ "user": user, "modifiedUser": modifiedUser });
     }
     catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);

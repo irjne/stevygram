@@ -3,11 +3,11 @@ import { User, findUserByPhone } from './users';
 import * as fs from 'fs';
 import mongoose from 'mongoose';
 
-export interface Message extends mongoose.Document {
-    sender: string /*| User*/;
-    body: string;
-    date: Date;
-}
+// export interface Message extends mongoose.Document {
+//     sender: string /*| User*/;
+//     body: string;
+//     date: string;
+// }
 
 export interface Chat extends mongoose.Document {
     id: number;
@@ -15,8 +15,8 @@ export interface Chat extends mongoose.Document {
     description: string;
     admin: string[];
     users: string[];
-    messages: Message[];
-    lastMessage: Message
+    messages: Object[];
+    lastMessage: Object
 
 }
 

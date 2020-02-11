@@ -241,8 +241,10 @@ router.put('/:id/add-message', mongooseUsers_1.authorization, [
         .trim()
         .isString(),
     express_validator_1.body('body')
+        .trim()
         .isString(),
     express_validator_1.body('date')
+        .trim()
         .isString(),
     express_validator_1.sanitizeParam('id').toInt()
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -255,31 +257,20 @@ router.put('/:id/add-message', mongooseUsers_1.authorization, [
     }
     const id = req.params.id;
     const { sender, body, date } = req.body;
-    const addingMessage = {
-        sender: sender,
-        body: body,
-        date: date
-    };
     try {
         mongooseUsers_1.mongoDBConnection();
-        const filter = { id: id };
         console.log(req.body);
-        console.log(addingMessage);
+        //console.log(addingMessage);
         // { upsert: true, new: true } are two optional settings. They make sure 
         // a new message will be added to chat messages array just once. Without 
         // them, it will happen twice and the whole messages array could be overwritten.
-        let chat = yield chatsModel.findOneAndUpdate(filter, {
-            $push: {
-                message: { sender: sender, body: body, date: date },
-            }
-        }, { upsert: true, new: true }, (err, chat) => {
-            if (err) {
-                res.status(500).json({ "error": err });
-            }
-            else {
-                res.status(200).json({ "addingMessageLog": chat });
-            }
-        });
+        let chat = yield chatsModel.findOneAndUpdate({ id: id }, { $push: { "messages": { sender: sender, body: body, date: date } } }, { upsert: true, new: true }).exec();
+        if (chat) {
+            return res.status(200).send(chat);
+        }
+        else {
+            return res.status(500).send("error!!!");
+        }
     }
     catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);

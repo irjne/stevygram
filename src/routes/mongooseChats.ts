@@ -237,8 +237,10 @@ router.put('/:id/add-message', authorization, [
         .trim()
         .isString(),
     body('body')
+        .trim()
         .isString(),
     body('date')
+        .trim()
         .isString(),
     sanitizeParam('id').toInt()
 ], async (req: any, res: any) => {
@@ -251,33 +253,22 @@ router.put('/:id/add-message', authorization, [
     }
     const id = req.params.id;
     const { sender, body, date } = req.body;
-    const addingMessage: any = {
-        sender: sender,
-        body: body,
-        date: date
-    };
     try {
         mongoDBConnection();
-        const filter = { id: id };
         console.log(req.body);
-        console.log(addingMessage);
+        //console.log(addingMessage);
         // { upsert: true, new: true } are two optional settings. They make sure 
         // a new message will be added to chat messages array just once. Without 
         // them, it will happen twice and the whole messages array could be overwritten.
-        let chat = await chatsModel.findOneAndUpdate(filter,
-            {
-                $push: {
-                    message: { sender: sender, body: body, date: date },
-                }
-            },
-            { upsert: true, new: true },
-            (err, chat) => {
-                if (err) {
-                    res.status(500).json({ "error": err });
-                } else {
-                    res.status(200).json({ "addingMessageLog": chat });
-                }
-            });
+        let chat = await chatsModel.findOneAndUpdate(
+            { id: id },
+            { $push: { "messages": { sender: sender, body: body, date: date } } },
+            { upsert: true, new: true }).exec();
+        if (chat) {
+            return res.status(200).send(chat);
+        } else {
+            return res.status(500).send("error!!!");
+        }
     } catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);
     }

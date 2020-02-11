@@ -17,7 +17,6 @@ export interface Chat extends mongoose.Document {
     users: string[];
     messages: Object[];
     lastMessage: Object
-
 }
 
 export const directory = __dirname.replace("/lib", "/data");

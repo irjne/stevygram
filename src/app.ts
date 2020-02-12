@@ -15,5 +15,5 @@ app.use('/', main);
 app.use('/users', users);
 app.use('/chats', chats);
 
-app.listen(3005, () => console.log('🙌 Server is running!'));
+app.listen(process.env.PORT || 3005, () => console.log('🙌 Server is running!'));
 module.exports = app;

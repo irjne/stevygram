@@ -17,3 +17,5 @@ app.use('/chats', chats);
 
 app.listen(process.env.PORT || 3005, () => console.log('🙌 Server is running!'));
 module.exports = app;
+
+//tsc -p prima di pushare

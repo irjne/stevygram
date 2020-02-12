@@ -6,7 +6,7 @@
   "types": "dist",
   "scripts": {
     "start": "node dist/app.js",
-    "build": "npm run build",
+    "build": "",
     "dev": "nodemon src/app.ts",
     "test": "npm run build; mocha -r ts-node/register src/test/test.ts"
   },

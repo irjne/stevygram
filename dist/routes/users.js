@@ -70,14 +70,16 @@ exports.mongoDBConnection = () => __awaiter(void 0, void 0, void 0, function* ()
 router.get('/', [], exports.authorization, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         exports.mongoDBConnection();
-        usersModel.find((err, users) => {
-            if (err) {
-                res.send("Error!");
-            }
-            else {
-                res.send(users);
-            }
-        });
+        if (res.locals.userOnSession) {
+            let phonebook = usersModel.find({ phone: res.locals.userOnSession }, 'phonebook', (err, users) => {
+                if (err) {
+                    res.send("Error!");
+                }
+                else {
+                    res.send(phonebook);
+                }
+            });
+        }
     }
     catch (err) {
         return res.status(500).send(`Unexpected error: ${err}`);

@@ -18,4 +18,5 @@ app.use('/users', users_1.default);
 app.use('/chats', chats_1.default);
 app.listen(process.env.PORT || 3005, () => console.log('🙌 Server is running!'));
 module.exports = app;
+//tsc -p prima di pushare
 //# sourceMappingURL=app.js.map

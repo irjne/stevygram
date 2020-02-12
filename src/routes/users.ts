@@ -63,13 +63,15 @@ router.get('/', [
 ], authorization, async (req: any, res: any) => {
     try {
         mongoDBConnection();
-        usersModel.find((err: any, users: any) => {
-            if (err) {
-                res.send("Error!");
-            } else {
-                res.send(users);
-            }
-        });
+        if (res.locals.userOnSession) {
+            let phonebook = usersModel.find({ phone: res.locals.userOnSession }, 'phonebook', (err: any, users: any) => {
+                if (err) {
+                    res.send("Error!");
+                } else {
+                    res.send(phonebook);
+                }
+            });
+        }
     }
     catch (err) {
         return res.status(500).send(`Unexpected error: ${err}`);

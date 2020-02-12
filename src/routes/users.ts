@@ -64,13 +64,12 @@ router.get('/', [
     try {
         mongoDBConnection();
         if (res.locals.userOnSession) {
-            let phonebook = usersModel.find({ phone: res.locals.userOnSession }, 'phonebook', (err: any, users: any) => {
-                if (err) {
-                    res.send("Error!");
-                } else {
-                    res.send(phonebook);
-                }
-            });
+            let phonebook = await usersModel.find({ phone: res.locals.userOnSession }, 'phonebook').exec();
+            if (phonebook) {
+                res.status(200).send(phonebook);
+            } else {
+                res.status(500).send("Error: id invalid.");
+            }
         }
     }
     catch (err) {

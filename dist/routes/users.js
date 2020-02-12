@@ -71,14 +71,13 @@ router.get('/', [], exports.authorization, (req, res) => __awaiter(void 0, void 
     try {
         exports.mongoDBConnection();
         if (res.locals.userOnSession) {
-            let phonebook = usersModel.find({ phone: res.locals.userOnSession }, 'phonebook', (err, users) => {
-                if (err) {
-                    res.send("Error!");
-                }
-                else {
-                    res.send(phonebook);
-                }
-            });
+            let phonebook = yield usersModel.find({ phone: res.locals.userOnSession }, 'phonebook').exec();
+            if (phonebook) {
+                res.status(200).send(phonebook);
+            }
+            else {
+                res.status(500).send("Error: id invalid.");
+            }
         }
     }
     catch (err) {

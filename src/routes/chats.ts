@@ -109,8 +109,7 @@ router.get('/:id/messages', [
             // return thenables (i.e. values with a "then" method). 
             // This means that you can do things like MyModel.findOne({}).then() 
             // and await MyModel.findOne({}).exec() if you're using async/await.
-            let messages: any;
-            messages = await chatsModel.findOne({ id: id }, 'messages').exec();
+            let messages = await chatsModel.findOne({ id: id }, 'messages').exec();
             if (messages) {
                 res.status(200).send(messages);
             } else {

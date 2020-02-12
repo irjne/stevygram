@@ -199,14 +199,13 @@ router.put('/add-contact/:phone', [
         // a new contact will be added to user's phonebook just once. Without 
         // them, it will happen twice and the whole phonebook could be overwritten.
         let user = await usersModel.findOneAndUpdate({ phone: phone },
-            { $push: { phonebook: contact } }, { upsert: true, new: true },
-            (err, user) => {
-                if (err) {
-                    res.status(500).json({ "error": err });
-                } else {
-                    res.status(200).json({ "user": user });
-                }
-            });
+            { $push: { phonebook: contact } }, { upsert: true, new: true }).exec();
+        if (user) {
+            res.status(200).json({ "user": user });
+        }
+        else {
+            res.status(500).send("Error!");
+        }
     } catch (err) {
         return res.status(500).send(`Unexpected error: ${err}`);
     }

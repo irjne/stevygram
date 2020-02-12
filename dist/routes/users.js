@@ -195,7 +195,7 @@ router.put('/add-contact/:phone', [
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-    const phone = req.params.user;
+    const phone = req.params.phone;
     const contact = req.body.contact;
     try {
         exports.mongoDBConnection();

@@ -3,7 +3,7 @@ import { body, param, validationResult, sanitizeParam, query } from 'express-val
 //import { }, userOnSession } from './users';
 import mongoose from 'mongoose';
 import { Chat } from '../lib/chats';
-import { mongoDBConnection, authorization } from './users';
+import { mongoDBConnection, authorization, usersSchema, usersModel } from './users';
 
 // this statement prints plain mongoDB queries on terminal
 mongoose.set('debug', true);
@@ -33,21 +33,22 @@ router.get('/', authorization, async (req: any, res: any) => {
         let chats: Chat[];
         if (res.locals.userOnSession) {
             // sends user's chats
-            chats = await chatsModel.find({ users: { "$in": [res.locals.userOnSession] } },
-                (err: any, chats: any) => {
-                    if (err) res.send("Error!");
-                    else res.send(chats);
-                }
-            )
-        }
-        // sends whole chats collection
-        else chats = await chatsModel.find((err: any, chats: any) => {
-            if (err) {
-                res.send("Error!");
+            chats = await chatsModel.find({ users: { "$in": [res.locals.userOnSession] } }).exec();
+            if (chats) {
+                chats = await Promise.all(chats.map(async chat => {
+                    console.log("I'm inside promise.all");
+                    if (chat.users.length === 2) {
+                        const otherUserPhone = res.locals.userOnSession === chat.users[0] ? chat.users[1] : chat.users[0];
+                        const otherUser = await usersModel.find({ phone: otherUserPhone }).exec();
+                        chat.name = `${otherUser[0].name} ${otherUser[0].surname}`;
+                    }
+                    return chat;
+                }));
+                res.status(200).send(chats);
             } else {
-                res.send(chats);
+                res.status(500).send("Error: chats not found.")
             }
-        })
+        }
     } catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);
     }

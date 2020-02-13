@@ -40,23 +40,23 @@ router.get('/', users_1.authorization, (req, res) => __awaiter(void 0, void 0, v
         let chats;
         if (res.locals.userOnSession) {
             // sends user's chats
-            chats = yield chatsModel.find({ users: { "$in": [res.locals.userOnSession] } }, (err, chats) => {
-                if (err)
-                    res.send("Error!");
-                else
-                    res.send(chats);
-            });
+            chats = yield chatsModel.find({ users: { "$in": [res.locals.userOnSession] } }).exec();
+            if (chats) {
+                chats = yield Promise.all(chats.map((chat) => __awaiter(void 0, void 0, void 0, function* () {
+                    console.log("I'm inside promise.all");
+                    if (chat.users.length === 2) {
+                        const otherUserPhone = res.locals.userOnSession === chat.users[0] ? chat.users[1] : chat.users[0];
+                        const otherUser = yield users_1.usersModel.find({ phone: otherUserPhone }).exec();
+                        chat.name = `${otherUser[0].name} ${otherUser[0].surname}`;
+                    }
+                    return chat;
+                })));
+                res.status(200).send(chats);
+            }
+            else {
+                res.status(500).send("Error: chats not found.");
+            }
         }
-        // sends whole chats collection
-        else
-            chats = yield chatsModel.find((err, chats) => {
-                if (err) {
-                    res.send("Error!");
-                }
-                else {
-                    res.send(chats);
-                }
-            });
     }
     catch (err) {
         return res.status(400).send(`Unexpected error: ${err}`);

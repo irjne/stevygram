@@ -10,7 +10,7 @@ mongoose.set('debug', true);
 
 // defining schema and model of users collection
 const Schema = mongoose.Schema;
-const usersSchema = new Schema({
+export const usersSchema = new Schema({
     //_id: mongoose.Types.ObjectId,
     name: String,
     surname: String,
@@ -19,7 +19,7 @@ const usersSchema = new Schema({
     password: String,
     phonebook: [String]
 });
-let usersModel = mongoose.model<User>("user", usersSchema);
+export const usersModel = mongoose.model<User>("user", usersSchema);
 
 // initializing express router
 const router = express.Router();

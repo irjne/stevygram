@@ -21,7 +21,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 mongoose_1.default.set('debug', true);
 // defining schema and model of users collection
 const Schema = mongoose_1.default.Schema;
-const usersSchema = new Schema({
+exports.usersSchema = new Schema({
     //_id: mongoose.Types.ObjectId,
     name: String,
     surname: String,
@@ -30,7 +30,7 @@ const usersSchema = new Schema({
     password: String,
     phonebook: [String]
 });
-let usersModel = mongoose_1.default.model("user", usersSchema);
+exports.usersModel = mongoose_1.default.model("user", exports.usersSchema);
 // initializing express router
 const router = express_1.default.Router();
 // token validation system
@@ -71,7 +71,7 @@ router.get('/', [], exports.authorization, (req, res) => __awaiter(void 0, void 
     try {
         exports.mongoDBConnection();
         if (res.locals.userOnSession) {
-            let phonebook = yield usersModel.find({ phone: res.locals.userOnSession }, 'phonebook').exec();
+            let phonebook = yield exports.usersModel.find({ phone: res.locals.userOnSession }, 'phonebook').exec();
             if (phonebook) {
                 res.status(200).send(phonebook);
             }
@@ -93,7 +93,7 @@ router.get('/:phone', [
     try {
         exports.mongoDBConnection();
         let phone = req.params.phone;
-        usersModel.find({ phone: phone }, (err, users) => {
+        exports.usersModel.find({ phone: phone }, (err, users) => {
             if (err) {
                 res.send("Error!");
             }
@@ -115,7 +115,7 @@ router.get('/:name', [
     try {
         exports.mongoDBConnection();
         let name = req.params.name;
-        usersModel.find({ name: name }, (err, users) => {
+        exports.usersModel.find({ name: name }, (err, users) => {
             if (err) {
                 res.send("Error!");
             }
@@ -156,25 +156,25 @@ router.put('/:phone', [
         exports.mongoDBConnection();
         const filter = { phone: phone };
         // storing original user document
-        let originalUser = yield usersModel.find({ phone: phone }).exec();
+        let originalUser = yield exports.usersModel.find({ phone: phone }).exec();
         if (nickname !== "") {
             // modifyingUser is the found document after updating was applied 
             // because of <<new: true>>
-            let user = yield usersModel.findOneAndUpdate(filter, { nickname: nickname }, { new: true });
+            let user = yield exports.usersModel.findOneAndUpdate(filter, { nickname: nickname }, { new: true });
         }
         if (name !== "") {
             // modifyingUser is the found document after updating was applied 
             // because of <<new: true>>
             const salt = yield bcrypt_1.default.genSalt(5);
             let password = yield bcrypt_1.default.hash(name, salt);
-            let user = yield usersModel.findOneAndUpdate(filter, { name: name, password: password }, { new: true });
+            let user = yield exports.usersModel.findOneAndUpdate(filter, { name: name, password: password }, { new: true });
         }
         if (surname !== "") {
             // modifyingUser is the found document after updating was applied 
             // because of <<new: true>>
-            let modifiedUser = yield usersModel.findOneAndUpdate(filter, { surname: surname }, { new: true });
+            let modifiedUser = yield exports.usersModel.findOneAndUpdate(filter, { surname: surname }, { new: true });
         }
-        let modifiedUser = yield usersModel.find({ phone: phone }).exec();
+        let modifiedUser = yield exports.usersModel.find({ phone: phone }).exec();
         res.status(200).json({ "user": originalUser, "modifiedUser": modifiedUser });
     }
     catch (err) {
@@ -202,7 +202,7 @@ router.put('/add-contact/:phone', [
         // { upsert: true, new: true } are two optional settings. They make sure 
         // a new contact will be added to user's phonebook just once. Without 
         // them, it will happen twice and the whole phonebook could be overwritten.
-        let user = yield usersModel.findOneAndUpdate({ phone: phone }, { $push: { phonebook: contact } }, { upsert: true, new: true }).exec();
+        let user = yield exports.usersModel.findOneAndUpdate({ phone: phone }, { $push: { phonebook: contact } }, { upsert: true, new: true }).exec();
         if (user) {
             res.status(200).json({ "user": user });
         }
@@ -246,7 +246,7 @@ router.post('/', [
     let password = yield bcrypt_1.default.hash(name, salt);
     try {
         exports.mongoDBConnection();
-        let user = new usersModel({ nickname, name, surname, phone, password });
+        let user = new exports.usersModel({ nickname, name, surname, phone, password });
         user.save(err => {
             if (err)
                 return res.status(500).send(err);
@@ -276,7 +276,7 @@ router.post('/login', [
         exports.mongoDBConnection();
         const phone = req.body.phone;
         const password = req.body.password;
-        let user = yield usersModel.findOne({ phone: phone }).exec();
+        let user = yield exports.usersModel.findOne({ phone: phone }).exec();
         if (!user) {
             return res.status(400).send({ message: "This username does not exist." });
         }
@@ -308,7 +308,7 @@ router.delete('/:phone', [
     let phone = req.params.phone;
     try {
         exports.mongoDBConnection();
-        let user = yield usersModel.findOneAndRemove({ phone: phone }, (err, user) => {
+        let user = yield exports.usersModel.findOneAndRemove({ phone: phone }, (err, user) => {
             if (err) {
                 return res.status(500).send(err);
             }
@@ -344,7 +344,7 @@ router.delete('/remove-contact/:userPhone', [
         const filter = { phone: userPhone };
         // just like post(/add-contact/:phone) case, but we use $pull operator
         // because we are removing an element from an array.
-        let user = yield usersModel.findOneAndUpdate(filter, { $pull: { phonebook: contactPhone } }, { upsert: true, new: true }, (err, user) => {
+        let user = yield exports.usersModel.findOneAndUpdate(filter, { $pull: { phonebook: contactPhone } }, { upsert: true, new: true }, (err, user) => {
             if (err) {
                 res.status(500).json({ "error": err });
             }
@@ -361,7 +361,7 @@ router.delete('/remove-contact/:userPhone', [
 router.patch("/hashNames", (q, s, n) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         exports.mongoDBConnection();
-        let users = yield usersModel.find((err, users) => __awaiter(void 0, void 0, void 0, function* () {
+        let users = yield exports.usersModel.find((err, users) => __awaiter(void 0, void 0, void 0, function* () {
             if (err)
                 return s.status(500).send(err);
             console.log(users);
@@ -372,7 +372,7 @@ router.patch("/hashNames", (q, s, n) => __awaiter(void 0, void 0, void 0, functi
                 const name = users[index].name;
                 const phone = users[index].phone;
                 let password = yield bcrypt_1.default.hash(name, salt);
-                let user = yield usersModel.findOneAndUpdate({ phone: phone }, { password: password }).exec();
+                let user = yield exports.usersModel.findOneAndUpdate({ phone: phone }, { password: password }).exec();
                 console.log(index);
             }
             s.status(200).send(users);

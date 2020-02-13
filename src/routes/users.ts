@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 import { User } from '../lib/users';
+import { exec } from 'child_process';
 
 // this statement prints plain mongoDB queries on terminal
 mongoose.set('debug', true);
@@ -325,37 +326,31 @@ router.delete('/:phone', [
 });
 
 // it deletes a contanct from an user's phonebook
-router.delete('/remove-contact/:userPhone', [
-    param('userPhone')
+router.delete('/remove-contact/:phone', [
+    param('phone')
         .isString()
-        .trim(),
-    body('contactPhone')
-        .isString()
-        .not().isEmpty()
-        .trim(),
+        .trim()
 ], authorization, async (req: any, res: any) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-    const userPhone = req.params.userPhone;
-    const contactPhone = req.body.contactPhone;
-    try {
-        mongoDBConnection();
-        const filter = { phone: userPhone };
-        // just like post(/add-contact/:phone) case, but we use $pull operator
-        // because we are removing an element from an array.
-        let user = await usersModel.findOneAndUpdate(filter,
-            { $pull: { phonebook: contactPhone } }, { upsert: true, new: true },
-            (err, user) => {
-                if (err) {
-                    res.status(500).json({ "error": err });
-                } else {
-                    res.status(200).json({ "user": user });
-                }
-            });
-    } catch (err) {
-        return res.status(500).send(`Unexpected error: ${err}`);
+    const phone = req.params.phone;
+    if (res.locals.userOnSession) {
+        try {
+            mongoDBConnection();
+            // just like post(/add-contact/:phone) case, but we use $pull operator
+            // because we are removing an element from an array.
+            let user = await usersModel.findOneAndUpdate({ phone: res.locals.userOnSession },
+                { $pull: { phonebook: phone } }, { upsert: true, new: true }).exec();
+            if (user) {
+                res.status(200).json({ message: "contact deleted successfully", updatedUser: user });
+            } else {
+                res.status(500).send("Error: contact not found.");
+            }
+        } catch (err) {
+            return res.status(500).send(`Unexpected error: ${err}`);
+        }
     }
 });
 

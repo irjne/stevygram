@@ -324,37 +324,32 @@ router.delete('/:phone', [
     }
 }));
 // it deletes a contanct from an user's phonebook
-router.delete('/remove-contact/:userPhone', [
-    express_validator_1.param('userPhone')
+router.delete('/remove-contact/:phone', [
+    express_validator_1.param('phone')
         .isString()
-        .trim(),
-    express_validator_1.body('contactPhone')
-        .isString()
-        .not().isEmpty()
-        .trim(),
+        .trim()
 ], exports.authorization, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-    const userPhone = req.params.userPhone;
-    const contactPhone = req.body.contactPhone;
-    try {
-        exports.mongoDBConnection();
-        const filter = { phone: userPhone };
-        // just like post(/add-contact/:phone) case, but we use $pull operator
-        // because we are removing an element from an array.
-        let user = yield exports.usersModel.findOneAndUpdate(filter, { $pull: { phonebook: contactPhone } }, { upsert: true, new: true }, (err, user) => {
-            if (err) {
-                res.status(500).json({ "error": err });
+    const phone = req.params.phone;
+    if (res.locals.userOnSession) {
+        try {
+            exports.mongoDBConnection();
+            // just like post(/add-contact/:phone) case, but we use $pull operator
+            // because we are removing an element from an array.
+            let user = yield exports.usersModel.findOneAndUpdate({ phone: res.locals.userOnSession }, { $pull: { phonebook: phone } }, { upsert: true, new: true }).exec();
+            if (user) {
+                res.status(200).json({ message: "contact deleted successfully", updatedUser: user });
             }
             else {
-                res.status(200).json({ "user": user });
+                res.status(500).send("Error: contact not found.");
             }
-        });
-    }
-    catch (err) {
-        return res.status(500).send(`Unexpected error: ${err}`);
+        }
+        catch (err) {
+            return res.status(500).send(`Unexpected error: ${err}`);
+        }
     }
 }));
 // hashes all user names and returns the former users collection

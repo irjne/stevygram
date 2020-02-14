@@ -67,7 +67,7 @@ router.get('/', [
         if (res.locals.userOnSession) {
             let phonebook = await usersModel.find({ phone: res.locals.userOnSession }, 'phonebook').exec();
             if (phonebook) {
-                res.status(200).send(phonebook);
+                res.status(200).json(phonebook);
             } else {
                 res.status(500).send("Error: id invalid.");
             }
@@ -91,7 +91,7 @@ router.get('/:phone', [
             if (err) {
                 res.send("Error!");
             } else {
-                res.send(users);
+                res.json(users);
             }
         });
     }
@@ -111,9 +111,9 @@ router.get('/:name', [
         let name = req.params.name;
         usersModel.find({ name: name }, (err: any, users: any) => {
             if (err) {
-                res.send("Error!");
+                res.status(404).send("Error!");
             } else {
-                res.send(users);
+                res.status(200).json(users);
             }
         });
     }
@@ -247,7 +247,7 @@ router.post('/', [
         let user = new usersModel({ nickname, name, surname, phone, password });
         user.save(err => {
             if (err) return res.status(500).send(err);
-            return res.status(200).send(user);
+            return res.status(200).json(user);
         });
     } catch (err) {
         return res.status(500).send(`Unexpected error: ${err}`);
@@ -318,7 +318,7 @@ router.delete('/:phone', [
                     message: `User successfully deleted!`,
                     user: user
                 };
-                return res.status(200).send(response);
+                return res.status(200).json(response);
             });
     } catch (err) {
         return res.status(500).send(`Unexpected error: ${err}`);
@@ -360,16 +360,12 @@ router.patch("/hashNames", async (q, s, n) => {
         mongoDBConnection();
         let users: any = await usersModel.find(async (err, users) => {
             if (err) return s.status(500).send(err);
-            console.log(users);
             const salt = await bcrypt.genSalt(5);
-            console.log(salt);
             for (let index = 0; index < users.length; index++) {
-                console.log(users[index]);
                 const name = users[index].name;
                 const phone = users[index].phone;
                 let password = await bcrypt.hash(name, salt);
                 let user = await usersModel.findOneAndUpdate({ phone: phone }, { password: password }).exec();
-                console.log(index);
             }
             s.status(200).send(users);
         });

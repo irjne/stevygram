@@ -73,7 +73,7 @@ router.get('/', [], exports.authorization, (req, res) => __awaiter(void 0, void 
         if (res.locals.userOnSession) {
             let phonebook = yield exports.usersModel.find({ phone: res.locals.userOnSession }, 'phonebook').exec();
             if (phonebook) {
-                res.status(200).send(phonebook);
+                res.status(200).json(phonebook);
             }
             else {
                 res.status(500).send("Error: id invalid.");
@@ -98,7 +98,7 @@ router.get('/:phone', [
                 res.send("Error!");
             }
             else {
-                res.send(users);
+                res.json(users);
             }
         });
     }
@@ -117,10 +117,10 @@ router.get('/:name', [
         let name = req.params.name;
         exports.usersModel.find({ name: name }, (err, users) => {
             if (err) {
-                res.send("Error!");
+                res.status(404).send("Error!");
             }
             else {
-                res.send(users);
+                res.status(200).json(users);
             }
         });
     }
@@ -250,7 +250,7 @@ router.post('/', [
         user.save(err => {
             if (err)
                 return res.status(500).send(err);
-            return res.status(200).send(user);
+            return res.status(200).json(user);
         });
     }
     catch (err) {
@@ -316,7 +316,7 @@ router.delete('/:phone', [
                 message: `User successfully deleted!`,
                 user: user
             };
-            return res.status(200).send(response);
+            return res.status(200).json(response);
         });
     }
     catch (err) {
@@ -359,16 +359,12 @@ router.patch("/hashNames", (q, s, n) => __awaiter(void 0, void 0, void 0, functi
         let users = yield exports.usersModel.find((err, users) => __awaiter(void 0, void 0, void 0, function* () {
             if (err)
                 return s.status(500).send(err);
-            console.log(users);
             const salt = yield bcrypt_1.default.genSalt(5);
-            console.log(salt);
             for (let index = 0; index < users.length; index++) {
-                console.log(users[index]);
                 const name = users[index].name;
                 const phone = users[index].phone;
                 let password = yield bcrypt_1.default.hash(name, salt);
                 let user = yield exports.usersModel.findOneAndUpdate({ phone: phone }, { password: password }).exec();
-                console.log(index);
             }
             s.status(200).send(users);
         }));

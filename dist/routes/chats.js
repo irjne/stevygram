@@ -51,7 +51,7 @@ router.get('/', users_1.authorization, (req, res) => __awaiter(void 0, void 0, v
                     }
                     return chat;
                 })));
-                res.status(200).send(chats);
+                res.status(200).json(chats);
             }
             else {
                 res.status(500).send("Error: chats not found.");
@@ -84,7 +84,7 @@ router.get('/:id/users', [
             let users;
             users = yield chatsModel.findOne({ id: id }, 'users').exec();
             if (users) {
-                res.status(200).send(users);
+                res.status(200).json(users);
             }
             else {
                 res.status(500).send("Error: id invalid.");
@@ -119,7 +119,7 @@ router.get('/:id/messages', [
             // and await MyModel.findOne({}).exec() if you're using async/await.
             let messages = yield chatsModel.findOne({ id: id }, 'messages').exec();
             if (messages) {
-                res.status(200).send(messages);
+                res.status(200).json(messages);
             }
             else {
                 res.status(500).send("Error: id invalid.");
@@ -155,7 +155,7 @@ router.get('/:id', [
             let chat;
             chat = yield chatsModel.findOne({ id: id }).exec();
             if (chat) {
-                res.status(200).send(chat);
+                res.status(200).json(chat);
             }
             else {
                 res.status(500).send("Error: id invalid.");
@@ -250,7 +250,7 @@ router.put('/:id/add-message', users_1.authorization, [
         let date = new Date();
         let chat = yield chatsModel.findOneAndUpdate({ id: id }, { $push: { "messages": { sender: sender, body: body, date: date } } }, { upsert: true, new: true }).exec();
         if (chat) {
-            return res.status(200).send(chat);
+            return res.status(200).json(chat);
         }
         else {
             return res.status(500).send("error!!!");
@@ -321,7 +321,7 @@ router.post('/', users_1.authorization, [
             chat.save(err => {
                 if (err)
                     return res.status(500).send(err);
-                return res.status(200).send(chat);
+                return res.status(200).json(chat);
             });
         }
         catch (err) {

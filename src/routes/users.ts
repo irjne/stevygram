@@ -44,7 +44,7 @@ export const authorization = async (req: any, res: any, next: any) => {
 
 // connection to MongoDB database on cluster
 export const mongoDBConnection = async () => {
-    const host = "mongodb+srv://matteo:stevygram@fakecluster-ahthz.mongodb.net/stevygram0?retryWrites=true&w=majority";
+    const host = "mongodb+srv://matteo:stevygram@cluster0-q7lqh.mongodb.net/stevygram0?retryWrites=true&w=majority";
     mongoose.connect(host, {
         useNewUrlParser: true,
         useUnifiedTopology: true

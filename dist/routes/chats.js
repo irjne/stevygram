@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const express_validator_1 = require("express-validator");
-//import { }, userOnSession } from './users';
 const mongoose_1 = __importDefault(require("mongoose"));
 const users_1 = require("./users");
 // this statement prints plain mongoDB queries on terminal
@@ -111,7 +110,6 @@ router.get('/:id/messages', [
     users_1.mongoDBConnection();
     const id = req.params.id;
     try {
-        console.log(res.locals.userOnSession);
         if (res.locals.userOnSession) {
             // Mongoose async operations, like .save() and generic queries, 
             // return thenables (i.e. values with a "then" method). 
@@ -146,7 +144,6 @@ router.get('/:id', [
     users_1.mongoDBConnection();
     const id = req.params.id;
     try {
-        console.log(res.locals.userOnSession);
         if (res.locals.userOnSession) {
             // Mongoose async operations, like .save() and generic queries, 
             // return thenables (i.e. values with a "then" method). 

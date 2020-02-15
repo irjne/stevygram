@@ -1,6 +1,5 @@
 import express from 'express';
 import { body, param, validationResult, sanitizeParam, query } from 'express-validator';
-//import { }, userOnSession } from './users';
 import mongoose from 'mongoose';
 import { Chat } from '../lib/chats';
 import { mongoDBConnection, authorization, usersSchema, usersModel } from './users';
@@ -104,7 +103,6 @@ router.get('/:id/messages', [
     mongoDBConnection();
     const id = req.params.id;
     try {
-        console.log(res.locals.userOnSession);
         if (res.locals.userOnSession) {
             // Mongoose async operations, like .save() and generic queries, 
             // return thenables (i.e. values with a "then" method). 
@@ -140,7 +138,6 @@ router.get('/:id', [
     const id = req.params.id;
 
     try {
-        console.log(res.locals.userOnSession);
         if (res.locals.userOnSession) {
             // Mongoose async operations, like .save() and generic queries, 
             // return thenables (i.e. values with a "then" method). 

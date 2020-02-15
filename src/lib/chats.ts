@@ -1,6 +1,3 @@
-import { promisify } from 'util';
-import { User, findUserByPhone } from './users';
-import * as fs from 'fs';
 import mongoose from 'mongoose';
 
 // export interface Message extends mongoose.Document {

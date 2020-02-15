@@ -229,6 +229,10 @@ router.post('/', [
     body('phone')
         .isString()
         .not().isEmpty()
+        .trim(),
+    body('password')
+        .isString()
+        .not().isEmpty()
         .trim()
 ], authorization, async (req: any, res: any) => {
     const errors = validationResult(req);
@@ -241,7 +245,7 @@ router.post('/', [
     const phone = req.body.phone;
     // password and its hashing
     const salt = await bcrypt.genSalt(5);
-    let password = await bcrypt.hash(name, salt);
+    let password = await bcrypt.hash(req.body.password, salt);
     try {
         mongoDBConnection();
         let user = new usersModel({ nickname, name, surname, phone, password });

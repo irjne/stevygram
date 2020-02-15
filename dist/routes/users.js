@@ -231,6 +231,10 @@ router.post('/', [
     express_validator_1.body('phone')
         .isString()
         .not().isEmpty()
+        .trim(),
+    express_validator_1.body('password')
+        .isString()
+        .not().isEmpty()
         .trim()
 ], exports.authorization, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);
@@ -243,7 +247,7 @@ router.post('/', [
     const phone = req.body.phone;
     // password and its hashing
     const salt = yield bcrypt_1.default.genSalt(5);
-    let password = yield bcrypt_1.default.hash(name, salt);
+    let password = yield bcrypt_1.default.hash(req.body.password, salt);
     try {
         exports.mongoDBConnection();
         let user = new exports.usersModel({ nickname, name, surname, phone, password });

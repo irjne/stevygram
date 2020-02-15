@@ -236,7 +236,7 @@ router.post('/', [
         .isString()
         .not().isEmpty()
         .trim()
-], exports.authorization, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });

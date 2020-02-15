@@ -146,9 +146,13 @@ router.get('/:id', [
             // return thenables (i.e. values with a "then" method). 
             // This means that you can do things like MyModel.findOne({}).then() 
             // and await MyModel.findOne({}).exec() if you're using async/await.
-            let chat: any;
-            chat = await chatsModel.findOne({ id: id }).exec();
+            let chat = await chatsModel.findOne({ id: id }).exec();
             if (chat) {
+                if (chat.users.length === 2) {
+                    const otherUserPhone = res.locals.userOnSession === chat.users[0] ? chat.users[1] : chat.users[0];
+                    const otherUser = await usersModel.find({ phone: otherUserPhone }).exec();
+                    chat.name = `${otherUser[0].name} ${otherUser[0].surname}`;
+                }
                 res.status(200).json(chat);
             } else {
                 res.status(500).send("Error: id invalid.");

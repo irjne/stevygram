@@ -152,9 +152,13 @@ router.get('/:id', [
             // return thenables (i.e. values with a "then" method). 
             // This means that you can do things like MyModel.findOne({}).then() 
             // and await MyModel.findOne({}).exec() if you're using async/await.
-            let chat;
-            chat = yield chatsModel.findOne({ id: id }).exec();
+            let chat = yield chatsModel.findOne({ id: id }).exec();
             if (chat) {
+                if (chat.users.length === 2) {
+                    const otherUserPhone = res.locals.userOnSession === chat.users[0] ? chat.users[1] : chat.users[0];
+                    const otherUser = yield users_1.usersModel.find({ phone: otherUserPhone }).exec();
+                    chat.name = `${otherUser[0].name} ${otherUser[0].surname}`;
+                }
                 res.status(200).json(chat);
             }
             else {

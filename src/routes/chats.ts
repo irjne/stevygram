@@ -67,14 +67,12 @@ router.get('/:id/users', [
     const id = req.params.id;
 
     try {
-        console.log(res.locals.userOnSession);
         if (res.locals.userOnSession) {
             // Mongoose async operations, like .save() and generic queries, 
             // return thenables (i.e. values with a "then" method). 
             // This means that you can do things like MyModel.findOne({}).then() 
             // and await MyModel.findOne({}).exec() if you're using async/await.
-            let users: any;
-            users = await chatsModel.findOne({ id: id }, 'users').exec();
+            let users = await chatsModel.find({ id: id }, 'users').exec();
             if (users) {
                 res.status(200).json(users);
             } else {

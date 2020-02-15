@@ -87,11 +87,11 @@ router.get('/:phone', [
     try {
         mongoDBConnection();
         let phone = req.params.phone;
-        usersModel.find({ phone: phone }, (err: any, users: any) => {
+        usersModel.find({ phone: phone }, (err: any, user: User) => {
             if (err) {
                 res.send("Error!");
             } else {
-                res.json(users);
+                res.json(user);
             }
         });
     }

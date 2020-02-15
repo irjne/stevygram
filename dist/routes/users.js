@@ -93,12 +93,12 @@ router.get('/:phone', [
     try {
         exports.mongoDBConnection();
         let phone = req.params.phone;
-        exports.usersModel.find({ phone: phone }, (err, users) => {
+        exports.usersModel.find({ phone: phone }, (err, user) => {
             if (err) {
                 res.send("Error!");
             }
             else {
-                res.json(users);
+                res.json(user);
             }
         });
     }

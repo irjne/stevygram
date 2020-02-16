@@ -22,7 +22,6 @@ mongoose_1.default.set('debug', true);
 // defining schema and model of users collection
 const Schema = mongoose_1.default.Schema;
 exports.usersSchema = new Schema({
-    //_id: mongoose.Types.ObjectId,
     name: String,
     surname: String,
     nickname: String,
@@ -41,12 +40,9 @@ exports.authorization = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         const payload = jsonwebtoken_1.default.verify(token, privateKey);
         //locally (on server) storing user's phone on for userOnSession
         res.locals.userOnSession = Object.values(payload)[0];
-        // console.log("Object.values(payload)[0] = " + Object.values(payload)[0]);
-        // console.log(res.locals.userOnSession);
         next();
     }
     catch (error) {
-        //console.log(error);
         return res.status(500).send(`Unexpected error: ${error}`);
     }
 });
@@ -59,11 +55,10 @@ exports.mongoDBConnection = () => __awaiter(void 0, void 0, void 0, function* ()
     });
     var db = mongoose_1.default.connection;
     db.on('error', function () {
-        console.error('Connection	error!\n');
+        console.error('Connection error!\n');
     });
     db.once('open', function () {
-        console.log('DB	connection	Ready\n');
-        //console.log(mongoose.connection.db.collections()); // [{ name: 'dbname.myCollection' }]
+        console.log('DB	connection ready\n');
     });
 });
 // it returns all users
@@ -147,8 +142,8 @@ router.put('/:phone', [
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-    const phone = req.params.phone; // param
-    const { nickname, name, surname } = req.body; // body
+    const phone = req.params.phone;
+    const { nickname, name, surname } = req.body;
     if (!nickname && !name && !surname) {
         return res.status(400).json({ errors: "Nickname or fullname (name, surname) are required" });
     }
@@ -271,7 +266,7 @@ router.post('/login', [
         .isString()
         .not().isEmpty()
         .trim(),
-], (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = express_validator_1.validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -288,10 +283,8 @@ router.post('/login', [
             return res.status(400).send({ message: "The password is not valid." });
         }
         const token = jsonwebtoken_1.default.sign({ phone: phone, password: password }, privateKey, { expiresIn: '5h' });
-        //authorization(token);
         res.send({
             message: "The username and password combination is correct!",
-            //user: user,
             token: token
         });
     }

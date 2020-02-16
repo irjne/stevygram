@@ -1,10 +1,10 @@
+import { Request, Response, NextFunction } from 'express';
 import express from 'express';
 import { body, param, validationResult, query } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 import { User } from '../lib/users';
-import { exec } from 'child_process';
 
 // this statement prints plain mongoDB queries on terminal
 mongoose.set('debug', true);
@@ -12,7 +12,6 @@ mongoose.set('debug', true);
 // defining schema and model of users collection
 const Schema = mongoose.Schema;
 export const usersSchema = new Schema({
-    //_id: mongoose.Types.ObjectId,
     name: String,
     surname: String,
     nickname: String,
@@ -27,17 +26,14 @@ const router = express.Router();
 
 // token validation system
 const privateKey = "MIIBPAIBAAJBAKcm16uoSgb36jlNsApBQf36uz17EPbkRLWAbW+8oQs2qExo68QBvNQWrriPnmOdYgmJrBJZCw9nbIEne5eRZKcCAwEAAQJBAII/pjdAv86GSKG2g8K57y51vom96A46+b9k/+Hd3q/Y+Mf4VxaXcMk8VkdQbY4zCkQCgmdyB8zAhIoobikU3CECIQDXxsKDIuXbt/V/+s7YyJS87JO87VAc01kEzKzhxRgfkwIhAMZPoAl4JpHsHsdgYPXln4L4SEEbL/R6DfUdvtXPK4sdAiEAv9V0bxPimVHWUF6R8Ud6fPAzdJ7jP41ishKpjNsmVEMCIQCZt77lmCzNj6mMAjkmYgdzDeF0Fg7mAnYvOg9izGOEQQIgchiD1OLZQCUuETiBiOLJ9NWWVWK5enEK4JhI3fj/teQ=";
-export const authorization = async (req: any, res: any, next: any) => {
+export const authorization = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const token = req.query.token;
         const payload = jwt.verify(token, privateKey);
         //locally (on server) storing user's phone on for userOnSession
         res.locals.userOnSession = Object.values(payload)[0];
-        // console.log("Object.values(payload)[0] = " + Object.values(payload)[0]);
-        // console.log(res.locals.userOnSession);
         next();
     } catch (error) {
-        //console.log(error);
         return res.status(500).send(`Unexpected error: ${error}`);
     }
 };
@@ -51,17 +47,16 @@ export const mongoDBConnection = async () => {
     });
     var db = mongoose.connection;
     db.on('error', function () {
-        console.error('Connection	error!\n');
+        console.error('Connection error!\n');
     });
     db.once('open', function () {
-        console.log('DB	connection	Ready\n');
-        //console.log(mongoose.connection.db.collections()); // [{ name: 'dbname.myCollection' }]
+        console.log('DB	connection ready\n');
     });
 };
 
 // it returns all users
 router.get('/', [
-], authorization, async (req: any, res: any) => {
+], authorization, async (req: Request, res: Response) => {
     try {
         mongoDBConnection();
         if (res.locals.userOnSession) {
@@ -83,7 +78,7 @@ router.get('/:phone', [
     param('phone')
         .isString()
         .trim()
-], authorization, async (req: any, res: any) => {
+], authorization, async (req: Request, res: Response) => {
     try {
         mongoDBConnection();
         let phone = req.params.phone;
@@ -105,7 +100,7 @@ router.get('/:name', [
     param('name')
         .isString()
         .trim()
-], authorization, async (req: any, res: any) => {
+], authorization, async (req: Request, res: Response) => {
     try {
         mongoDBConnection();
         let name = req.params.name;
@@ -136,13 +131,13 @@ router.put('/:phone', [
         .isString(),
     body('surname')
         .isString(),
-], authorization, async (req: any, res: any) => {
+], authorization, async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-    const phone = req.params.phone; // param
-    const { nickname, name, surname } = req.body; // body
+    const phone = req.params.phone;
+    const { nickname, name, surname } = req.body;
     if (!nickname && !name && !surname) {
         return res.status(400).json({ errors: "Nickname or fullname (name, surname) are required" });
     }
@@ -187,7 +182,7 @@ router.put('/add-contact/:phone', [
         .isString()
         .not().isEmpty()
         .trim(),
-], authorization, async (req: any, res: any) => {
+], authorization, async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -234,7 +229,7 @@ router.post('/', [
         .isString()
         .not().isEmpty()
         .trim()
-], async (req: any, res: any) => {
+], async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -268,7 +263,7 @@ router.post('/login', [
         .isString()
         .not().isEmpty()
         .trim(),
-], async (req: any, res: any, next: any) => {
+], async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -288,10 +283,8 @@ router.post('/login', [
             { phone: phone, password: password },
             privateKey,
             { expiresIn: '5h' });
-        //authorization(token);
         res.send({
             message: "The username and password combination is correct!",
-            //user: user,
             token: token
         });
     }
@@ -305,7 +298,7 @@ router.delete('/:phone', [
     param('phone')
         .isString()
         .trim()
-], authorization, async (req: any, res: any) => {
+], authorization, async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -334,7 +327,7 @@ router.delete('/remove-contact/:phone', [
     param('phone')
         .isString()
         .trim()
-], authorization, async (req: any, res: any) => {
+], authorization, async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });

@@ -1,3 +1,4 @@
+import { Request, Response } from "express";
 import express from 'express';
 import { body, param, validationResult, sanitizeParam, query } from 'express-validator';
 import mongoose from 'mongoose';
@@ -26,7 +27,7 @@ let chatsModel = mongoose.model<Chat>("chat", chatsSchema);
 const router = express.Router();
 
 // returns either user's chats or whole chats collection 
-router.get('/', authorization, async (req: any, res: any) => {
+router.get('/', authorization, async (req: Request, res: Response) => {
     try {
         mongoDBConnection();
         let chats: Chat[];
@@ -58,7 +59,7 @@ router.get('/:id/users', [
     param('id')
         .isNumeric(),
     sanitizeParam('id').toInt()
-], authorization, async (req: any, res: any) => {
+], authorization, async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -93,7 +94,7 @@ router.get('/:id/messages', [
     param('id')
         .isNumeric(),
     sanitizeParam('id').toInt()
-], authorization, async (req: any, res: any) => {
+], authorization, async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -127,7 +128,7 @@ router.get('/:id', [
     param('id')
         .isNumeric(),
     sanitizeParam('id').toInt()
-], authorization, async (req: any, res: any) => {
+], authorization, async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -174,7 +175,7 @@ router.put('/:id', authorization, [
     body('name')
         .isString(),
     sanitizeParam('id').toInt()
-], async (req: any, res: any) => {
+], async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!req.body.description && !req.body.name) {
         return res.status(400).json({
@@ -228,7 +229,7 @@ router.put('/:id/add-message', authorization, [
         .trim()
         .isString(),
     sanitizeParam('id').toInt()
-], async (req: any, res: any) => {
+], async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!req.body.sender && !req.body.body) {
         return res.status(400).json({ Error: "Sender and body are required" });
@@ -264,7 +265,7 @@ router.delete('/:id', authorization, [
     param('id')
         .isNumeric(),
     sanitizeParam('id').toInt()
-], async (req: any, res: any) => {
+], async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -297,7 +298,7 @@ router.post('/', authorization, [
         .not().isEmpty(),
     body('users')
         .trim()
-], async (req: any, res: any) => {
+], async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });

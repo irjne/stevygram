@@ -8,5 +8,4 @@ export interface Chat extends mongoose.Document {
     messages: Object[];
     lastMessage: Object;
 }
-export declare const directory: string;
 //# sourceMappingURL=chats.d.ts.map

@@ -8,4 +8,9 @@ export interface Chat extends mongoose.Document {
     messages: Object[];
     lastMessage: Object;
 }
+export interface Message {
+    sender: string;
+    body: string;
+    date: Date;
+}
 //# sourceMappingURL=chats.d.ts.map

@@ -18,5 +18,14 @@ const router = express_1.default.Router();
 router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.json('I\'m alive');
 }));
+router.get("/socket.io", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // http://localhost:3005/socket.io/?EIO=3&transport=polling&t=N1F3sMZ
+    const { EIO, transport, t } = req.query;
+    console.log(req.query);
+}));
+router.get("/socket.io/send-message", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // http://localhost:3005/socket.io/?EIO=3&transport=polling&t=N1F3sMZ
+    console.log('prova a muzzo');
+}));
 exports.default = router;
 //# sourceMappingURL=main.js.map

@@ -1,55 +1,34 @@
 # 📱 STEVYGRAM
 
-Stevygram is a basilar version of Telegram: it manages information of users, chats and correlated messages. 
-It uses JSON files to store its data; its APIs are based on REST paradigm.  
+Stevygram is a RESTfull and basic instant messaging service: it manages information of users, chats or groups and correlated messages. 
+It uses a MongoDB database to store its data and runs on a NodeJS server.
 
 Created by [@irjne](https://github.com/irjne), [@erocookv5](https://github.com/erocookv5), [@clacchisi](https://github.com/clacchisi), [@GlitchXCIV](https://github.com/GlitchXCIV), [@DarioLag96](https://github.com/Dariolag96)
 
 
-## 📕 STRUCTURE
-
-
-All methods belong to the *index.ts* library.
-In particular, they are:
- - `addUser  =  async (nickname:  string, name:  string, surname:  string, phone:  string):  Promise<string  |  any>`: allows to add a new user in the Stevygram DB; 
- - `addChat  =  async (id:  number, name:  string, description:  string, users:  string[]):  Promise<string  |  any>`: allows to add a new chat in the Stevygram DB;
- - `getAllChats  =  async ():  Promise<object  |  any`: returns all chats, as the name suggests 😝;
- - `getAllUsers  =  async ():  Promise<object  |  any>`: returns all users, as the name suggests;
- - `getUsersByChatId  =  async (id:  number):  Promise<object  |  any>`: returns all users of a specific chat (selected by id); 
- - `getInfoByChatId  =  async (id:  number):  Promise<object[] |  any>`: returns info (name, description) of a specific chat (selected by id); 
- - `getMessagesByChatId  =  async (id:  number):  Promise<object  |  any>`: returns relative info (sender, body, date) of all messages of a specific chat (selected by id);
- - `changeInfoByChatId  =  async (id:  number, name?:  string, description?:  string):  Promise<string  |  any>`:  modifies the reported informations of a specific chat (selected by id); 
- - `changeUserByPhone  =  async (phone:  string, nickname?:  string, name?:  string, surname?:  string):  Promise<string  |  any>`: modifies the expressed informations of a specific user (selected by phone); 
- - `searchByChatId  =  async (id:  number, sender?:  string, word?:  string):  Promise<string  |  any>`: returns the chat information (id, name, messages and users) if exists;
- - `removeChatById  =  async (id:  number):  Promise<string  |  any>`: deletes a specified chat from Stevygram DB;
- - `removeUserByPhone  =  async (phone:  string):  Promise<string  |  any>`: deletes a specified user from Stevygram DB.
-
-
 ## 📗 HOW TO USE
-▶️ Run `npm start` if you want to run it manually
-
-▶️ Run `npm run dev` if you want to use nodemon
-
-☑️ Run `npm run test` if you want to test APIs
-
-
-## 📘 PATH, HERE WE ARE!
 You can use this path to access to the resources: 
 
  - ***chats***
-   - **GET** `/chats`: all chats in Stevygram;
-   - **GET** `/chats/:id/users`: all users of a specified chat;
-   - **GET** `/chats/:id`: all info of a specified chat;
-   - **GET** `/chats/:id/messages`: all messages of a specified chat;
-   - **POST** `/chats` + {id, name, description, users} : add a new chat;
-   - **PUT** `/chats/:id` +{name?, description?}: modifies info of a specified chat;
-   - **DELETE** `/chats/:id`: remove a specified chat.
+   - **GET** `https://stevygram.herokuapp.com/chats` > return all chats of the user in session;
+   - **GET** `https://stevygram.herokuapp.com/chats/:id/users` > return all users of a specific chat, choosed by id;
+   - **GET** `https://stevygram.herokuapp.com/chats/:id` > return informations of a specific chat, choosed by id;
+   - **GET** `https://stevygram.herokuapp.com/chats/:id/messages` > return all messages of a specified chat, choosed by id;
+   - **POST** `https://stevygram.herokuapp.com/chats` + body: {id, name, description?, users} > add a new chat;
+   - **PUT** `https://stevygram.herokuapp.com/chats/:id` + body: {name?, description?} > modify informations of a specified chat, choosed by id;
+   - **PUT** `https://stevygram.herokuapp.com/chats/:id/add-message` + body: {sender, body} > add a message in a specified chat, choosed by id; 
+   - **DELETE** `https://stevygram.herokuapp.com/chats/:id` > remove a specified chat, choosed by id.
 
  - ***users***
-   - **GET** `/users`: all users in Stevygram;
-   - **POST** `/users` + {phone, nickname?, name?, surname?} : add a new user;
-   - **PUT** `/users/:id` +{name?, description?}: modifies info of a specified chat;
-   - **DELETE** `/chats/:id`: remove a specified user.
+   - **GET** `https://stevygram.herokuapp.com/users` > return all contacts of the user in session; 
+   - **POST** `https://stevygram.herokuapp.com/users` + body: {phone, nickname?, name?, surname?} > add a new user in Stevygram;
+   - **PUT** `https://stevygram.herokuapp.com/users/:id` + body: {name?, description?} > modify informations of a specified user, choosed by id;
+   - **PUT** `https://stevygram.herokuapp.com/users/add-contact/:phone` > add a contact in a specified user's phonebook;
+   - **DELETE** `https://stevygram.herokuapp.com/users/remove-contact/:phone` > remove a contact from an user's phonebook;
+   - **DELETE** `https://stevygram.herokuapp.com/chats/:id` > remove a specified user, choosed by id.
 
+## 📺 PRESENTATION 
+
+[Stevygram](https://drive.google.com/file/d/10mCoeioAgRIoNKiJwrDZ8oqXUpWGqJ0Y/view?usp=sharing)
 
 

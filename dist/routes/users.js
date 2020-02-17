@@ -48,9 +48,9 @@ exports.authorization = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
 });
 // connection to MongoDB database on cluster
 exports.mongoDBConnection = () => __awaiter(void 0, void 0, void 0, function* () {
-    //const host = "mongodb+srv://matteo:stevygram@cluster0-q7lqh.mongodb.net/stevygram0?retryWrites=true&w=majority";
+    const host = "mongodb+srv://matteo:stevygram@cluster0-q7lqh.mongodb.net/stevygram0?retryWrites=true&w=majority";
     // otherwise, use this:
-    const host = "mongodb+srv://matteo:stevygram@fakecluster-ahthz.mongodb.net/stevygram0?retryWrites=true&w=majority";
+    //const host = "mongodb+srv://matteo:stevygram@fakecluster-ahthz.mongodb.net/stevygram0?retryWrites=true&w=majority";
     mongoose_1.default.connect(host, {
         useNewUrlParser: true,
         useUnifiedTopology: true

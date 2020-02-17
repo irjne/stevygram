@@ -250,15 +250,10 @@ router.put('/:id/add-message', users_1.authorization, [
         let date = new Date();
         let chat = yield chatsModel.findOneAndUpdate({ id: id }, { $push: { "messages": { sender: sender, body: body, date: date } } }, { upsert: true, new: true }).exec();
         if (chat) {
-            let phonebook = yield users_1.usersModel.find({ phone: res.locals.userOnSession }, 'phonebook').exec();
-            if (phonebook.includes(res.locals.userOnSession) === true) {
+            //let phonebook = await usersModel.find({ phone: res.locals.userOnSession }, 'phonebook').exec();
+            if (chat.users.includes(res.locals.userOnSession) === true) {
                 app_1.io.emit("add-message", {
                     event: "you've just received a message from someone, please check your own chats!"
-                });
-            }
-            else {
-                app_1.io.emit("add-message", {
-                    event: "Don't worry, it's not your concern."
                 });
             }
             return res.status(200).json(chat);

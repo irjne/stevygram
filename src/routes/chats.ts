@@ -253,14 +253,10 @@ router.put('/:id/add-message', authorization, [
             { $push: { "messages": { sender: sender, body: body, date: date } } },
             { upsert: true, new: true }).exec();
         if (chat) {
-            let phonebook = await usersModel.find({ phone: res.locals.userOnSession }, 'phonebook').exec();
-            if (phonebook.includes(res.locals.userOnSession) === true) {
+            //let phonebook = await usersModel.find({ phone: res.locals.userOnSession }, 'phonebook').exec();
+            if (chat.users.includes(res.locals.userOnSession) === true) {
                 io.emit("add-message", {
                     event: "you've just received a message from someone, please check your own chats!"
-                });
-            } else {
-                io.emit("add-message", {
-                    event: "Don't worry, it's not your concern."
                 });
             }
             return res.status(200).json(chat);

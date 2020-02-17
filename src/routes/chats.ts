@@ -4,6 +4,8 @@ import { body, param, validationResult, sanitizeParam, query } from 'express-val
 import mongoose from 'mongoose';
 import { Chat } from '../lib/chats';
 import { mongoDBConnection, authorization, usersSchema, usersModel } from './users';
+import { io } from "../app";
+import { User } from "../lib/users";
 
 // this statement prints plain mongoDB queries on terminal
 mongoose.set('debug', true);
@@ -251,6 +253,16 @@ router.put('/:id/add-message', authorization, [
             { $push: { "messages": { sender: sender, body: body, date: date } } },
             { upsert: true, new: true }).exec();
         if (chat) {
+            let phonebook = await usersModel.find({ phone: res.locals.userOnSession }, 'phonebook').exec();
+            if (phonebook.includes(res.locals.userOnSession) === true) {
+                io.emit("add-message", {
+                    event: "you've just received a message from someone, please check your own chats!"
+                });
+            } else {
+                io.emit("add-message", {
+                    event: "Don't worry, it's not your concern."
+                });
+            }
             return res.status(200).json(chat);
         } else {
             return res.status(500).send("error!!!");
